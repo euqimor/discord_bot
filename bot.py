@@ -10,8 +10,8 @@ bot = commands.Bot(command_prefix='?', description=description)
 def load_game_suggestions():
     suggestions = {}
     os.chdir(os.path.expanduser('~/bothelper/'))
-    try:
-        load_data('suggestions')
+    # try:
+    suggestions = load_data('suggestions')
     # except:
     #     pass
     return suggestions
