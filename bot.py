@@ -95,20 +95,27 @@ async def remove(data):
             if suggestions[name] == set({}):
                 del suggestions[name]
             save_data(suggestions, 'suggestions')
-            await bot.say('Deleted '+game+' from '+name+'\'s suggestions')
+            await bot.say('Successfully deleted '+game+' from '+name+'\'s suggestions')
     else:
         await bot.say('You cannot delete a game you didn\'t suggest')
 
 @bot.command(pass_context=True)
 async def adminremove(data):
-    """Adds game suggestion"""
+    """Removes game from every suggestion"""
     name = str(data.message.author.nick)
     role_obj_list = data.message.author.roles
     game = ' '.join(data.message.content[13:].split())
     roles = []
     for role in role_obj_list:
         roles.append(role.name)
-    await bot.say(str(roles))
+    if 'Admin' in roles:
+        for name in suggestions:
+            if game in suggestions[name]:
+                suggestions[name].remove(game)
+        save_data(suggestions, 'suggestions')
+        await bot.say('Successfully deleted ' + game + ' from suggestions')
+    else:
+        await bot.say('You need to be an Admin to issue this command')
 
 
 if __name__ == '__main__':
