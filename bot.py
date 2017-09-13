@@ -4,9 +4,34 @@ import random
 import os
 
 description = '''An awkward attempt at making a discord bot'''
-bot = commands.Bot(command_prefix='?', description=description)
-
 os.chdir(os.path.expanduser('~/bothelper/'))
+suggestions = {}
+
+def save_data(data, filename):
+    '''
+    :param data: data to be stored into a file
+    :param filename: filename to save data to
+    :return: None, saves dict as a file for future usage
+    '''
+    with open(filename, 'w') as file:
+        file.write(str(data))
+
+def load_data(filename):
+    '''
+    :param filename: file from which to load the data
+    :return: returns eval() of the file contents
+    '''
+    data = ''
+    try:
+        with open(filename) as file:
+            data = eval(file.read())
+        return data
+    except(FileNotFoundError):
+        print('File not found')
+    except:
+        print('Something went wrong during data evaluation')
+
+bot = commands.Bot(command_prefix='?', description=description)
 
 @bot.event
 async def on_ready():
@@ -18,6 +43,27 @@ async def on_ready():
 @bot.command()
 async def suggested():
     """Prints games suggested so far"""
+    try:
+        with open('suggestions') as file:
+            message = ''
+            for line in file:
+                message += line+'\n'
+            message += author.roles
+            await bot.say(message)
+    except(FileNotFoundError):
+        await bot.say('Nothing has been suggested so far')
+
+@bot.command(pass_context=True)
+async def suggest(data):
+    """Adds game suggestion"""
+    await bot.say('Message content: '+data.Message.content)
+    await bot.say('Name: '+data.Message.author.name)
+    await bot.say('Nick: '+data.Message.author.nick)
+
+
+@bot.command()
+async def suggest():
+    """Adds a game to the suggested list"""
     try:
         with open('suggestions') as file:
             message = ''
@@ -72,5 +118,6 @@ async def cool(ctx):
 async def _bot():
     """Is the bot cool?"""
     await bot.say('Yes, the bot is cool.')
+
 
 bot.run('MzQ3ODQxOTExNjE4MjczMjkz.DHeSCg.Dqbmw8CecxiBHIqKbooRbkLlVWc')
