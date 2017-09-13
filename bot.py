@@ -56,7 +56,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    client.change_presence(game=discord.Game(name='my game'))
+    await client.change_presence(game=discord.Game(name='my game'))
 
 @bot.command()
 async def games():
