@@ -59,7 +59,8 @@ async def on_ready():
 
 @bot.command()
 async def games():
-    """Prints games suggested so far"""
+    """Prints games suggested so far
+    grouped by suggester's name"""
     message = ''
     try:
         for name in suggestions:
@@ -71,9 +72,26 @@ async def games():
     except:
         await bot.say('Nothing has been suggested so far')
 
+@bot.command()
+async def list():
+    """Prints games suggested so far
+    in one list"""
+    try:
+        set_of_games = set({})
+        message = '```\rGames suggested so far:'
+        for name in suggestions:
+            for game in suggestions[name]:
+                set_of_games.add(game)
+        for game in set_of_games:
+            message+='\r'+game
+        message+='```'
+        await bot.say(message)
+    except:
+        await bot.say('Nothing has been suggested yet')
+
 @bot.command(pass_context=True)
 async def suggest(data):
-    """Adds game suggestion"""
+    """Adds a game suggestion"""
     name = str(data.message.author.nick)
     game = ' '.join(data.message.content[9:].split())
     if name in suggestions:
@@ -85,7 +103,8 @@ async def suggest(data):
 
 @bot.command(pass_context=True)
 async def remove(data):
-    """Adds game suggestion"""
+    """Removes game suggestion if the game
+    was suggested by the user issuing the command"""
     name = str(data.message.author.nick)
     game = ' '.join(data.message.content[8:].split())
     if name in suggestions:
@@ -100,7 +119,8 @@ async def remove(data):
 
 @bot.command(pass_context=True)
 async def adminremove(data):
-    """Removes game from every suggestion"""
+    """Removes game from every suggestion,
+    command only available to Admin role"""
     name = str(data.message.author.nick)
     role_obj_list = data.message.author.roles
     game = ' '.join(data.message.content[13:].split())
