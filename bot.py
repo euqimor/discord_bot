@@ -144,4 +144,4 @@ async def adminremove(data):
 
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
-    bot.run('MzQ3ODQxOTExNjE4MjczMjkz.DHeSCg.Dqbmw8CecxiBHIqKbooRbkLlVWc')
+    bot.run('MzU3NjUyMTE3MTQ3NzQ2MzA2.DJtBFg.Ph9XfkThb6HM9W7KJ9Ud7fSxkYc')
