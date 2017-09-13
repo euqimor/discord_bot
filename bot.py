@@ -56,6 +56,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    client.change_presence(game=discord.Game(name='my game'))
 
 @bot.command()
 async def games():
@@ -145,4 +146,3 @@ async def adminremove(data):
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
     bot.run('MzU3NjUyMTE3MTQ3NzQ2MzA2.DJtBFg.Ph9XfkThb6HM9W7KJ9Ud7fSxkYc')
-    client.change_presence(game=discord.Game(name='my game'))
