@@ -3,14 +3,25 @@ from discord.ext import commands
 import random
 import os
 
+def bot_launch(prefix='?'):
+    description = '''An awkward attempt at making a discord bot'''
+    bot = commands.Bot(command_prefix=prefix, description=description)
+    return bot
+
+def load_game_suggestions():
+    suggestions = {}
+    os.chdir(os.path.expanduser('~/bothelper/'))
+    try:
+        load_data('suggestions')
+    except:
+        pass
+    return suggestions
+
+
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # DON'T FORGET TO CHANGE NICK BACK TO NAME IN SUGGEST and uncomment save data
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
-description = '''An awkward attempt at making a discord bot'''
-os.chdir(os.path.expanduser('~/bothelper/'))
-suggestions = {}
 
 def save_data(data, filename):
     '''
@@ -36,7 +47,7 @@ def load_data(filename):
     except:
         print('Something went wrong during data evaluation')
 
-bot = commands.Bot(command_prefix='?', description=description)
+
 
 @bot.event
 async def on_ready():
@@ -51,7 +62,7 @@ async def games():
     message = ''
     try:
         for name in suggestions:
-            message+='```'+name
+            message+='```\r'+name+'has suggested:'
             for game in suggestions[name]:
                 message+='\r'+game
             message+='```'
@@ -70,7 +81,7 @@ async def suggest(data):
         suggestions[name]=[game]
     await bot.say(name+' suggested '+game)
     await bot.say(str(suggestions))
-    # save_data(suggestions,'suggestions')
+    save_data(suggestions,'suggestions')
 
 
 @bot.command()
@@ -113,5 +124,7 @@ async def _bot():
     """Is the bot cool?"""
     await bot.say('Yes, the bot is cool.')
 
-
-bot.run('MzQ3ODQxOTExNjE4MjczMjkz.DHeSCg.Dqbmw8CecxiBHIqKbooRbkLlVWc')
+if __name__ == '__main__':
+    bot = bot_launch()
+    suggestions = load_game_suggestions()
+    bot.run('MzQ3ODQxOTExNjE4MjczMjkz.DHeSCg.Dqbmw8CecxiBHIqKbooRbkLlVWc')
