@@ -6,7 +6,7 @@ import os
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='?', description=description)
 
-os.chdir('~/bothelper/')
+os.chdir(os.path.expanduser('~/bothelper/'))
 
 @bot.event
 async def on_ready():
