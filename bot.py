@@ -22,7 +22,7 @@ def load_game_suggestions():
 
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# DON'T FORGET TO CHANGE NICK BACK TO NAME IN SUGGEST and uncomment save data
+# DON'T FORGET TO CHANGE NICK BACK TO NAME IN SUGGEST
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -83,6 +83,27 @@ async def suggest(data):
     await bot.say(name+' suggested '+game)
     await bot.say(str(suggestions))
     save_data(suggestions,'suggestions')
+
+@bot.command(pass_context=True)
+async def remove(data):
+    """Adds game suggestion"""
+    name = str(data.message.author.nick)
+    game = ' '.join(data.message.content[8:].split())
+    if name in suggestions:
+        if game in suggestions[name]:
+            suggestions[name].remove(game)
+            save_data(suggestions, 'suggestions')
+            await bot.say('Deleted '+game+' from '+name+'\'s suggestions')
+    else:
+        await bot.say('You cannot delete a game you didn\'t suggest')
+
+@bot.command(pass_context=True)
+async def adminremove(data):
+    """Adds game suggestion"""
+    name = str(data.message.author.nick)
+    roles = data.message.author.roles
+    game = ' '.join(data.message.content[13:].split())
+    await bot.say(str(roles))
 
 
 if __name__ == '__main__':
