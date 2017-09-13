@@ -92,6 +92,8 @@ async def remove(data):
     if name in suggestions:
         if game in suggestions[name]:
             suggestions[name].remove(game)
+            if suggestions[name] == set({}):
+                del suggestions[name]
             save_data(suggestions, 'suggestions')
             await bot.say('Deleted '+game+' from '+name+'\'s suggestions')
     else:
