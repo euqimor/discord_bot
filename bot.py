@@ -20,8 +20,10 @@ async def suggested():
     """Prints games suggested so far"""
     try:
         with open('suggestions') as file:
+            message = ''
             for line in file:
-                await bot.say(line)
+                message += 'line\n'
+            await bot.say(message)
     except(FileNotFoundError):
         await bot.say('Nothing has been suggested so far')
 
