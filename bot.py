@@ -61,7 +61,7 @@ async def games():
     message = ''
     try:
         for name in suggestions:
-            message+='```\r'+name+'has suggested:'
+            message+='```\r'+'Suggested by '+name+':'
             for game in suggestions[name]:
                 message+='\r'+game
             message+='```'
@@ -75,9 +75,9 @@ async def suggest(data):
     name = str(data.message.author.nick)
     game = ' '.join(data.message.content[9:].split())
     if name in suggestions:
-        suggestions[name].append(game)
+        suggestions[name].add(game)
     else:
-        suggestions[name]=[game]
+        suggestions[name]= {game}
     await bot.say(name+' suggested '+game)
     await bot.say(str(suggestions))
     save_data(suggestions,'suggestions')
