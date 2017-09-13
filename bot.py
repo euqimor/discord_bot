@@ -62,23 +62,6 @@ async def suggest(data):
 
 
 @bot.command()
-async def suggest():
-    """Adds a game to the suggested list"""
-    try:
-        with open('suggestions') as file:
-            message = ''
-            for line in file:
-                message += line+'\n'
-            await bot.say(message)
-    except(FileNotFoundError):
-        await bot.say('Nothing has been suggested so far')
-
-@bot.command()
-async def add(left : int, right : int):
-    """Adds two numbers together."""
-    await bot.say(left + right)
-
-@bot.command()
 async def roll(dice : str):
     """Rolls a dice in NdN format."""
     try:
@@ -86,7 +69,6 @@ async def roll(dice : str):
     except Exception:
         await bot.say('Format has to be in NdN!')
         return
-
     result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
     await bot.say(result)
 
