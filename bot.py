@@ -124,5 +124,5 @@ async def _bot():
     await bot.say('Yes, the bot is cool.')
 
 if __name__ == '__main__':
-    suggestions = load_game_suggestions()
     bot.run('MzQ3ODQxOTExNjE4MjczMjkz.DHeSCg.Dqbmw8CecxiBHIqKbooRbkLlVWc')
+    suggestions = load_game_suggestions()
