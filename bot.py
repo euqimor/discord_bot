@@ -1,11 +1,10 @@
 import discord
 from discord.ext import commands
-import random
 import os
 
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='?', description=description)
-
+client = discord.Client()
 
 
 def load_game_suggestions():
@@ -146,4 +145,4 @@ async def adminremove(data):
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
     bot.run('MzU3NjUyMTE3MTQ3NzQ2MzA2.DJtBFg.Ph9XfkThb6HM9W7KJ9Ud7fSxkYc')
-    discord.Client.change_presence(game=discord.Game(name='my game'))
+    client.change_presence(game=discord.Game(name='my game'))
