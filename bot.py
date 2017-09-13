@@ -4,7 +4,6 @@ import os
 
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='?', description=description)
-client = discord.Client()
 
 
 def load_game_suggestions():
@@ -52,6 +51,7 @@ def load_data(filename):
 
 @bot.event
 async def on_ready():
+    client = discord.Client()
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
