@@ -103,8 +103,11 @@ async def remove(data):
 async def adminremove(data):
     """Adds game suggestion"""
     name = str(data.message.author.nick)
-    roles = data.message.author.roles
+    role_obj_list = data.message.author.roles
     game = ' '.join(data.message.content[13:].split())
+    roles = []
+    for role in role_obj_list:
+        roles.append(role.name)
     await bot.say(str(roles))
 
 
