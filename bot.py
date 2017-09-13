@@ -12,8 +12,8 @@ def load_game_suggestions():
     os.chdir(os.path.expanduser('~/bothelper/'))
     try:
         load_data('suggestions')
-    except:
-        pass
+    # except:
+    #     pass
     return suggestions
 
 
@@ -124,5 +124,5 @@ async def _bot():
     await bot.say('Yes, the bot is cool.')
 
 if __name__ == '__main__':
-    bot.run('MzQ3ODQxOTExNjE4MjczMjkz.DHeSCg.Dqbmw8CecxiBHIqKbooRbkLlVWc')
     suggestions = load_game_suggestions()
+    bot.run('MzQ3ODQxOTExNjE4MjczMjkz.DHeSCg.Dqbmw8CecxiBHIqKbooRbkLlVWc')
