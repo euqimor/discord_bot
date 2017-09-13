@@ -51,12 +51,11 @@ def load_data(filename):
 
 @bot.event
 async def on_ready():
-    client = discord.Client()
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    await client.change_presence(game=discord.Game(name='my game'))
+    await bot.change_presence(game=discord.Game(name='my game'))
 
 @bot.command()
 async def games():
