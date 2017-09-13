@@ -19,7 +19,7 @@ async def on_ready():
 async def suggested():
     """Prints games suggested so far"""
     try:
-        with 'suggestions' as file:
+        with open('suggestions') as file:
             for line in file:
                 await bot.say(line)
     except(FileNotFoundError):
