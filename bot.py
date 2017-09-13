@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
 import random
+import os
 
-description = '''An example bot to showcase the discord.ext.commands extension
-module.
-There are a number of utility commands being showcased here.'''
+description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='?', description=description)
+
+os.chdir('~/bothelper/')
 
 @bot.event
 async def on_ready():
@@ -13,6 +14,16 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+
+@bot.command()
+async def suggested():
+    """Prints games suggested so far"""
+    try:
+        with 'suggestions' as file:
+            for line in file:
+                await bot.say(line)
+    except(FileNotFoundError):
+        await bot.say('Nothing has been suggested so far')
 
 @bot.command()
 async def add(left : int, right : int):
