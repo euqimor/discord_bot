@@ -7,6 +7,7 @@ description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='?', description=description)
 
 
+
 def load_game_suggestions():
     '''
     :return: tries to load a dict of suggestions from a file,
@@ -145,3 +146,4 @@ async def adminremove(data):
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
     bot.run('MzU3NjUyMTE3MTQ3NzQ2MzA2.DJtBFg.Ph9XfkThb6HM9W7KJ9Ud7fSxkYc')
+    discord.Client.change_presence(game=discord.Game(name='my game'))
