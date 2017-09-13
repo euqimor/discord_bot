@@ -81,7 +81,6 @@ async def suggest(data):
     else:
         suggestions[name]= {game}
     await bot.say(name+' suggested '+game)
-    await bot.say(str(suggestions))
     save_data(suggestions,'suggestions')
 
 @bot.command(pass_context=True)
@@ -112,6 +111,8 @@ async def adminremove(data):
         for name in suggestions:
             if game in suggestions[name]:
                 suggestions[name].remove(game)
+                if suggestions[name] == set({}):
+                    del suggestions[name]
         save_data(suggestions, 'suggestions')
         await bot.say('Successfully deleted ' + game + ' from suggestions')
     else:
