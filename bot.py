@@ -4,7 +4,7 @@ import random
 import os
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# DON'T FORGET TO CHANGE NICK BACK TO NAME IN SUGGEST
+# DON'T FORGET TO CHANGE NICK BACK TO NAME IN SUGGEST and uncomment save data
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -46,16 +46,17 @@ async def on_ready():
     print('------')
 
 @bot.command()
-async def suggested():
+async def suggestions():
     """Prints games suggested so far"""
+    message = ''
     try:
-        with open('suggestions') as file:
-            message = ''
-            for line in file:
-                message += line+'\n'
-            message += author.roles
-            await bot.say(message)
-    except(FileNotFoundError):
+        for name in suggestions:
+            message+='```'+name
+            for game in suggestions[name]:
+                message+='\r'+game
+            message+='```'
+        await bot.say(message)
+    except:
         await bot.say('Nothing has been suggested so far')
 
 @bot.command(pass_context=True)
@@ -69,6 +70,7 @@ async def suggest(data):
         suggestions[name]=[game]
     await bot.say(name+' suggested '+game)
     await bot.say(str(suggestions))
+    # save_data(suggestions,'suggestions')
 
 
 @bot.command()
