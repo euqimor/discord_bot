@@ -105,6 +105,7 @@ async def adminremove(data):
     role_obj_list = data.message.author.roles
     game = ' '.join(data.message.content[13:].split())
     roles = []
+    names_to_delete = []
     for role in role_obj_list:
         roles.append(role.name)
     if 'Admin' in roles:
@@ -112,7 +113,9 @@ async def adminremove(data):
             if game in suggestions[name]:
                 suggestions[name].remove(game)
                 if suggestions[name] == set({}):
-                    del suggestions[name]
+                    names_to_delete.append(name)
+        for name in names_to_delete:
+            del suggestions[name]
         save_data(suggestions, 'suggestions')
         await bot.say('Successfully deleted ' + game + ' from suggestions')
     else:
