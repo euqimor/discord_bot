@@ -63,7 +63,10 @@ async def suggestions():
 async def suggest(data):
     """Adds game suggestion"""
     name = str(data.message.author.nick)
-    game = ' '.join(data.message.content[9:].split())
+    try:
+        game = ' '.join(data.message.content[9:].split())
+    except(TypeError):
+        game = data.message.content[9:].strip()
     if name in suggestions:
         suggestions[name].append(game)
     else:
