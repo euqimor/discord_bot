@@ -56,9 +56,14 @@ async def suggested():
 @bot.command(pass_context=True)
 async def suggest(data):
     """Adds game suggestion"""
-    await bot.say('Message content: '+data.message.content)
-    await bot.say('Name: '+data.message.author.name)
-    await bot.say('Nick: '+data.message.author.nick)
+    name = data.message.author.name
+    game = data.message.content[9:].strip()
+    if name in suggestions:
+        suggestions[name].append(game)
+    else:
+        suggestions[name]=[game]
+    await bot.say(name+' suggested '+game)
+    await bot.say(str(suggestions))
 
 
 @bot.command()
