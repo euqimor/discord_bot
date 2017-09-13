@@ -3,6 +3,11 @@ from discord.ext import commands
 import random
 import os
 
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# DON'T FORGET TO CHANGE NICK BACK TO NAME IN SUGGEST
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 description = '''An awkward attempt at making a discord bot'''
 os.chdir(os.path.expanduser('~/bothelper/'))
 suggestions = {}
@@ -56,8 +61,8 @@ async def suggested():
 @bot.command(pass_context=True)
 async def suggest(data):
     """Adds game suggestion"""
-    name = data.message.author.name
-    game = data.message.content[9:].strip()
+    name = str(data.message.author.nick)
+    game = ' '.join(data.message.content[9:].split())
     if name in suggestions:
         suggestions[name].append(game)
     else:
