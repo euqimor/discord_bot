@@ -3,10 +3,9 @@ from discord.ext import commands
 import random
 import os
 
-def bot_launch(prefix='?'):
-    description = '''An awkward attempt at making a discord bot'''
-    bot = commands.Bot(command_prefix=prefix, description=description)
-    return bot
+description = '''An awkward attempt at making a discord bot'''
+bot = commands.Bot(command_prefix='?', description=description)
+
 
 def load_game_suggestions():
     suggestions = {}
@@ -125,6 +124,5 @@ async def _bot():
     await bot.say('Yes, the bot is cool.')
 
 if __name__ == '__main__':
-    bot = bot_launch()
     suggestions = load_game_suggestions()
     bot.run('MzQ3ODQxOTExNjE4MjczMjkz.DHeSCg.Dqbmw8CecxiBHIqKbooRbkLlVWc')
