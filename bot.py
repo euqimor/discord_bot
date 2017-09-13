@@ -22,7 +22,7 @@ async def suggested():
         with open('suggestions') as file:
             message = ''
             for line in file:
-                message += 'line\n'
+                message += line+'\n'
             await bot.say(message)
     except(FileNotFoundError):
         await bot.say('Nothing has been suggested so far')
