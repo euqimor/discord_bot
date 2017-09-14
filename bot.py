@@ -81,7 +81,7 @@ async def echo(*, message: str):
     message = ' '.join(message.split())
     msg = await bot.say(message)
     sleep(3)
-    bot.delete_message(msg)
+    await bot.delete_message(msg)
 
 @bot.command()
 async def merriam(*, word: str):
