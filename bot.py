@@ -23,7 +23,7 @@ def load_game_suggestions():
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # DON'T FORGET TO CHANGE NICK BACK TO NAME IN SUGGEST
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# CHANGE BOT.RUN AND COMMAND_PREFIX BEFORE MERGING 
+# CHANGE BOT.RUN AND COMMAND_PREFIX BEFORE MERGING
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -146,4 +146,4 @@ async def adminremove(data):
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
     # bot.run('MzU3NjUyMTE3MTQ3NzQ2MzA2.DJtBFg.Ph9XfkThb6HM9W7KJ9Ud7fSxkYc')
-    bot.run('iJRGGYxqpjDy-iRUWRkvZm9-zFWYbscu')
+    bot.run('MzU3ODg3OTcwMjczMDAxNDcy.DJwzog.SDutum51myHyYMnGvIc_7_rYCZ8')
