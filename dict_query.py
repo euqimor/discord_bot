@@ -1,4 +1,5 @@
 import requests
+import re
 from string import ascii_lowercase as alphabet
 from bs4 import BeautifulSoup as Soup
 
