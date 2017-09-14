@@ -3,7 +3,7 @@ from discord.ext import commands
 import os
 
 description = '''An awkward attempt at making a discord bot'''
-bot = commands.Bot(command_prefix='?', description=description)
+bot = commands.Bot(command_prefix='$', description=description)
 
 
 def load_game_suggestions():
@@ -22,6 +22,8 @@ def load_game_suggestions():
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # DON'T FORGET TO CHANGE NICK BACK TO NAME IN SUGGEST
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# CHANGE BOT.RUN AND COMMAND_PREFIX BEFORE MERGING 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -141,7 +143,7 @@ async def adminremove(data):
     else:
         await bot.say('You need to be an Admin to issue this command')
 
-
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
-    bot.run('MzU3NjUyMTE3MTQ3NzQ2MzA2.DJtBFg.Ph9XfkThb6HM9W7KJ9Ud7fSxkYc')
+    # bot.run('MzU3NjUyMTE3MTQ3NzQ2MzA2.DJtBFg.Ph9XfkThb6HM9W7KJ9Ud7fSxkYc')
+    bot.run('iJRGGYxqpjDy-iRUWRkvZm9-zFWYbscu')
