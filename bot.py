@@ -81,16 +81,16 @@ async def echo(*, message: str):
     await bot.say(message)
 
 @bot.command()
-async def meriam(*, word: str):
+async def merriam(*, word: str):
     """Prints games suggested so far
     grouped by suggester's name"""
     word = ' '.join(word.split())
     # try:
-    cases = dict_query.query_meriam(word)
+    cases = dict_query.query_merriam(word)
     # except:
     #     await bot.say('Something went wrong during online query')
     # try:
-    phrase = dict_query.compose_meriam(cases)
+    phrase = dict_query.compose_merriam(cases, word)
     # except:
     #     await bot.say('Something went wrong during result parsing')
     await bot.say(phrase)

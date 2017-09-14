@@ -3,7 +3,7 @@ import re
 from string import ascii_lowercase as alphabet
 from bs4 import BeautifulSoup as Soup
 
-def query_meriam(word):
+def query_merriam(word):
     '''
     :param word: the word to search for in the dictionaries
     :return: a list of bs4.element.Tag objects in meriam xml format
@@ -17,7 +17,7 @@ def query_meriam(word):
     cases = soup.find_all(id=regex)
     return cases
 
-def compose_meriam(cases):
+def compose_merriam(cases, word):
     '''
     :param cases: a list of bs4.element.Tag objects in meriam xml format
     corresponding to the word's classes (adj., verb, etc)
