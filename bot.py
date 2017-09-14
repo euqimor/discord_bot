@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from . import dict_query
 import os
 
 description = '''An awkward attempt at making a discord bot'''
@@ -73,6 +74,21 @@ async def games():
         await bot.say(message)
     except:
         await bot.say('Nothing has been suggested so far')
+
+@bot.command()
+async def meriam(*, word: str):
+    """Prints games suggested so far
+    grouped by suggester's name"""
+    word = word.strip()
+    # try:
+    cases = dict_query.query_meriam(word)
+    # except:
+    #     await bot.say('Something went wrong during online query')
+    # try:
+    phrase = dict_query.compose_meriam(cases)
+    # except:
+    #     await bot.say('Something went wrong during result parsing')
+    await bot.say(phrase)
 
 @bot.command()
 async def list():
