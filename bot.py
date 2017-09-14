@@ -23,7 +23,7 @@ def load_game_suggestions():
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # DON'T FORGET TO CHANGE NICK BACK TO NAME IN SUGGEST
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# CHANGE BOT.RUN AND COMMAND_PREFIX BEFORE MERGING
+# CHANGE | BOT.RUN | COMMAND_PREFIX | PLAYING WITH |
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -57,7 +57,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    await bot.change_presence(game=discord.Game(name='with ponies'))
+    await bot.change_presence(game=discord.Game(name='with turrets'))
 
 @bot.command()
 async def games():
