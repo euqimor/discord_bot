@@ -77,6 +77,7 @@ async def games():
 
 @bot.command()
 async def echo(*, message: str):
+    message = ' '.join(message.split())
     await bot.say(message)
 
 @bot.command()
