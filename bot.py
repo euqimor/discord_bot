@@ -76,6 +76,10 @@ async def games():
         await bot.say('Nothing has been suggested so far')
 
 @bot.command()
+async def echo(*, message: str):
+    await bot.say(message)
+
+@bot.command()
 async def meriam(*, word: str):
     """Prints games suggested so far
     grouped by suggester's name"""
