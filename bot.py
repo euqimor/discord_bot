@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import dict_query
 import os
+from time import sleep
 
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
@@ -78,7 +79,9 @@ async def games():
 @bot.command()
 async def echo(*, message: str):
     message = ' '.join(message.split())
-    await bot.say(message)
+    msg = await bot.say(message)
+    sleep(3)
+    bot.delete_message(msg)
 
 @bot.command()
 async def merriam(*, word: str):
@@ -93,7 +96,12 @@ async def merriam(*, word: str):
     phrase = dict_query.compose_merriam(cases, word)
     # except:
     #     await bot.say('Something went wrong during result parsing')
-    await bot.say(phrase)
+    if phrase != '' and phrase is not None:
+        await bot.say(phrase)
+    else:
+        message = await bot.say('Could not find the word or something went wrong with the request')
+        sleep(4)
+        bot.delete_message(message)
 
 @bot.command()
 async def list():
