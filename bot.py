@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from . import dict_query
+import dict_query
 import os
 
 description = '''An awkward attempt at making a discord bot'''
