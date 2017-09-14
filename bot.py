@@ -76,12 +76,12 @@ async def games():
     except:
         await bot.say('Nothing has been suggested so far')
 
-@bot.command()
-async def echo(*, message: str):
-    message = ' '.join(message.split())
-    msg = await bot.say(message)
-    sleep(3)
-    await bot.delete_message(msg)
+# @bot.command()
+# async def echo(*, message: str):
+#     message = ' '.join(message.split())
+#     msg = await bot.say(message)
+#     sleep(3)
+#     await bot.delete_message(msg)
 
 @bot.command()
 async def merriam(*, word: str):
@@ -101,7 +101,7 @@ async def merriam(*, word: str):
     else:
         message = await bot.say('Could not find the word or something went wrong with the request')
         sleep(4)
-        bot.delete_message(message)
+        await bot.delete_message(message)
 
 @bot.command()
 async def list():
