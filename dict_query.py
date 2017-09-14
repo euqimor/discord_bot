@@ -38,3 +38,4 @@ def compose_merriam(cases, word):
             else:
                 phrase+=definition.next+'\n'
         phrase+='\n'
+    return phrase
