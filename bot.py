@@ -84,7 +84,7 @@ async def echo(*, message: str):
 async def meriam(*, word: str):
     """Prints games suggested so far
     grouped by suggester's name"""
-    word = word.strip()
+    word = ' '.join(word.split())
     # try:
     cases = dict_query.query_meriam(word)
     # except:
