@@ -82,9 +82,9 @@ async def echo(ctx, *, message: str):
     sleep(3)
     await msg.delete()
 
-@bot.command(pass_context=True)
+@bot.command()
 async def echo2(ctx, *, data: str):
-    await ctx.send(data)
+    await ctx.send(data+'| nick: '+ctx.author.nick)
 
 @bot.command()
 async def merriam(ctx, *, word: str):
@@ -123,7 +123,7 @@ async def list(ctx):
     except:
         await ctx.send('Nothing has been suggested yet')
 
-@bot.command(pass_context=True)
+@bot.command()
 async def suggest(ctx, data):
     """Adds a game suggestion"""
     name = str(data.message.author.nick)
@@ -135,7 +135,7 @@ async def suggest(ctx, data):
     await ctx.send(name+' suggested '+game)
     save_data(suggestions,'suggestions')
 
-@bot.command(pass_context=True)
+@bot.command()
 async def remove(ctx, data):
     """Removes game suggestion if the game
     was suggested by the user issuing the command"""
@@ -151,7 +151,7 @@ async def remove(ctx, data):
     else:
         await ctx.send('You cannot delete a game you didn\'t suggest')
 
-@bot.command(pass_context=True)
+@bot.command()
 async def adminremove(ctx, data):
     """Removes game from every suggestion,
     command only available to Admin role"""
