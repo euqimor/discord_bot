@@ -13,7 +13,7 @@ def query_merriam(word):
     url = 'http://www.dictionaryapi.com/api/v1/references/collegiate/xml/'+word.lower()+'?key='+key
     r = requests.get(url)
     soup = Soup(r.text,'xml')
-    regex = re.compile(word.lower()'(?:\[\d\])*$')
+    regex = re.compile(word.lower()+'(?:\[\d\])*$')
     cases = soup.find_all(id=regex)
     return cases
 
