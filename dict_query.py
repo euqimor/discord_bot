@@ -28,7 +28,7 @@ def compose_merriam(cases, word):
     for item in cases:
         y=0
         i+=1
-        phrase+='**'+word.lower()', '+item.find('fl').text+'**\n'
+        phrase+='**'+word.lower()+', '+item.find('fl').text+'**\n'
         phrase+='**'+str(i)+'**\n'
         for definition in item.find_all('dt'):
             phrase+='	'+alphabet[y]+' '
