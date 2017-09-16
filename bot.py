@@ -86,7 +86,7 @@ async def echo(ctx, *, message: str):
 async def echo2(ctx, *, data: str):
     await ctx.send(data+'| nick: '+ctx.author.nick)
 
-@bot.command()
+@bot.command(aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM'])
 async def merriam(ctx, *, word: str):
     """Prints games suggested so far
     grouped by suggester's name"""
@@ -106,7 +106,7 @@ async def merriam(ctx, *, word: str):
         sleep(4)
         bot.delete_message(message)
 
-@commands.command(name='merriam', aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM'])
+# @commands.command(name='merriam', aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM'])
 
 @bot.command()
 async def list(ctx):
