@@ -124,23 +124,23 @@ async def list(ctx):
         await ctx.send('Nothing has been suggested yet')
 
 @bot.command()
-async def suggest(ctx, data):
+async def suggest(ctx, *, data):
     """Adds a game suggestion"""
-    name = str(data.message.author.nick)
-    game = ' '.join(data.message.content[9:].split())
+    name = str(ctx.author.nick)
+    game = ' '.join(data.split())
     if name in suggestions:
         suggestions[name].add(game)
     else:
-        suggestions[name]= {game}
+        suggestions[name] = {game}
     await ctx.send(name+' suggested '+game)
-    save_data(suggestions,'suggestions')
+    save_data(suggestions, 'suggestions')
 
 @bot.command()
-async def remove(ctx, data):
+async def remove(ctx, *, data):
     """Removes game suggestion if the game
     was suggested by the user issuing the command"""
-    name = str(data.message.author.nick)
-    game = ' '.join(data.message.content[8:].split())
+    name = str(ctx.author.nick)
+    game = ' '.join(data.split())
     if name in suggestions:
         if game in suggestions[name]:
             suggestions[name].remove(game)
@@ -152,12 +152,12 @@ async def remove(ctx, data):
         await ctx.send('You cannot delete a game you didn\'t suggest')
 
 @bot.command()
-async def adminremove(ctx, data):
+async def adminremove(ctx, *, data):
     """Removes game from every suggestion,
     command only available to Admin role"""
-    name = str(data.message.author.nick)
-    role_obj_list = data.message.author.roles
-    game = ' '.join(data.message.content[13:].split())
+    name = str(ctx.author.nick)
+    role_obj_list = ctx.author.roles
+    game = ' '.join(data.split())
     roles = []
     names_to_delete = []
     for role in role_obj_list:
@@ -173,7 +173,7 @@ async def adminremove(ctx, data):
         save_data(suggestions, 'suggestions')
         await ctx.send('Successfully deleted ' + game + ' from suggestions')
     else:
-        await ctx.send('You need to be an Admin to issue this command')
+        await ctx.send('You need to be an admin to issue this command')
 
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
