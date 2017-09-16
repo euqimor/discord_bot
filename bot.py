@@ -106,6 +106,8 @@ async def merriam(ctx, *, word: str):
         sleep(4)
         bot.delete_message(message)
 
+miriam = merriam
+
 @bot.command()
 async def list(ctx):
     """Prints games suggested so far
