@@ -82,6 +82,10 @@ async def echo(ctx, *, message: str):
     sleep(3)
     await bot.delete_message(msg)
 
+@bot.command(pass_context=True)
+async def echo2(ctx, data):
+    await ctx.send(data)
+
 @bot.command()
 async def merriam(ctx, *, word: str):
     """Prints games suggested so far
