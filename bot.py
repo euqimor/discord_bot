@@ -53,7 +53,7 @@ def load_data(filename):
         print('Something went wrong during data evaluation')
 
 @bot.event
-async def on_ready(ctx):
+async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
