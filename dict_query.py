@@ -13,7 +13,7 @@ def query_merriam(word):
     url = 'http://www.dictionaryapi.com/api/v1/references/collegiate/xml/'+word.lower()+'?key='+key
     r = requests.get(url)
     soup = Soup(r.text,'xml')
-    regex = re.compile(word+'(?:\[\d\])*$')
+    regex = re.compile(word.lower()'(?:\[\d\])*$')
     cases = soup.find_all(id=regex)
     return cases
 
@@ -28,7 +28,7 @@ def compose_merriam(cases, word):
     for item in cases:
         y=0
         i+=1
-        phrase+='**'+word+', '+item.find('fl').text+'**\n'
+        phrase+='**'+word.lower()', '+item.find('fl').text+'**\n'
         phrase+='**'+str(i)+'**\n'
         for definition in item.find_all('dt'):
             phrase+='	'+alphabet[y]+' '

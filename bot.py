@@ -106,7 +106,6 @@ async def merriam(ctx, *, word: str):
         sleep(4)
         bot.delete_message(message)
 
-# @commands.command(name='merriam', aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM'])
 
 @bot.command()
 async def list(ctx):
