@@ -104,7 +104,7 @@ async def merriam(ctx, *, word: str):
     else:
         message = await ctx.send('Could not find the word or something went wrong with the request')
         sleep(4)
-        bot.delete_message(message)
+        await message.delete()
 
 
 @bot.command()
