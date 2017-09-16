@@ -80,10 +80,10 @@ async def echo(ctx, *, message: str):
     message = ' '.join(message.split())
     msg = await ctx.send(message)
     sleep(3)
-    await bot.delete_message(msg)
+    await msg.delete()
 
 @bot.command(pass_context=True)
-async def echo2(ctx, data):
+async def echo2(ctx, *, data: str):
     await ctx.send(data)
 
 @bot.command()
