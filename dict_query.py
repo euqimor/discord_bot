@@ -21,33 +21,6 @@ def query_merriam(word):
         cases = soup.find_all(id=regex)
     return cases
 
-def compose_merriam(cases, word):
-    '''
-    :param cases: a list of bs4.element.Tag objects in meriam xml format
-    corresponding to the word's classes (adj., verb, etc)
-    :return: a formatted string with the word's meanings
-    '''
-    phrase = ''
-    i=0
-    for item in cases:
-        y=0
-        i+=1
-        phrase+='**'+word.lower()+', '+item.find('fl').text+'**\n'
-        phrase+='**'+str(i)+'**\n'
-        for definition in item.find_all('dt'):
-            phrase+='	'+alphabet[y]+' '
-            y+=1
-            if definition.next.name:
-                definition_text = ':*'+definition.next.text+'* :'
-            else:
-                definition_text = definition.next
-            if definition.sx is not None:
-                phrase+=definition_text+definition.sx.text+'\n'
-            else:
-                phrase+=definition_text+'\n'
-        phrase+='\n'
-    return phrase
-
 
 def parse_merriam(cases, word):
     '''
@@ -60,26 +33,38 @@ def parse_merriam(cases, word):
     for entry in cases:
         if i > 0: phrase+='\n\n' #using counter to add new lines before every entry except the 1st one
         i+=1
-        phrase+='**'+entry.ew.text+'**, *'+entry.fl.text+'*\n' #opening text. <ew> = word, <fl> = what part of speech it is
+        phrase+='__**'+entry.ew.text+'**, *'+entry.fl.text+'*__\n' #opening text. <ew> = word, <fl> = what part of speech it is
         definition_full = entry.find('def') #find the <def> tag inside the entry
         definition_content = definition_full(name = ['sn','dt']) #filter out all the garbage from the <def> tag
         if definition_content[0].name != 'sn': phrase+='\n' #add a new line if the first item in definition doesn't imply one
         for tag in definition_content:
             if tag.name == 'sn':
-                if not tag.next.name: #if there's no other tag (namely <snm>) inside the <sn> tag
-                    if tag.text[0] in alphabet: #create an indentation on new line if <sn> content starts with a letter
-                        phrase+='\n   '+tag.text+' '
-                    else: #write in the beginning of the new line otherwise
-                        phrase += '\n' + tag.text+' '
-                else: #if there's a tag inside the <sn> tag, continue writing on the same line
-                    phrase += tag.text + ' '
+                phrase+=parse_sn(tag)
             elif tag.name == 'dt':
-                if not tag.next.name: #if <dt>'s content doesn't start with another tag
-                    sx = tag(name = 'sx') #collect all the <sx> tags for parsing
-                    phrase += tag.next + ' ' #add the definition text
-                    if sx != []: #if there are <sx> tags, add the first word from the tag in italic (to filter out garbage tags after the word)
-                        for sx_tag in sx:
-                            phrase+='*`'+sx_tag.next+'`* '
-                if tag.next.name: #TODO parse the inner <dt>'s tag (should be <un>)
-                    phrase += '[<'+tag.next.name+'> SOMETHING <\\'+tag.next.name+'>] '
+                phrase += parse_dt(tag)
+    return phrase
+
+
+def parse_sn(sn):
+    phrase = ''
+    if not sn.next.name:  # if there's no other tag (namely <snm>) inside the <sn> tag
+        if sn.text[0] in alphabet:  # create an indentation on new line if <sn> content starts with a letter
+            phrase += '\n   ' + sn.text + ' '
+        else:  # write in the beginning of the new line otherwise
+            phrase += '\n' + sn.text + ' '
+    else:  # if there's a tag inside the <sn> tag, continue writing on the same line
+        phrase += sn.text + ' '
+    return phrase
+
+
+def parse_dt(dt):
+    phrase = ''
+    if not dt.next.name:  # if <dt>'s content doesn't start with another tag
+        sx = dt(name='sx')  # collect all the <sx> tags for parsing
+        phrase += dt.next + ' '  # add the definition text
+        if sx != []:  # if there are <sx> tags, add the first word from the tag in italic (to filter out garbage tags after the word)
+            for sx_tag in sx:
+                phrase += '*`' + sx_tag.next + '`* '
+    if dt.next.name:  # TODO parse the inner <dt>'s tag (should be <un>)
+        phrase += '[<' + dt.next.name + '> SOMETHING <\\' + dt.next.name + '>] '
     return phrase
