@@ -7,7 +7,6 @@ from time import sleep
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
 
-
 def load_game_suggestions():
     '''
     :return: tries to load a dict of suggestions from a file,
@@ -62,7 +61,7 @@ async def on_ready():
     await bot.change_presence(game=discord.Game(name='with turrets'))
 
 @bot.command()
-async def games():
+async def games(ctx):
     """Prints games suggested so far
     grouped by suggester's name"""
     message = ''
@@ -72,39 +71,43 @@ async def games():
             for game in suggestions[name]:
                 message+='\r'+game
             message+='```'
-        await bot.say(message)
+        await ctx.send(message)
     except:
-        await bot.say('Nothing has been suggested so far')
-
-# @bot.command()
-# async def echo(*, message: str):
-#     message = ' '.join(message.split())
-#     msg = await bot.say(message)
-#     sleep(3)
-#     await bot.delete_message(msg)
+        await ctx.send('Nothing has been suggested so far')
 
 @bot.command()
-async def merriam(*, word: str):
+async def echo(ctx, *, message: str):
+    message = ' '.join(message.split())
+    msg = await ctx.send(message)
+    sleep(3)
+    await msg.delete()
+
+@bot.command()
+async def echo2(ctx, *, data: str):
+    await ctx.send(data+'| nick: '+ctx.author.nick)
+
+@bot.command(aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM'])
+async def merriam(ctx, *, word: str):
     """Prints games suggested so far
     grouped by suggester's name"""
     word = ' '.join(word.split())
     # try:
     cases = dict_query.query_merriam(word)
     # except:
-    #     await bot.say('Something went wrong during online query')
+    #     await ctx.send('Something went wrong during online query')
     # try:
     phrase = dict_query.parse_merriam(cases, word)
     # except:
-    #     await bot.say('Something went wrong during result parsing')
+    #     await ctx.send('Something went wrong during result parsing')
     if phrase != '' and phrase is not None:
-        await bot.say(phrase)
+        await ctx.send(phrase)
     else:
-        message = await bot.say('Could not find the word or something went wrong with the request')
+        message = await ctx.send('Could not find the word or something went wrong with the request')
         sleep(4)
-        await bot.delete_message(message)
+        await message.delete()
 
 @bot.command()
-async def list():
+async def list(ctx):
     """Prints games suggested so far
     in one list"""
     try:
@@ -116,45 +119,45 @@ async def list():
         for game in set_of_games:
             message+='\r'+game
         message+='```'
-        await bot.say(message)
+        await ctx.send(message)
     except:
-        await bot.say('Nothing has been suggested yet')
+        await ctx.send('Nothing has been suggested yet')
 
-@bot.command(pass_context=True)
-async def suggest(data):
+@bot.command()
+async def suggest(ctx, *, data):
     """Adds a game suggestion"""
-    name = str(data.message.author.nick)
-    game = ' '.join(data.message.content[9:].split())
+    name = str(ctx.author.nick)
+    game = ' '.join(data.split())
     if name in suggestions:
         suggestions[name].add(game)
     else:
-        suggestions[name]= {game}
-    await bot.say(name+' suggested '+game)
-    save_data(suggestions,'suggestions')
+        suggestions[name] = {game}
+    await ctx.send(name+' suggested '+game)
+    save_data(suggestions, 'suggestions')
 
-@bot.command(pass_context=True)
-async def remove(data):
+@bot.command()
+async def remove(ctx, *, data):
     """Removes game suggestion if the game
     was suggested by the user issuing the command"""
-    name = str(data.message.author.nick)
-    game = ' '.join(data.message.content[8:].split())
+    name = str(ctx.author.nick)
+    game = ' '.join(data.split())
     if name in suggestions:
         if game in suggestions[name]:
             suggestions[name].remove(game)
             if suggestions[name] == set({}):
                 del suggestions[name]
             save_data(suggestions, 'suggestions')
-            await bot.say('Successfully deleted '+game+' from '+name+'\'s suggestions')
+            await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
     else:
-        await bot.say('You cannot delete a game you didn\'t suggest')
+        await ctx.send('You cannot delete a game you didn\'t suggest')
 
-@bot.command(pass_context=True)
-async def adminremove(data):
+@bot.command()
+async def adminremove(ctx, *, data):
     """Removes game from every suggestion,
     command only available to Admin role"""
-    name = str(data.message.author.nick)
-    role_obj_list = data.message.author.roles
-    game = ' '.join(data.message.content[13:].split())
+    name = str(ctx.author.nick)
+    role_obj_list = ctx.author.roles
+    game = ' '.join(data.split())
     roles = []
     names_to_delete = []
     for role in role_obj_list:
@@ -168,11 +171,11 @@ async def adminremove(data):
         for name in names_to_delete:
             del suggestions[name]
         save_data(suggestions, 'suggestions')
-        await bot.say('Successfully deleted ' + game + ' from suggestions')
+        await ctx.send('Successfully deleted ' + game + ' from suggestions')
     else:
-        await bot.say('You need to be an Admin to issue this command')
+        await ctx.send('You need to be an admin to issue this command')
 
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
-    # bot.run('MzU3NjUyMTE3MTQ3NzQ2MzA2.DJtBFg.Ph9XfkThb6HM9W7KJ9Ud7fSxkYc')
-    bot.run('MzU3ODg3OTcwMjczMDAxNDcy.DJwzog.SDutum51myHyYMnGvIc_7_rYCZ8')
+    # bot.run('MzU3NjUyMTE3MTQ3NzQ2MzA2.DJtBFg.Ph9XfkThb6HM9W7KJ9Ud7fSxkYc') #cutie-pie
+    bot.run('MzU3ODg3OTcwMjczMDAxNDcy.DJwzog.SDutum51myHyYMnGvIc_7_rYCZ8') #test-instance
