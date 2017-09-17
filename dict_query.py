@@ -41,7 +41,7 @@ def parse_merriam(cases, word):
             if tag.name == 'sn':
                 phrase+=parse_sn(tag)
             elif tag.name == 'dt':
-                phrase += parse_dt(tag)
+                phrase += parse_tag(tag)
     return phrase
 
 
