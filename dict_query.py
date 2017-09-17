@@ -63,13 +63,13 @@ def parse_dt(dt):
         if not child.name:
             phrase+=child+' '
         elif child.name == 'sx':
-            phrase += '*`' + child.next + '`* '
+            phrase += '`' + child.next + '` '
         elif child.name == 'fw':
             phrase += '*' + child.next + '* '
         elif child.name == 'vi':
             phrase += '*' + child.text + '* '
         elif child.name == 'd_link':
-            phrase += '*`' + child.next + '`* '
+            phrase += '`' + child.next + '` '
         elif child.name == 'un':  # TODO parse the inner <dt>'s tag (should be <un>)
             phrase += '<un> SOMETHING </un> \n'
     return phrase
