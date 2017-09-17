@@ -15,8 +15,10 @@ def query_merriam(word):
     url = 'http://www.dictionaryapi.com/api/v1/references/collegiate/xml/'+word.lower()+'?key='+key
     r = requests.get(url)
     soup = Soup(r.text,'xml')
-    regex = re.compile(word.lower()+'(?:\[\d\])*$')
-    cases = soup.find_all(id=regex)
+    cases = soup(id=word) #for a single meaning word there's only entry id == word
+    if cases == []: #if there's no entry with id == word, then it has multiple meanings with entries like word[\d]
+        regex = re.compile(word.lower()+'(?:\[\d\])')
+        cases = soup.find_all(id=regex)
     return cases
 
 def compose_merriam(cases, word):
