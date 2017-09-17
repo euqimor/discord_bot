@@ -56,8 +56,11 @@ def parse_merriam(cases, word):
     :return: a formatted string with the word's meanings
     '''
     phrase = ''
+    i = 0
     for entry in cases:
-        phrase+='\n**'+entry.ew.text+'**, *'+entry.fl.text+'*' #opening text. <ew> = word, <fl> = what part of speech it is
+        if i > 0: phrase+='\n\n' #using counter to add new lines before every entry except the 1st one
+        i+=1
+        phrase+='**'+entry.ew.text+'**, *'+entry.fl.text+'*\n' #opening text. <ew> = word, <fl> = what part of speech it is
         definition_full = entry.find('def') #find the <def> tag inside the entry
         definition_content = definition_full(name = ['sn','dt']) #filter out all the garbage from the <def> tag
         if definition_content[0].name != 'sn': phrase+='\n' #add a new line if the first item in definition doesn't imply one
@@ -78,5 +81,5 @@ def parse_merriam(cases, word):
                         for sx_tag in sx:
                             phrase+='*`'+sx_tag.next+'`* '
                 if tag.next.name: #TODO parse the inner <dt>'s tag (should be <un>)
-                    phrase += '[<UN> SOMETHING <\\UN>] '
+                    phrase += '[<'+tag.next.name+'> SOMETHING <\\'+tag.next.name+'>] '
     return phrase
