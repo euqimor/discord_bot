@@ -56,10 +56,9 @@ def parse_sn(sn):
         phrase += sn.text + ' '
     return phrase
 
-
-def parse_dt(dt):
+def parse_tag(tag):
     phrase = ''
-    for child in dt.children:
+    for child in tag.children:
         if not child.name:
             phrase+=child+' '
         elif child.name == 'sx':
@@ -67,9 +66,14 @@ def parse_dt(dt):
         elif child.name == 'fw':
             phrase += '*' + child.next + '* '
         elif child.name == 'vi':
-            phrase += '*' + child.text + '* '
+            phrase += '• '+parse_tag(child)
+            # phrase += '*' + child.text + '* '
         elif child.name == 'd_link':
             phrase += '`' + child.next + '` '
-        elif child.name == 'un':  # TODO parse the inner <dt>'s tag (should be <un>)
-            phrase += '<un> SOMETHING </un> \n'
+        elif child.name == 'un':
+            phrase += parse_tag(child)
+        elif child.name == 'it':
+            phrase += '*'+child.next+'*'
+        elif child.name == 'aq':
+            phrase += ' —*'+child.text+'* '
     return phrase
