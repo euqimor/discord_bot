@@ -3,7 +3,8 @@ import re
 from string import ascii_lowercase as alphabet
 from bs4 import BeautifulSoup as Soup
 
-from bs4 import element
+ #TODO "b (1) : talk   discourse   • putting one's feelings into  word**s(2) :the text of a vocal musical composition"
+ #TODO get rid of **; add a space after italic words; actualize the comments
 
 def query_merriam(word):
     '''
