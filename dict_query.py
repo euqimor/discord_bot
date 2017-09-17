@@ -57,9 +57,10 @@ def parse_merriam(cases, word):
     '''
     phrase = ''
     for entry in cases:
-        phrase+='**'+entry.ew.text+'**, *'+entry.fl.text+'*' #opening text. <ew> = word, <fl> = what part of speech it is
+        phrase+='\n**'+entry.ew.text+'**, *'+entry.fl.text+'*' #opening text. <ew> = word, <fl> = what part of speech it is
         definition_full = entry.find('def') #find the <def> tag inside the entry
         definition_content = definition_full(name = ['sn','dt']) #filter out all the garbage from the <def> tag
+        if definition_content[0].name != 'sn': phrase+='\n' #add a new line if the first item in definition doesn't imply one
         for tag in definition_content:
             if tag.name == 'sn':
                 if not tag.next.name: #if there's no other tag (namely <snm>) inside the <sn> tag
