@@ -59,12 +59,13 @@ def parse_sn(sn):
 
 def parse_dt(dt):
     phrase = ''
-    if not dt.next.name:  # if <dt>'s content doesn't start with another tag
-        sx = dt(name='sx')  # collect all the <sx> tags for parsing
-        phrase += dt.next + ' '  # add the definition text
-        if sx != []:  # if there are <sx> tags, add the first word from the tag in italic (to filter out garbage tags after the word)
-            for sx_tag in sx:
-                phrase += '*`' + sx_tag.next + '`* '
-    if dt.next.name:  # TODO parse the inner <dt>'s tag (should be <un>)
-        phrase += '[<' + dt.next.name + '> SOMETHING <\\' + dt.next.name + '>] '
+    for child in dt.children:
+        if not child.name:
+            phrase+=child+' '
+        elif child.name == 'sx':
+            phrase += '*`' + child.next + '`* '
+        elif child.name == 'd_link':
+            phrase += '*`' + child.next + '`* '
+        elif child.name == 'un':  # TODO parse the inner <dt>'s tag (should be <un>)
+            phrase += '<un> SOMETHING </un> \n'
     return phrase
