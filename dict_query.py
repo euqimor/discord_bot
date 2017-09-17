@@ -66,7 +66,7 @@ def parse_dt(dt):
             phrase += '*`' + child.next + '`* '
         elif child.name == 'fw':
             phrase += '*' + child.next + '* '
-        elif child.next == 'vi':
+        elif child.name == 'vi':
             phrase += '*' + child.text + '* '
         elif child.name == 'd_link':
             phrase += '*`' + child.next + '`* '
