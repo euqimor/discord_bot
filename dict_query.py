@@ -55,14 +55,14 @@ def parse_merriam(cases, word):
     '''
     phrase = ''
     for entry in cases:
-        phrase+='```\r**'+entry.ew.text+'**, *'+entry.fl.text+'*```' #opening text. <ew> = word, <fl> = what part of speech it is
+        phrase+='**'+entry.ew.text+'**, *'+entry.fl.text+'*' #opening text. <ew> = word, <fl> = what part of speech it is
         definition_full = entry.find('def') #find the <def> tag inside the entry
         definition_content = definition_full(name = ['sn','dt']) #filter out all the garbage from the <def> tag
         for tag in definition_content:
             if tag.name == 'sn':
                 if not tag.next.name: #if there's no other tag (namely <snm>) inside the <sn> tag
                     if tag.text[0] in alphabet: #create an indentation on new line if <sn> content starts with a letter
-                        phrase+='\n  '+tag.text+' '
+                        phrase+='\n   '+tag.text+' '
                     else: #write in the beginning of the new line otherwise
                         phrase += '\n' + tag.text+' '
                 else: #if there's a tag inside the <sn> tag, continue writing on the same line
@@ -71,9 +71,9 @@ def parse_merriam(cases, word):
                 if not tag.next.name: #if <dt>'s content doesn't start with another tag
                     sx = tag(name = 'sx') #collect all the <sx> tags for parsing
                     phrase += tag.next + ' ' #add the definition text
-                    if sx != []: #if there are <sx> tags, add their contents in italic
+                    if sx != []: #if there are <sx> tags, add the first word from the tag in italic (to filter out garbage tags after the word)
                         for sx_tag in sx:
-                            phrase+='*'+sx_tag.text+'* '
+                            phrase+='*`'+sx_tag.next+'`* '
                 if tag.next.name: #TODO parse the inner <dt>'s tag (should be <un>)
                     phrase += '[<UN> SOMETHING <\\UN>] '
     return phrase
