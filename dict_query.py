@@ -48,9 +48,9 @@ def parse_merriam(cases, word):
 def parse_sn(sn):
     phrase = ''
     if not sn.next.name:  # if there's no other tag (namely <snm>) inside the <sn> tag
-        if sn.text[0] in alphabet:  # create an indentation on new line if <sn> content starts with a letter
+        if sn.text[0] in alphabet:  # if <sn> content starts with a letter create an indentation on new line
             phrase += '\n   ' + sn.text + ' '
-        else:  # write in the beginning of the new line otherwise
+        else:  # otherwise write in the beginning of the new line
             phrase += '\n' + sn.text + ' '
     else:  # if there's a tag inside the <sn> tag, continue writing on the same line
         phrase += sn.text + ' '
@@ -64,6 +64,10 @@ def parse_dt(dt):
             phrase+=child+' '
         elif child.name == 'sx':
             phrase += '*`' + child.next + '`* '
+        elif child.name == 'fw':
+            phrase += '*' + child.next + '* '
+        elif child.next == 'vi':
+            phrase += '*' + child.text + '* '
         elif child.name == 'd_link':
             phrase += '*`' + child.next + '`* '
         elif child.name == 'un':  # TODO parse the inner <dt>'s tag (should be <un>)
