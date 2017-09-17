@@ -93,7 +93,7 @@ async def merriam(*, word: str):
     # except:
     #     await bot.say('Something went wrong during online query')
     # try:
-    phrase = dict_query.compose_merriam(cases, word)
+    phrase = dict_query.parse_merriam(cases, word)
     # except:
     #     await bot.say('Something went wrong during result parsing')
     if phrase != '' and phrase is not None:
