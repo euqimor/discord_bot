@@ -4,6 +4,8 @@ from string import ascii_lowercase as alphabet
 from bs4 import BeautifulSoup as Soup
 from bs4 import NavigableString
 
+#TODO fix "caught"
+
 def query_merriam(word):
     '''
     :param word: the word to search for in the dictionaries
