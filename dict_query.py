@@ -14,10 +14,11 @@ def query_merriam(word):
     url = 'http://www.dictionaryapi.com/api/v1/references/collegiate/xml/'+word.lower()+'?key='+key
     r = requests.get(url)
     soup = Soup(r.text,'xml')
+    word = soup.ew.string #the word may change during the request if you have originally queried for the past tense for example, this ensures we get the right one
     cases = soup(id=word)
     regex = re.compile(word.lower()+'(?:\[\d\])')
     cases+= soup.find_all(id=regex)
-    return cases
+    return (cases, word)
 
 
 def parse_merriam(cases, word):

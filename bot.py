@@ -86,13 +86,14 @@ async def echo(ctx, *, message: str):
 async def echo2(ctx, *, data: str):
     await ctx.send(data+'| nick: '+ctx.author.nick)
 
-@bot.command(aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM'])
+@bot.command(aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM', 'word', 'mw'])
 async def merriam(ctx, *, word: str):
     """Prints games suggested so far
     grouped by suggester's name"""
     word = ' '.join(word.split())
     # try:
-    cases = dict_query.query_merriam(word)
+    query_result = dict_query.query_merriam(word)
+    cases, word = query_result[0], query_result[1] #the word may have changed if you queried for the past tense for example
     # except:
     #     await ctx.send('Something went wrong during online query')
     # try:
