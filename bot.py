@@ -67,9 +67,9 @@ async def games(ctx):
     message = ''
     try:
         for name in suggestions:
-            message+='```\r'+'Suggested by '+name+':'
+            message+='```\n'+'Suggested by '+name+':'
             for game in suggestions[name]:
-                message+='\r'+game
+                message+='\n'+game
             message+='```'
         await ctx.send(message)
     except:
@@ -112,12 +112,12 @@ async def list(ctx):
     in one list"""
     try:
         set_of_games = set({})
-        message = '```\rGames suggested so far:'
+        message = '```\nGames suggested so far:'
         for name in suggestions:
             for game in suggestions[name]:
                 set_of_games.add(game)
         for game in set_of_games:
-            message+='\r'+game
+            message+='\n'+game
         message+='```'
         await ctx.send(message)
     except:
