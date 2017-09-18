@@ -86,7 +86,7 @@ def parse_tag(tag):
         if not child.name:
             phrase+=child
         elif child.name == 'sx':
-            phrase += '`' + child.next + '`'
+            phrase += '`' + child.next + '` '
         elif child.name == 'fw':
             phrase += '*' + child.next + '*'
         elif child.name == 'vi':
