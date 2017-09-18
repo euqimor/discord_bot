@@ -47,7 +47,7 @@ def parse_tag_list(tag_list):
     for tag in tag_list:
         is_str = isinstance(tag, NavigableString)
         if is_str:
-            phrase+= tag
+            phrase+= tag+' '
         else:
             if tag.name == 'sx':
                 phrase += '`' + parse_tag_list(tag) + '` '
