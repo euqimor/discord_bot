@@ -92,7 +92,7 @@ def parse_tag(tag):
         elif child.name == 'vi':
             phrase += '• '+parse_tag(child)
         elif child.name == 'd_link':
-            phrase += '`' + child.next + '`'
+            phrase += '`' + child.next + '` '
         elif child.name == 'un':
             phrase += parse_tag(child)
         elif child.name == 'it':
