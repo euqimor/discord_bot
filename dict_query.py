@@ -84,19 +84,19 @@ def parse_tag(tag):
     phrase = ''
     for child in tag.children:
         if not child.name:
-            phrase+=child+' '
+            phrase+=child
         elif child.name == 'sx':
-            phrase += '`' + child.next + '` '
+            phrase += '`' + child.next + '`'
         elif child.name == 'fw':
-            phrase += '*' + child.next + '* '
+            phrase += '*' + child.next + '*'
         elif child.name == 'vi':
             phrase += '• '+parse_tag(child)
         elif child.name == 'd_link':
-            phrase += '`' + child.next + '` '
+            phrase += '`' + child.next + '`'
         elif child.name == 'un':
             phrase += parse_tag(child)
         elif child.name == 'it':
             phrase+= parse_it(child)
         elif child.name == 'aq':
-            phrase += ' —*'+child.text+'* '
+            phrase += ' —*'+child.text+'*'
     return phrase
