@@ -4,9 +4,6 @@ from string import ascii_lowercase as alphabet
 from bs4 import BeautifulSoup as Soup
 from bs4 import NavigableString
 
- #TODO "b (1) : talk   discourse   • putting one's feelings into  word**s(2) :the text of a vocal musical composition"
- #TODO get rid of **; add a space after italic words; actualize the comments
-
 def query_merriam(word):
     '''
     :param word: the word to search for in the dictionaries
@@ -36,10 +33,10 @@ def parse_merriam(cases, word):
         i+=1
         phrase+='__**'+entry.ew.text+'**, *'+entry.fl.text+'*__\n' #opening text. <ew> = word, <fl> = what part of speech it is
         definition_full = entry.find('def') #find the <def> tag inside the entry
-        # definition_content = definition_full(name=['sn', 'spl', 'dt']) #filter out all the garbage from the <def> tag
-        # if definition_full[0].name != 'sn': phrase += '\n' #add a new line if the first item in definition doesn't imply one
+        definition_content = definition_full(name=['sn', 'spl', 'dt']) #filter out all the garbage from the <def> tag
+        if definition_content[0].name != 'sn': phrase += '\n' #add a new line if the first item in definition doesn't imply one
         try:
-            phrase += parse_tag_list(definition_full)
+            phrase += parse_tag_list(definition_content)
         except Exception as error:
             print('Caught an exception while parsing tags:\n{}'.format(error))
     return phrase
@@ -72,6 +69,7 @@ def parse_tag_list(tag_list):
             else:
                 phrase += parse_tag_list(tag)
     return phrase
+
 
 def parse_sn(sn):
     phrase = ''
