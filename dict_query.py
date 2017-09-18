@@ -2,6 +2,7 @@ import requests
 import re
 from string import ascii_lowercase as alphabet
 from bs4 import BeautifulSoup as Soup
+from bs4 import NavigableString
 
  #TODO "b (1) : talk   discourse   • putting one's feelings into  word**s(2) :the text of a vocal musical composition"
  #TODO get rid of **; add a space after italic words; actualize the comments
@@ -35,13 +36,21 @@ def parse_merriam(cases, word):
         i+=1
         phrase+='__**'+entry.ew.text+'**, *'+entry.fl.text+'*__\n' #opening text. <ew> = word, <fl> = what part of speech it is
         definition_full = entry.find('def') #find the <def> tag inside the entry
-        definition_content = definition_full(name = ['sn','dt']) #filter out all the garbage from the <def> tag
-        if definition_content[0].name != 'sn': phrase+='\n' #add a new line if the first item in definition doesn't imply one
-        for tag in definition_content:
-            if tag.name == 'sn':
-                phrase+=parse_sn(tag)
-            elif tag.name == 'dt':
-                phrase += parse_tag(tag)
+        definition_content = definition_full(name=['sn', 'spl', 'dt']) #filter out all the garbage from the <def> tag
+        if definition_content[0].name != 'sn': phrase += '\n' #add a new line if the first item in definition doesn't imply one
+        try:
+            phrase += parse_tag_list(definition_content)
+        except Exception as error:
+            print('Caught an exception while parsing tags:\n{}'.format(error))
+        # for tag in definition_content:
+        #     try:
+        #         phrase += parse_tag(tag)
+        #     except Exception as error:
+        #         print('Caught an exception while parsing tags:\n{}'.format(error))
+        #     # if tag.name == 'sn':
+            #     phrase+=parse_sn(tag)
+            # elif tag.name == 'dt':
+            #     phrase += parse_tag(tag)
     return phrase
 
 
@@ -67,7 +76,6 @@ def parse_it(it):
         next_tag = it.next_sibling.name
     else:
         next_tag = False
-
     if previous_tag == 'it' and next_tag == 'it':
         phrase += it.next
     elif previous_tag != 'it' and next_tag == 'it':
@@ -76,7 +84,6 @@ def parse_it(it):
         phrase += it.next + '* '
     else:
         phrase += '*' + it.next + '* '
-
     return phrase
 
 
@@ -99,4 +106,45 @@ def parse_tag(tag):
             phrase+= parse_it(child)
         elif child.name == 'aq':
             phrase += ' —*'+child.text+'*'
+        elif child.name == 'spl':
+            phrase += '*' + child.next + '*\n'
+        elif child.name == 'sn':
+            phrase += parse_sn(child)
     return phrase
+
+def parse_tag_list(tag_list):
+    phrase = ''
+    for tag in tag_list:
+        is_str = isinstance(tag, NavigableString)
+        if is_str:
+            phrase+= tag
+        else:
+            if tag.name == 'sx':
+                phrase += '`' + parse_tag_list(tag) + '` '
+            elif tag.name == 'fw':
+                phrase += '*' + parse_tag_list(tag) + '*'
+            elif tag.name == 'vi':
+                phrase += '• ' + parse_tag_list(tag)
+            elif tag.name == 'd_link':
+                phrase += '`' + parse_tag_list(tag) + '` '
+            elif tag.name == 'un':
+                phrase += parse_tag_list(tag)
+            elif tag.name == 'it':
+                phrase += parse_it(tag)
+            elif tag.name == 'aq':
+                phrase += ' —' + parse_tag_list(tag)
+            elif tag.name == 'spl':
+                phrase += '*' + parse_tag_list(tag) + '*\n'
+            elif tag.name == 'sn':
+                phrase += parse_sn(tag)
+            else:
+                phrase += parse_tag_list(tag)
+    return phrase
+
+
+
+
+
+
+
+
