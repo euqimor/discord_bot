@@ -16,10 +16,9 @@ def query_merriam(word):
     url = 'http://www.dictionaryapi.com/api/v1/references/collegiate/xml/'+word.lower()+'?key='+key
     r = requests.get(url)
     soup = Soup(r.text,'xml')
-    cases = soup(id=word) #for a single meaning word there's only entry id == word
-    if cases == []: #if there's no entry with id == word, then it has multiple meanings with entries like word[\d]
-        regex = re.compile(word.lower()+'(?:\[\d\])')
-        cases = soup.find_all(id=regex)
+    cases = soup(id=word)
+    regex = re.compile(word.lower()+'(?:\[\d\])')
+    cases+= soup.find_all(id=regex)
     return cases
 
 
@@ -57,6 +56,30 @@ def parse_sn(sn):
         phrase += sn.text + ' '
     return phrase
 
+
+def parse_it(it):
+    phrase = ''
+    if it.previous_sibling and it.previous_sibling.name:
+        previous_tag = it.previous_sibling.name
+    else:
+        previous_tag = False
+    if it.next_sibling and it.next_sibling.name:
+        next_tag = it.next_sibling.name
+    else:
+        next_tag = False
+
+    if previous_tag == 'it' and next_tag == 'it':
+        phrase += it.next
+    elif previous_tag != 'it' and next_tag == 'it':
+        phrase += '*' + it.next
+    elif previous_tag == 'it' and next_tag != 'it':
+        phrase += it.next + '* '
+    else:
+        phrase += '*' + it.next + '* '
+
+    return phrase
+
+
 def parse_tag(tag):
     phrase = ''
     for child in tag.children:
@@ -68,13 +91,12 @@ def parse_tag(tag):
             phrase += '*' + child.next + '* '
         elif child.name == 'vi':
             phrase += '• '+parse_tag(child)
-            # phrase += '*' + child.text + '* '
         elif child.name == 'd_link':
             phrase += '`' + child.next + '` '
         elif child.name == 'un':
             phrase += parse_tag(child)
         elif child.name == 'it':
-            phrase += '*'+child.next+'*'
+            phrase+= parse_it(child)
         elif child.name == 'aq':
             phrase += ' —*'+child.text+'* '
     return phrase
