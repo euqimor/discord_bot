@@ -170,5 +170,5 @@ async def merriam(ctx, *, word: str):
 
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
-    # bot.run('MzU3NjUyMTE3MTQ3NzQ2MzA2.DJtBFg.Ph9XfkThb6HM9W7KJ9Ud7fSxkYc') #cutie-pie
-    bot.run('MzU3ODg3OTcwMjczMDAxNDcy.DJwzog.SDutum51myHyYMnGvIc_7_rYCZ8') #test-instance
+    bot.run('MzYxMzAyMjYwMDQ4OTg2MTEy.DKiIdw.i3t7w2gduC7Md01SKtFNg-nKiAM') #Companion Cube
+    # bot.run('MzU3ODg3OTcwMjczMDAxNDcy.DJwzog.SDutum51myHyYMnGvIc_7_rYCZ8') #test-instance
