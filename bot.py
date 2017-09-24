@@ -3,9 +3,12 @@ from discord.ext import commands
 import dict_query
 import os
 from time import sleep
+import random
 
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
+
+rejections = ['Nope','Nu-uh','You are not my supervisor!','Sorry, you are not important enough to do that -_-','Stop trying that, or I\'ll report you to Nightmom!']
 
 def load_game_suggestions():
     '''
@@ -19,14 +22,6 @@ def load_game_suggestions():
     except:
         pass
     return suggestions
-
-
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# DON'T FORGET TO CHANGE NICK BACK TO NAME IN SUGGEST
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# CHANGE | BOT.RUN | COMMAND_PREFIX | PLAYING WITH |
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 
 def save_data(data, filename):
     '''
@@ -93,7 +88,7 @@ async def list(ctx):
 @bot.command()
 async def suggest(ctx, *, data):
     """Adds a game suggestion"""
-    name = str(ctx.author.nick)
+    name = str(ctx.author.name)
     game = ' '.join(data.split())
     if name in suggestions:
         suggestions[name].add(game)
@@ -105,7 +100,7 @@ async def suggest(ctx, *, data):
 @bot.command()
 async def remove(ctx, *, data):
     """Removes the game suggestion if the game was suggested by the user issuing the command"""
-    name = str(ctx.author.nick)
+    name = str(ctx.author.name)
     game = ' '.join(data.split())
     if name in suggestions:
         if game in suggestions[name]:
@@ -120,7 +115,6 @@ async def remove(ctx, *, data):
 @bot.command()
 async def adminremove(ctx, *, data):
     """Removes the game from every list, command only available to Admin role"""
-    name = str(ctx.author.nick)
     role_obj_list = ctx.author.roles
     game = ' '.join(data.split())
     roles = []
@@ -138,7 +132,21 @@ async def adminremove(ctx, *, data):
         save_data(suggestions, 'suggestions')
         await ctx.send('Successfully deleted ' + game + ' from suggestions')
     else:
-        await ctx.send('You need to be an admin to issue this command')
+        await ctx.send(random.choice(rejections))
+
+@bot.command()
+async def adminwipe(ctx, *, data):
+    """Purges the game suggestions list, command only available to Admin role"""
+    role_obj_list = ctx.author.roles
+    roles = []
+    for role in role_obj_list:
+        roles.append(role.name)
+    if 'Admin' in roles:
+        suggestions = {}
+        save_data(suggestions, 'suggestions')
+        await ctx.send('The list is empty now :\'(')
+    else:
+        await ctx.send(random.choice(rejections))
 
 @bot.command(aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM', 'word', 'mw', 'Merriam'])
 async def merriam(ctx, *, word: str):
