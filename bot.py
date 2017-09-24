@@ -134,20 +134,20 @@ async def adminremove(ctx, *, data):
     else:
         await ctx.send(random.choice(rejections))
 
-@bot.command()
-async def adminwipe(ctx):
-    """Purges the game suggestions list, command only available to Admin role"""
-    role_obj_list = ctx.author.roles
-    roles = []
-    for role in role_obj_list:
-        roles.append(role.name)
-    if 'Admin' in roles:
-        for name in suggestions: #TODO understand what's wrong here
-            del name
-        save_data(suggestions, 'suggestions')
-        await ctx.send('The list is empty now :\'(')
-    else:
-        await ctx.send(random.choice(rejections))
+# @bot.command()
+# async def adminwipe(ctx):
+#     """Purges the game suggestions list, command only available to Admin role"""
+#     role_obj_list = ctx.author.roles
+#     roles = []
+#     for role in role_obj_list:
+#         roles.append(role.name)
+#     if 'Admin' in roles:
+#         for name in suggestions: #TODO understand what's wrong here
+#             del name
+#         save_data(suggestions, 'suggestions')
+#         await ctx.send('The list is empty now :\'(')
+#     else:
+#         await ctx.send(random.choice(rejections))
 
 
 @bot.command(aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM', 'word', 'mw', 'Merriam'])
