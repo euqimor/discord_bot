@@ -142,11 +142,13 @@ async def adminwipe(ctx):
     for role in role_obj_list:
         roles.append(role.name)
     if 'Admin' in roles:
-        suggestions = {}
+        for name in suggestions: #TODO understand what's wrong here
+            del name
         save_data(suggestions, 'suggestions')
         await ctx.send('The list is empty now :\'(')
     else:
         await ctx.send(random.choice(rejections))
+
 
 @bot.command(aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM', 'word', 'mw', 'Merriam'])
 async def merriam(ctx, *, word: str):
