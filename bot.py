@@ -135,7 +135,7 @@ async def adminremove(ctx, *, data):
         await ctx.send(random.choice(rejections))
 
 @bot.command()
-async def adminwipe(ctx, *, data):
+async def adminwipe(ctx):
     """Purges the game suggestions list, command only available to Admin role"""
     role_obj_list = ctx.author.roles
     roles = []
