@@ -18,7 +18,7 @@ def load_game_suggestions():
     suggestions = {}
     os.chdir(os.path.expanduser('~/bothelper/'))
     try:
-        suggestions = load_data('suggestions_from_testing')
+        suggestions = load_data('suggestions')
     except:
         pass
     return suggestions
@@ -95,7 +95,7 @@ async def suggest(ctx, *, data):
     else:
         suggestions[name] = {game}
     await ctx.send(name+' suggested '+game)
-    save_data(suggestions, 'suggestions_from_testing')
+    save_data(suggestions, 'suggestions')
 
 @bot.command()
 async def remove(ctx, *, data):
@@ -107,7 +107,7 @@ async def remove(ctx, *, data):
             suggestions[name].remove(game)
             if suggestions[name] == set({}):
                 del suggestions[name]
-            save_data(suggestions, 'suggestions_from_testing')
+            save_data(suggestions, 'suggestions')
             await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
     else:
         await ctx.send('You cannot delete a game you did naaaht suggest')
@@ -129,7 +129,7 @@ async def adminremove(ctx, *, data):
                     names_to_delete.append(name)
         for name in names_to_delete:
             del suggestions[name]
-        save_data(suggestions, 'suggestions_from_testing')
+        save_data(suggestions, 'suggestions')
         await ctx.send('Successfully deleted ' + game + ' from suggestions')
     else:
         await ctx.send(random.choice(rejections))
@@ -144,7 +144,7 @@ async def adminremove(ctx, *, data):
 #     if 'Admin' in roles:
 #         for name in suggestions: #TODO understand what's wrong here
 #             del name
-#         save_data(suggestions, 'suggestions_from_testing')
+#         save_data(suggestions, 'suggestions')
 #         await ctx.send('The list is empty now :\'(')
 #     else:
 #         await ctx.send(random.choice(rejections))
