@@ -62,8 +62,7 @@ async def on_ready():
 
 @bot.command()
 async def games(ctx):
-    """Prints games suggested so far
-    grouped by suggester's name"""
+    """Prints games suggested so far grouped by suggestion author's name"""
     message = ''
     try:
         for name in suggestions:
@@ -76,41 +75,8 @@ async def games(ctx):
         await ctx.send('Nothing has been suggested so far')
 
 @bot.command()
-async def echo(ctx, *, message: str):
-    message = ' '.join(message.split())
-    msg = await ctx.send(message)
-    sleep(3)
-    await msg.delete()
-
-@bot.command()
-async def echo2(ctx, *, data: str):
-    await ctx.send(data+'| nick: '+ctx.author.nick)
-
-@bot.command(aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM', 'word', 'mw'])
-async def merriam(ctx, *, word: str):
-    """Prints games suggested so far
-    grouped by suggester's name"""
-    word = ' '.join(word.split())
-    # try:
-    query_result = dict_query.query_merriam(word)
-    cases, word = query_result[0], query_result[1] #the word may have changed if you queried for the past tense for example
-    # except:
-    #     await ctx.send('Something went wrong during online query')
-    # try:
-    phrase = dict_query.parse_merriam(cases, word)
-    # except:
-    #     await ctx.send('Something went wrong during result parsing')
-    if phrase != '' and phrase is not None:
-        await ctx.send(phrase)
-    else:
-        message = await ctx.send('Could not find the word or something went wrong with the request')
-        sleep(4)
-        await message.delete()
-
-@bot.command()
 async def list(ctx):
-    """Prints games suggested so far
-    in one list"""
+    """Prints games suggested so far in one list"""
     try:
         set_of_games = set({})
         message = '```\nGames suggested so far:'
@@ -138,8 +104,7 @@ async def suggest(ctx, *, data):
 
 @bot.command()
 async def remove(ctx, *, data):
-    """Removes game suggestion if the game
-    was suggested by the user issuing the command"""
+    """Removes the game suggestion if the game was suggested by the user issuing the command"""
     name = str(ctx.author.nick)
     game = ' '.join(data.split())
     if name in suggestions:
@@ -150,12 +115,11 @@ async def remove(ctx, *, data):
             save_data(suggestions, 'suggestions')
             await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
     else:
-        await ctx.send('You cannot delete a game you didn\'t suggest')
+        await ctx.send('You cannot delete a game you did naaaht suggest')
 
 @bot.command()
 async def adminremove(ctx, *, data):
-    """Removes game from every suggestion,
-    command only available to Admin role"""
+    """Removes the game from every list, command only available to Admin role"""
     name = str(ctx.author.nick)
     role_obj_list = ctx.author.roles
     game = ' '.join(data.split())
@@ -175,6 +139,26 @@ async def adminremove(ctx, *, data):
         await ctx.send('Successfully deleted ' + game + ' from suggestions')
     else:
         await ctx.send('You need to be an admin to issue this command')
+
+@bot.command(aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM', 'word', 'mw', 'Merriam'])
+async def merriam(ctx, *, word: str):
+    """Queries Merriam-Webster's Collegiate Dictionary for a word definition. Well, tries to at least..."""
+    word = ' '.join(word.split())
+    # try:
+    query_result = dict_query.query_merriam(word)
+    cases, word = query_result[0], query_result[1] #the word may have changed if you queried for the past tense for example
+    # except:
+    #     await ctx.send('Something went wrong during online query')
+    # try:
+    phrase = dict_query.parse_merriam(cases, word)
+    # except:
+    #     await ctx.send('Something went wrong during result parsing')
+    if phrase != '' and phrase is not None:
+        await ctx.send(phrase)
+    else:
+        message = await ctx.send('Could not find the word or something went wrong with the request')
+        sleep(4)
+        await message.delete()
 
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
