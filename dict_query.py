@@ -16,14 +16,14 @@ def query_merriam(word):
     url = 'http://www.dictionaryapi.com/api/v1/references/collegiate/xml/'+word.lower()+'?key='+key
     r = requests.get(url)
     soup = Soup(r.text,'xml')
-    word = soup.ew.string #the word may change during the request if you have originally queried for the past tense for example, this ensures we get the right one
-    cases = soup(id=word)
-    regex = re.compile(word.lower()+'(?:\[\d\])')
-    cases+= soup.find_all(id=regex)
-    return (cases, word)
+    # word = soup.ew.string #the word may change during the request if you have originally queried for the past tense for example, this ensures we get the right one
+    cases = soup.find_all('entry')
+    # regex = re.compile(word.lower()+'(?:\[\d\])')
+    # cases+= soup.find_all(id=regex)
+    return cases
 
 
-def parse_merriam(cases, word):
+def parse_merriam(cases):
     '''
     :param cases: a list of bs4.element.Tag objects in meriam xml format
     corresponding to the word's classes (adj., verb, etc)
@@ -34,14 +34,22 @@ def parse_merriam(cases, word):
     for entry in cases:
         if i > 0: phrase+='\n\n' #using counter to add new lines before every entry except the 1st one
         i+=1
-        phrase+='__**'+entry.ew.text+'**, *'+entry.fl.text+'*__\n' #opening text. <ew> = word, <fl> = what part of speech it is
-        definition_full = entry.find('def') #find the <def> tag inside the entry
-        definition_content = definition_full(name=['sn', 'spl', 'dt']) #filter out all the garbage from the <def> tag
-        if definition_content[0].name != 'sn': phrase += '\n' #add a new line if the first item in definition doesn't imply one
         try:
-            phrase += parse_tag_list(definition_content)
-        except Exception as error:
-            print('Caught an exception while parsing tags:\n{}'.format(error))
+            phrase+='__**'+entry.ew.text+'**, *'+entry.fl.text+'*__\n' #opening text. <ew> = word, <fl> = what part of speech it is
+            definition_full = entry.find('def') #find the <def> tag inside the entry
+            definition_content = definition_full(name=['sn', 'spl', 'dt']) #filter out all the garbage from the <def> tag
+            if definition_content[0].name != 'sn': phrase += '\n' #add a new line if the first item in definition doesn't imply one
+            try:
+                phrase += parse_tag_list(definition_content)
+            except Exception as error:
+                print('Caught an exception while parsing tags:\n{}'.format(error))
+        except:
+            try:
+                phrase += '__**' + entry.ew.text + '**__\n'
+                definition_content = entry.cx
+                phrase += parse_tag_list(definition_content)
+            except Exception as error:
+                print('Caught an exception while trying to parse an entry with no <def>:\n{}'.format(error))
     return phrase
 
 def parse_tag_list(tag_list):
@@ -51,7 +59,7 @@ def parse_tag_list(tag_list):
         if is_str:
             phrase+= tag+' '
         else:
-            if tag.name == 'sx':
+            if tag.name in ['sx','ct']:
                 phrase += '`' + parse_tag_list(tag) + '` '
             elif tag.name == 'fw':
                 phrase += '*' + parse_tag_list(tag) + '*'
