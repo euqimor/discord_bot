@@ -86,7 +86,7 @@ async def list(ctx):
         await ctx.send('Nothing has been suggested yet')
 
 @bot.command()
-async def suggest(ctx, *, data:str):
+async def suggest(ctx, data:str):
     """Adds a game suggestion"""
     name = str(ctx.author.name)
     game = ' '.join(data.split())
@@ -98,7 +98,7 @@ async def suggest(ctx, *, data:str):
     save_data(suggestions, 'suggestions')
 
 @bot.command()
-async def remove(ctx, *, data:str):
+async def remove(ctx, data:str):
     """Removes the game suggestion if the game was suggested by the user issuing the command"""
     name = str(ctx.author.name)
     game = ' '.join(data.split())
@@ -113,7 +113,7 @@ async def remove(ctx, *, data:str):
         await ctx.send('You cannot delete a game you did naaaht suggest')
 
 @bot.command()
-async def adminremove(ctx, *, data:str):
+async def adminremove(ctx, data:str):
     """Removes the game from every list, command only available to Admin role"""
     role_obj_list = ctx.author.roles
     game = ' '.join(data.split())
