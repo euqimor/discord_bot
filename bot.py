@@ -180,10 +180,10 @@ async def merriam(ctx, *, word: str):
 
 
 
-
+suggestions = load_game_suggestions()
 
 if __name__ == '__main__':
-    suggestions = load_game_suggestions()
+
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that or I\'ll report you to Nightmom!']
     # bot.run('MzYxMzAyMjYwMDQ4OTg2MTEy.DKiIdw.i3t7w2gduC7Md01SKtFNg-nKiAM') #Companion Cube
