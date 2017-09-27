@@ -100,6 +100,7 @@ async def suggest(ctx, data:str):
 @bot.command()
 async def remove(ctx, data:str):
     """Removes the game suggestion if the game was suggested by the user issuing the command"""
+    suggestions = load_game_suggestions()
     name = str(ctx.author.name)
     game = ' '.join(data.split())
     await ctx.send('Name: '+name+'\nGame: '+game)
