@@ -14,12 +14,11 @@ def load_game_suggestions():
     :return: tries to load a dict of suggestions from a file,
     otherwise returns empty dict
     '''
-    suggestions = {}
     os.chdir(os.path.expanduser('~/bothelper/'))
     try:
         suggestions = load_data('suggestions')
     except:
-        pass
+        suggestions = {}
     return suggestions
 
 
@@ -86,7 +85,7 @@ async def list(ctx):
         await ctx.send('Nothing has been suggested yet')
 
 @bot.command()
-async def suggest(ctx, data:str):
+async def suggest(ctx, *, data):
     """Adds a game suggestion"""
     name = str(ctx.author.name)
     game = ' '.join(data.split())
@@ -98,24 +97,22 @@ async def suggest(ctx, data:str):
     save_data(suggestions, 'suggestions')
 
 @bot.command()
-async def remove(ctx, data:str):
+async def remove(ctx, *, data):
     """Removes the game suggestion if the game was suggested by the user issuing the command"""
-    suggestions = load_game_suggestions()
     name = str(ctx.author.name)
     game = ' '.join(data.split())
-    await ctx.send('Name: '+name+'\nGame: '+game)
-    await ctx.send(str(name in suggestions))
-    #     if game in suggestions[name]:
-    #         suggestions[name].remove(game)
-    #         if suggestions[name] == set({}):
-    #             del suggestions[name]
-    #         save_data(suggestions, 'suggestions')
-    #         await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
-    # else:
-    #     await ctx.send('You cannot delete a game you did naaaht suggest')
+    if name in suggestions:
+        if game in suggestions[name]:
+            suggestions[name].remove(game)
+            if suggestions[name] == set({}):
+                del suggestions[name]
+            save_data(suggestions, 'suggestions')
+            await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
+    else:
+        await ctx.send('You cannot delete a game you did naaaht suggest')
 
 @bot.command()
-async def adminremove(ctx, data:str):
+async def adminremove(ctx, *, data):
     """Removes the game from every list, command only available to Admin role"""
     role_obj_list = ctx.author.roles
     game = ' '.join(data.split())
@@ -180,11 +177,11 @@ async def merriam(ctx, *, word: str):
 
 
 
-suggestions = load_game_suggestions()
+
 
 if __name__ == '__main__':
-
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
-                  'Stop trying that or I\'ll report you to Nightmom!']
+                  'Stop trying that, or I\'ll report you to Nightmom!']
+    suggestions = {}
     # bot.run('MzYxMzAyMjYwMDQ4OTg2MTEy.DKiIdw.i3t7w2gduC7Md01SKtFNg-nKiAM') #Companion Cube
     bot.run('MzU3ODg3OTcwMjczMDAxNDcy.DJwzog.SDutum51myHyYMnGvIc_7_rYCZ8') #test-instance
