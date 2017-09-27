@@ -110,11 +110,10 @@ def parse_it(it):
 def split_message(message):
     message_list = []
     if len(message) < 2000:
-        return message
+        return [message]
     else:
-        i = message.rindex('__**')
-        if i>5:
-            message_list = [split_message(message[:i]),message[i:]]
-        else:
-            message_list = [message[:2000], split_message(message[2000:])]
+        i = message[:2000].rfind('\n')
+        message_list.append(message[:i])
+        for item in split_message(message[i:]):
+            message_list.append(item)
     return message_list
