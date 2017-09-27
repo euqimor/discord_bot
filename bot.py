@@ -166,8 +166,9 @@ async def merriam(ctx, *, word: str):
     if phrase != '' and phrase is not None:
         if len(phrase) >= 2000:
             message_list = dict_query.split_message(phrase)
-            for message in message_list:
-                await ctx.send(message)
+            # for message in message_list:
+            await ctx.send(message_list[0])
+            await ctx.send('Read more: '+'https://www.merriam-webster.com/dictionary/'+'%20'.join(word.split(' ')))
         else:
             await ctx.send(phrase)
     else:
