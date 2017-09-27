@@ -14,7 +14,6 @@ def load_game_suggestions():
     :return: tries to load a dict of suggestions from a file,
     otherwise returns empty dict
     '''
-    os.chdir(os.path.expanduser('~/bothelper/'))
     try:
         suggestions = load_data('suggestions')
     except:
