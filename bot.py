@@ -103,7 +103,8 @@ async def remove(ctx, data:str):
     name = str(ctx.author.name)
     game = ' '.join(data.split())
     await ctx.send('Name: '+name+'\nGame: '+game)
-    # if name in suggestions:
+    if name in suggestions:
+        await ctx.send(str(name in suggestions))
     #     if game in suggestions[name]:
     #         suggestions[name].remove(game)
     #         if suggestions[name] == set({}):
