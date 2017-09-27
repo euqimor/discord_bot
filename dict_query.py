@@ -50,7 +50,6 @@ def parse_merriam(cases):
                 print('Caught an exception while parsing tags:\n{}'.format(error))
         else:
             try:
-                phrase += '__**' + entry.ew.text + '**__\n'
                 definition_content = entry.cx
                 phrase += parse_tag_list(definition_content)
             except Exception as error:
