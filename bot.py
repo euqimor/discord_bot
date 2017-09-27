@@ -164,6 +164,10 @@ async def merriam(ctx, *, word: str):
     # except:
     #     await ctx.send('Something went wrong during result parsing')
     if phrase != '' and phrase is not None:
+        if len(phrase) >= 2000:
+            message_list = dict_query.split_message(phrase)
+            for message in message_list:
+                await ctx.send(message)
         await ctx.send(phrase)
     else:
         message = await ctx.send('Could not find the word or something went wrong with the request')
@@ -172,5 +176,5 @@ async def merriam(ctx, *, word: str):
 
 if __name__ == '__main__':
     suggestions = load_game_suggestions()
-    bot.run('MzYxMzAyMjYwMDQ4OTg2MTEy.DKiIdw.i3t7w2gduC7Md01SKtFNg-nKiAM') #Companion Cube
-    # bot.run('MzU3ODg3OTcwMjczMDAxNDcy.DJwzog.SDutum51myHyYMnGvIc_7_rYCZ8') #test-instance
+    # bot.run('MzYxMzAyMjYwMDQ4OTg2MTEy.DKiIdw.i3t7w2gduC7Md01SKtFNg-nKiAM') #Companion Cube
+    bot.run('MzU3ODg3OTcwMjczMDAxNDcy.DJwzog.SDutum51myHyYMnGvIc_7_rYCZ8') #test-instance
