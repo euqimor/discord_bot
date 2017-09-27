@@ -156,11 +156,11 @@ async def merriam(ctx, *, word: str):
     word = ' '.join(word.split())
     # try:
     query_result = dict_query.query_merriam(word)
-    cases, word = query_result[0], query_result[1] #the word may have changed if you queried for the past tense for example
+    cases = query_result #the word may have changed if you queried for the past tense for example
     # except:
     #     await ctx.send('Something went wrong during online query')
     # try:
-    phrase = dict_query.parse_merriam(cases, word)
+    phrase = dict_query.parse_merriam(cases)
     # except:
     #     await ctx.send('Something went wrong during result parsing')
     if phrase != '' and phrase is not None:
