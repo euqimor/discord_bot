@@ -58,20 +58,20 @@ async def on_ready():
 async def games(ctx):
     """Prints games suggested so far grouped by suggestion author's name"""
     message = ''
-    try:
+    if suggestions:
         for name in suggestions:
             message+='```\n'+'Suggested by '+name+':'
             for game in suggestions[name]:
                 message+='\n'+game
             message+='```'
         await ctx.send(message)
-    except:
+    else:
         await ctx.send('Nothing has been suggested so far')
 
 @bot.command()
 async def list(ctx):
     """Prints games suggested so far in one list"""
-    try:
+    if suggestions:
         set_of_games = set({})
         message = '```\nGames suggested so far:'
         for name in suggestions:
@@ -81,7 +81,7 @@ async def list(ctx):
             message+='\n'+game
         message+='```'
         await ctx.send(message)
-    except:
+    else:
         await ctx.send('Nothing has been suggested yet')
 
 @bot.command()
