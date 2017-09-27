@@ -168,7 +168,7 @@ async def merriam(ctx, *, word: str):
             message_list = dict_query.split_message(phrase)
             # for message in message_list:
             await ctx.send(message_list[0])
-            await ctx.send('Read more: '+'https://www.merriam-webster.com/dictionary/'+'%20'.join(word.split(' ')))
+            await ctx.send('\_'*20+'\nRead more: '+'https://www.merriam-webster.com/dictionary/'+'%20'.join(word.split(' ')))
         else:
             await ctx.send(phrase)
     else:
