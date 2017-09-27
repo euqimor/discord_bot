@@ -168,7 +168,8 @@ async def merriam(ctx, *, word: str):
             message_list = dict_query.split_message(phrase)
             for message in message_list:
                 await ctx.send(message)
-        await ctx.send(phrase)
+        else:
+            await ctx.send(phrase)
     else:
         message = await ctx.send('Could not find the word or something went wrong with the request')
         sleep(4)
