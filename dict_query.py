@@ -34,8 +34,13 @@ def parse_merriam(cases):
     for entry in cases:
         if i > 0: phrase+='\n\n' #using counter to add new lines before every entry except the 1st one
         i+=1
-        try:
-            phrase+='__**'+entry.ew.text+'**, *'+entry.fl.text+'*__\n' #opening text. <ew> = word, <fl> = what part of speech it is
+        phrase+='__**'+entry.ew.text
+        if entry.fl:
+            phrase+='**, *'+entry.fl.text+'*__\n' #opening text. <ew> = word, <fl> = what part of speech it is
+        else:
+            phrase += '**__\n'
+
+        if entry.find('def'):
             definition_full = entry.find('def') #find the <def> tag inside the entry
             definition_content = definition_full(name=['sn', 'spl', 'dt']) #filter out all the garbage from the <def> tag
             if definition_content[0].name != 'sn': phrase += '\n' #add a new line if the first item in definition doesn't imply one
@@ -43,7 +48,7 @@ def parse_merriam(cases):
                 phrase += parse_tag_list(definition_content)
             except Exception as error:
                 print('Caught an exception while parsing tags:\n{}'.format(error))
-        except:
+        else:
             try:
                 phrase += '__**' + entry.ew.text + '**__\n'
                 definition_content = entry.cx
