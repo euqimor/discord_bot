@@ -8,20 +8,17 @@ import random
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
 
-rejections = ['Nope','Nu-uh','You are not my supervisor!','Sorry, you are not important enough to do that -_-','Stop trying that, or I\'ll report you to Nightmom!']
 
 def load_game_suggestions():
     '''
     :return: tries to load a dict of suggestions from a file,
     otherwise returns empty dict
     '''
-    suggestions = {}
-    os.chdir(os.path.expanduser('~/bothelper/'))
-    try:
-        suggestions = load_data('suggestions')
-    except:
-        pass
+    suggestions = load_data('suggestions')
+    if not suggestions:
+        suggestions = {}
     return suggestions
+
 
 def save_data(data, filename):
     '''
@@ -59,20 +56,20 @@ async def on_ready():
 async def games(ctx):
     """Prints games suggested so far grouped by suggestion author's name"""
     message = ''
-    try:
+    if suggestions:
         for name in suggestions:
             message+='```\n'+'Suggested by '+name+':'
             for game in suggestions[name]:
                 message+='\n'+game
             message+='```'
         await ctx.send(message)
-    except:
+    else:
         await ctx.send('Nothing has been suggested so far')
 
 @bot.command()
 async def list(ctx):
     """Prints games suggested so far in one list"""
-    try:
+    if suggestions:
         set_of_games = set({})
         message = '```\nGames suggested so far:'
         for name in suggestions:
@@ -82,7 +79,7 @@ async def list(ctx):
             message+='\n'+game
         message+='```'
         await ctx.send(message)
-    except:
+    else:
         await ctx.send('Nothing has been suggested yet')
 
 @bot.command()
@@ -176,7 +173,13 @@ async def merriam(ctx, *, word: str):
         sleep(4)
         await message.delete()
 
+
+
+
+
 if __name__ == '__main__':
+    rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
+                  'Stop trying that, or I\'ll report you to Nightmom!']
     suggestions = load_game_suggestions()
     bot.run('MzYxMzAyMjYwMDQ4OTg2MTEy.DKiIdw.i3t7w2gduC7Md01SKtFNg-nKiAM') #Companion Cube
     # bot.run('MzU3ODg3OTcwMjczMDAxNDcy.DJwzog.SDutum51myHyYMnGvIc_7_rYCZ8') #test-instance
