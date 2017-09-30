@@ -173,7 +173,7 @@ async def merriam(ctx, *, word: str):
         sleep(4)
         await message.delete()
 
-@bot.command
+@bot.command()
 async def adc(ctx, *, data: str):
     await ctx.message.delete()
     await ctx.send(data)
