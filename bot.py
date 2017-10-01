@@ -183,4 +183,4 @@ if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!']
     suggestions = load_game_suggestions()
-    bot.run(keys[bot])
+    bot.run(keys['bot'])
