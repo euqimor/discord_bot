@@ -176,7 +176,7 @@ async def merriam(ctx, *, word: str):
 @bot.command()
 async def adc(ctx, *, data: str):
     message = ctx.message
-    tshootdata = str(message.channel)+' | '+str(message.channel.me)+' | '+str(isinstance(message.channel, discord.DMChannel))
+    tshootdata = str(message.channel)+' | '+str(isinstance(message.channel, discord.DMChannel))
     # channels = str(str(x)+'; ' for x in bot.get_all_channels())
     await ctx.send(tshootdata)
 
