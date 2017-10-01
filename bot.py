@@ -176,7 +176,7 @@ async def merriam(ctx, *, word: str):
 @bot.command()
 async def adc(ctx, *, data: str):
     message = ctx.message
-    tshootdata = str(message.channel)+' | '+str(message.channel.me)+' | '+(str(x)+' ;' for x in ctx.get_all_channels())
+    tshootdata = str(message.channel)+' | '+str(message.channel.me)+' | '+(str(x)+' ;' for x in ctx.client.get_all_channels())
     await ctx.send(tshootdata)
 
 if __name__ == '__main__':
