@@ -176,8 +176,9 @@ async def merriam(ctx, *, word: str):
 @bot.command()
 async def adc(ctx, *, data: str):
     message = ctx.message
-    tshootdata = str(message.channel)+' | '+str(message.channel.me)+' | '+(str(x)+' ;' for x in bot.get_all_channels())
-    await ctx.send(tshootdata)
+    tshootdata = str(message.channel)+' | '+str(message.channel.me)+' | '
+    channels = str(str(x)+'; ' for x in bot.get_all_channels())
+    await ctx.send(tshootdata+channels)
 
 if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
