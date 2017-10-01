@@ -156,8 +156,7 @@ async def adminwipe(ctx):
     for role in role_obj_list:
         roles.append(role.name)
     if 'Admin' in roles:
-        for name in suggestions:
-            del name
+        suggestions = {}
         save_data(suggestions, 'suggestions')
         await ctx.send('The list is empty now :\'(')
     else:
