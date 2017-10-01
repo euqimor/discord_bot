@@ -97,13 +97,16 @@ async def remove(ctx, *, data):
     """Removes the game suggestion if the game was suggested by the user issuing the command"""
     name = str(ctx.author.name)
     game = ' '.join(data.split())
+    success_flag = 0
     if name in suggestions:
         if game in suggestions[name]:
             suggestions[name].remove(game)
             if suggestions[name] == set({}):
                 del suggestions[name]
-            save_data(suggestions, 'suggestions')
-            await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
+                save_data(suggestions, 'suggestions')
+                success_flag = 1
+    if success_flag:
+        await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
     else:
         await ctx.send('You cannot delete a game you did naaaht suggest')
 
