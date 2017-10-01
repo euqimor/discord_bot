@@ -190,12 +190,12 @@ async def merriam(ctx, *, word: str):
         await message.delete()
 
 
-@bot.command()
-async def adc(ctx, *, data: str):
-    message = ctx.message
-    tshootdata = str(message.channel)+' | '+str(isinstance(message.channel, discord.DMChannel))
-    # channels = str(str(x)+'; ' for x in bot.get_all_channels())
-    await ctx.send(tshootdata)
+# @bot.command()
+# async def adc(ctx, *, data: str):
+#     message = ctx.message
+#     tshootdata = str(message.channel)+' | '+str(isinstance(message.channel, discord.DMChannel))
+#     # channels = str(str(x)+'; ' for x in bot.get_all_channels())
+#     await ctx.send(tshootdata)
 
 
 if __name__ == '__main__':
