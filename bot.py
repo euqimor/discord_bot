@@ -8,7 +8,6 @@ import random
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
 
-
 def load_game_suggestions():
     '''
     :return: tries to load a dict of suggestions from a file,
@@ -34,7 +33,6 @@ def load_data(filename):
     :param filename: file from which to load the data
     :return: returns eval() of the file contents
     '''
-    data = ''
     try:
         with open(filename) as file:
             data = eval(file.read())
@@ -181,8 +179,8 @@ async def adc(ctx, *, data: str):
     await ctx.send(tshootdata)
 
 if __name__ == '__main__':
+    keys = load_data('keys')
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!']
     suggestions = load_game_suggestions()
-    # bot.run('MzYxMzAyMjYwMDQ4OTg2MTEy.DKiIdw.i3t7w2gduC7Md01SKtFNg-nKiAM') #Companion Cube
-    bot.run('MzU3ODg3OTcwMjczMDAxNDcy.DJwzog.SDutum51myHyYMnGvIc_7_rYCZ8') #test-instance
+    bot.run(keys[bot])
