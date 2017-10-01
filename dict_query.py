@@ -6,13 +6,12 @@ from bs4 import NavigableString
 
 #TODO fix "caught"
 
-def query_merriam(word):
+def query_merriam(word, key):
     '''
     :param word: the word to search for in the dictionaries
     :return: a list of bs4.element.Tag objects in meriam xml format
     corresponding to the word's classes (adj., verb, etc)
     '''
-    key = '1cbb9d6b-e0d5-4822-968d-d16f4942ab65'
     url = 'http://www.dictionaryapi.com/api/v1/references/collegiate/xml/'+word.lower()+'?key='+key
     r = requests.get(url)
     soup = Soup(r.text,'xml')

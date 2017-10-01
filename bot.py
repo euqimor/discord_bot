@@ -150,7 +150,7 @@ async def merriam(ctx, *, word: str):
     """Queries Merriam-Webster's Collegiate Dictionary for a word definition. Well, tries to at least..."""
     word = ' '.join(word.split())
     # try:
-    query_result = dict_query.query_merriam(word)
+    query_result = dict_query.query_merriam(word, keys['merriam-webster'])
     cases = query_result #the word may have changed if you queried for the past tense for example
     # except:
     #     await ctx.send('Something went wrong during online query')
