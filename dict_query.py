@@ -4,7 +4,6 @@ from string import ascii_lowercase as alphabet
 from bs4 import BeautifulSoup as Soup
 from bs4 import NavigableString
 
-#TODO fix "caught"
 
 def query_merriam(word, key):
     '''
@@ -54,6 +53,7 @@ def parse_merriam(cases):
             except Exception as error:
                 print('Caught an exception while trying to parse an entry with no <def>:\n{}'.format(error))
     return phrase
+
 
 def parse_tag_list(tag_list):
     phrase = ''

@@ -67,8 +67,7 @@ async def games(ctx):
             message+='```'
         await ctx.send(message)
     else:
-        await ctx.send('Nothing has been suggested so far')
-
+        await ctx.send('Nothing has been suggested yet')
 
 @bot.command()
 async def list(ctx):
