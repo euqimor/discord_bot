@@ -5,8 +5,10 @@ import os
 from time import sleep
 import random
 
+
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
+
 
 def load_game_suggestions():
     '''
@@ -28,6 +30,7 @@ def save_data(data, filename):
     with open(filename, 'w') as file:
         file.write(str(data))
 
+
 def load_data(filename):
     '''
     :param filename: file from which to load the data
@@ -42,6 +45,7 @@ def load_data(filename):
     except:
         print('Something went wrong during data evaluation')
 
+
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -49,6 +53,7 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     await bot.change_presence(game=discord.Game(name='with turrets'))
+
 
 @bot.command()
 async def games(ctx):
@@ -63,6 +68,7 @@ async def games(ctx):
         await ctx.send(message)
     else:
         await ctx.send('Nothing has been suggested so far')
+
 
 @bot.command()
 async def list(ctx):
@@ -80,6 +86,7 @@ async def list(ctx):
     else:
         await ctx.send('Nothing has been suggested yet')
 
+
 @bot.command()
 async def suggest(ctx, *, data):
     """Adds a game suggestion"""
@@ -89,8 +96,9 @@ async def suggest(ctx, *, data):
         suggestions[name].add(game)
     else:
         suggestions[name] = {game}
-    await ctx.send(name+' suggested '+game)
     save_data(suggestions, 'suggestions')
+    await ctx.send(name+' suggested '+game)
+
 
 @bot.command()
 async def remove(ctx, *, data):
@@ -110,6 +118,7 @@ async def remove(ctx, *, data):
     else:
         await ctx.send('You cannot delete a game you did naaaht suggest')
 
+
 @bot.command()
 async def adminremove(ctx, *, data):
     """Removes the game from every list, command only available to Admin role"""
@@ -120,17 +129,24 @@ async def adminremove(ctx, *, data):
     for role in role_obj_list:
         roles.append(role.name)
     if 'Admin' in roles:
+        success_flag = 0
         for name in suggestions:
             if game in suggestions[name]:
                 suggestions[name].remove(game)
+                success_flag = 1 #flag is placed here because below is only deletion of users with empty suggestions
                 if suggestions[name] == set({}):
                     names_to_delete.append(name)
         for name in names_to_delete:
             del suggestions[name]
-        save_data(suggestions, 'suggestions')
-        await ctx.send('Successfully deleted ' + game + ' from suggestions')
+            save_data(suggestions, 'suggestions')
+        if success_flag:
+            await ctx.send('Successfully deleted ' + game + ' from suggestions')
+        else:
+            await ctx.send('Game '+game+' not found in suggestions')
     else:
         await ctx.send(random.choice(rejections))
+
+
 
 # @bot.command()
 # async def adminwipe(ctx):
@@ -174,12 +190,14 @@ async def merriam(ctx, *, word: str):
         sleep(4)
         await message.delete()
 
+
 @bot.command()
 async def adc(ctx, *, data: str):
     message = ctx.message
     tshootdata = str(message.channel)+' | '+str(isinstance(message.channel, discord.DMChannel))
     # channels = str(str(x)+'; ' for x in bot.get_all_channels())
     await ctx.send(tshootdata)
+
 
 if __name__ == '__main__':
     keys = load_data('keys')
