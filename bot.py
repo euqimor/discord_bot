@@ -223,8 +223,8 @@ async def update_list_banner(ctx):
         if message.author.id == bot.user.id:
             message_list.append(message)
     if message_list:
-        await message_list[0].edit(content=create_list_message(suggestions))
-        await message_list[1].edit(content=create_games_message(suggestions))
+        await message_list[0].edit(content=create_games_message(suggestions))
+        await message_list[1].edit(content=create_list_message(suggestions))
     else:
         await ctx.send(create_list_message(suggestions))
         await ctx.send(create_games_message(suggestions))
