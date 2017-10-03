@@ -201,7 +201,7 @@ async def adc(ctx, *, data: str):
 async def test_channel(ctx):
     guild = ctx.guild
     channels = ''
-    channels += (str(x) for x in guild.channels) + '; '
+    channels += '; '.join(str(x) for x in guild.channels)
     # channel = guild.get_channel('game_suggestions_bot')
     await ctx.send(channels)
 
