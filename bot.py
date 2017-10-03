@@ -210,7 +210,7 @@ async def update_list_banner(ctx):
     guild = ctx.guild
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
     async for message in channel.history(limit=200):
-        if message.author == bot.user.name:
+        if message.author.id == bot.user.id:
             await channel.send(message)
 
 if __name__ == '__main__':
