@@ -268,7 +268,7 @@ async def update_games_banner(ctx):
 
 @bot.command()
 async def id(ctx):
-    check_admin_rights(ctx)
+    await check_admin_rights(ctx)
     id = ctx.author.id
     await ctx.send(id)
 
