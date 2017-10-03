@@ -209,9 +209,10 @@ async def test_channel(ctx):
 async def update_list_banner(ctx):
     guild = ctx.guild
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
-    async for message in channel.history(limit=200):
+    async for message in channel.history(limit=5):
         if message.author.id == bot.user.id:
-            await channel.send(message)
+            if 'success' in message.content:
+                await message.edit(content='hacked')
 
 if __name__ == '__main__':
     keys = load_data('keys')
