@@ -56,7 +56,7 @@ async def on_ready():
 
 
 def create_games_message(suggestions):
-    message = '__**SUGGESTIONS BY AUTHOR**__\n'
+    message = '__**SUGGESTIONS BY AUTHOR**__\n\n'
     for name in suggestions:
         message += '**'+name+':**\n'+'```'
         for game in suggestions[name]:
