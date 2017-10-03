@@ -124,9 +124,9 @@ async def remove(ctx, *, data):
             suggestions[name].remove(game)
             if suggestions[name] == set({}):
                 del suggestions[name]
-                save_data(suggestions, 'suggestions')
-                await update_games_banner(ctx)
-                success_flag = 1
+            save_data(suggestions, 'suggestions')
+            await update_games_banner(ctx)
+            success_flag = 1
     if success_flag:
         await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
     elif game_not_found:
