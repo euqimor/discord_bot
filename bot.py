@@ -11,6 +11,24 @@ description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
 
 
+async def check_admin_rights(ctx):
+    try:
+        roles_list = ctx.author.roles
+    except AttributeError:
+        await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
+                       'doesn\'t know how to check if you have admin rights.')
+        return None
+    roles = []
+    for role in roles_list:
+        roles.append(role.name)
+    success_flag = 0
+    if 'Admin' in roles:
+        success_flag = 1
+    elif ctx.author.id == 173747843314483210:
+        success_flag = 1
+    return bool(success_flag)
+
+
 def load_game_suggestions():
     '''
     :return: tries to load a dict of suggestions from a file,
@@ -249,9 +267,30 @@ async def update_games_banner(ctx):
             await channel.send(create_games_message(suggestions))
 
 
+@bot.command()
+async def set_prefix(ctx, message: str):
+    prefix = message.strip()
+    if await check_admin_rights(ctx):
+        bot.command_prefix = prefix
+        await ctx.send('The prefix is set to '+str(bot.command_prefix))
+    else:
+        await ctx.send(random.choice(rejections))
+
+
+@bot.command()
+async def set_nick(ctx, *, message:str = ''):
+    nickname = message.strip()
+    if await check_admin_rights(ctx):
+        bot_member = [x for x in bot.get_all_members() if x.bot and x.id == bot.user.id][0]
+        await bot_member.edit(nick=nickname)
+        await ctx.send('Nickname set')
+    else:
+        await ctx.send(random.choice(rejections))
+
+
 if __name__ == '__main__':
     keys = load_data('keys')
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
-                  'Stop trying that, or I\'ll report you to Nightmom!']
+                  'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     suggestions = load_game_suggestions()
     bot.run(keys['bot'])
