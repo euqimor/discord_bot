@@ -197,6 +197,10 @@ async def adc(ctx, *, data: str):
     # channels = str(str(x)+'; ' for x in bot.get_all_channels())
     await ctx.send(tshootdata)
 
+@bot.command()
+async def test_channel(ctx):
+    channel = bot.guild.get_channel('game_suggestions_bot')
+    await ctx.send('test', channel=channel)
 
 if __name__ == '__main__':
     keys = load_data('keys')
