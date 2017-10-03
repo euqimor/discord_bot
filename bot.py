@@ -197,6 +197,7 @@ async def adc(ctx, *, data: str):
     # channels = str(str(x)+'; ' for x in bot.get_all_channels())
     await ctx.send(tshootdata)
 
+
 @bot.command()
 async def test_channel(ctx):
     guild = ctx.guild
@@ -204,7 +205,8 @@ async def test_channel(ctx):
     update_list_banner(ctx)
     await channel.send('success?')
 
-def update_list_banner(ctx):
+
+async def update_list_banner(ctx):
     guild = ctx.guild
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
     async for message in channel.history(limit=200):
