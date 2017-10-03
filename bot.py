@@ -56,46 +56,45 @@ async def on_ready():
 
 
 def create_games_message(suggestions):
-    message = '__**SUGGESTIONS BY AUTHOR**__\n\n'
-    for name in suggestions:
-        message += '**'+name+':**\n'+'```'
-        for game in suggestions[name]:
-            message += '\n' + game
-        message += '```'
+    if suggestions:
+        message = '__**SUGGESTIONS BY AUTHOR**__\n\n'
+        for name in suggestions:
+            message += '**'+name+':**\n'+'```'
+            for game in suggestions[name]:
+                message += '\n' + game
+            message += '```'
+    else:
+        message = 'Nothing has been suggested yet'
     return message
 
 
 @bot.command()
 async def games(ctx):
     """Prints games suggested so far grouped by suggestion author's name"""
-    message = ''
-    if suggestions:
-        message = create_games_message(suggestions)
-        await ctx.send(message)
-    else:
-        await ctx.send('Nothing has been suggested yet')
+    message = create_games_message(suggestions)
+    await ctx.send(message)
 
 
 def create_list_message(suggestions):
-    set_of_games = set({})
-    message = '__**SUGGESTED GAMES**__\n```\n'
-    for name in suggestions:
-        for game in suggestions[name]:
-            set_of_games.add(game)
-    for game in set_of_games:
-        message += '\n' + game
-    message += '```'
+    if suggestions:
+        set_of_games = set({})
+        message = '__**SUGGESTED GAMES**__\n```\n'
+        for name in suggestions:
+            for game in suggestions[name]:
+                set_of_games.add(game)
+        for game in set_of_games:
+            message += '\n' + game
+        message += '```'
+    else:
+        message = 'Nothing has been suggested yet'
     return message
 
 
 @bot.command()
 async def list(ctx):
     """Prints games suggested so far in one list"""
-    if suggestions:
-        message = create_list_message(suggestions)
-        await ctx.send(message)
-    else:
-        await ctx.send('Nothing has been suggested yet')
+    message = create_list_message(suggestions)
+    await ctx.send(message)
 
 
 @bot.command()
@@ -108,6 +107,7 @@ async def suggest(ctx, *, data):
     else:
         suggestions[name] = {game}
     save_data(suggestions, 'suggestions')
+    await update_games_banner(ctx)
     await ctx.send(name+' suggested '+game)
 
 
@@ -123,6 +123,7 @@ async def remove(ctx, *, data):
             if suggestions[name] == set({}):
                 del suggestions[name]
                 save_data(suggestions, 'suggestions')
+                await update_games_banner(ctx)
                 success_flag = 1
     if success_flag:
         await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
@@ -150,6 +151,7 @@ async def adminremove(ctx, *, data):
         for name in names_to_delete:
             del suggestions[name]
             save_data(suggestions, 'suggestions')
+            await update_games_banner(ctx)
         if success_flag:
             await ctx.send('Successfully deleted ' + game + ' from suggestions')
         else:
@@ -170,6 +172,7 @@ async def adminwipe(ctx):
         global suggestions
         suggestions = {}
         save_data(suggestions, 'suggestions')
+        await update_games_banner(ctx)
         await ctx.send('The list is empty now :\'(')
     else:
         await ctx.send(random.choice(rejections))
