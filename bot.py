@@ -139,7 +139,11 @@ async def remove(ctx, *, data):
 @bot.command()
 async def adminremove(ctx, *, data):
     """Removes the game from every list, command only available to Admin role"""
-    role_obj_list = ctx.author.roles
+    try:
+        role_obj_list = ctx.author.roles #TODO ?
+    except discord.ext.commands.errors.CommandInvokeError:
+        await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
+                       'doesn\'t know how to check if you have admin rights. Can fix this if you poke me.')
     game = ' '.join(data.split())
     roles = []
     names_to_delete = []
@@ -169,7 +173,11 @@ async def adminremove(ctx, *, data):
 @bot.command()
 async def adminwipe(ctx):
     """Purges the game suggestions list, command only available to Admin role"""
-    role_obj_list = ctx.author.roles
+    try:
+        role_obj_list = ctx.author.roles #TODO ?
+    except discord.ext.commands.errors.CommandInvokeError:
+        await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
+                       'doesn\'t know how to check if you have admin rights. Can fix this if you poke me.')
     roles = []
     for role in role_obj_list:
         roles.append(role.name)
