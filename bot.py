@@ -10,6 +10,7 @@ import random
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
 
+
 async def check_admin_rights(ctx):
     try:
         roles_list = ctx.author.roles
@@ -21,12 +22,12 @@ async def check_admin_rights(ctx):
     for role in roles_list:
         roles.append(role.name)
     success_flag = 0
-    # if 'Admin' in roles:
-    #     success_flag = 1
-    if ctx.author.id == 173747843314483210:
-        await ctx.send('owner permissions')
+    if 'Admin' in roles:
+        success_flag = 1
+    elif ctx.author.id == 173747843314483210:
         success_flag = 1
     return bool(success_flag)
+
 
 def load_game_suggestions():
     '''
@@ -267,10 +268,11 @@ async def update_games_banner(ctx):
 
 
 @bot.command()
-async def id(ctx):
-    await check_admin_rights(ctx)
-    id = ctx.author.id
-    await ctx.send(id)
+async def set_prefix(ctx, message: str):
+    prefix = message.strip()
+    if await check_admin_rights(ctx):
+       bot.command_prefix = prefix
+    await ctx.send('The prefix is set to '+str(bot.command_prefix))
 
 
 if __name__ == '__main__':
