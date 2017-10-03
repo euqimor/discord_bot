@@ -56,9 +56,9 @@ async def on_ready():
 
 
 def create_games_message(suggestions):
-    message = ''
+    message = '__**SUGGESTIONS BY AUTHOR**__\n'
     for name in suggestions:
-        message += '```\n' + 'Suggested by ' + name + ':'
+        message += '```\n' + name + ':'
         for game in suggestions[name]:
             message += '\n' + game
         message += '```'
@@ -78,7 +78,7 @@ async def games(ctx):
 
 def create_list_message(suggestions):
     set_of_games = set({})
-    message = '```\nGames suggested so far:'
+    message = '__**SUGGESTED GAMES**__\n```\n'
     for name in suggestions:
         for game in suggestions[name]:
             set_of_games.add(game)
