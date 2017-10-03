@@ -23,7 +23,8 @@ async def check_admin_rights(ctx):
     success_flag = 0
     if 'Admin' in roles:
         success_flag = 1
-    elif ctx.author.id == 'TODO':
+    elif ctx.author.id == '173747843314483210':
+        await ctx.send('owner permissions')
         success_flag = 1
     return bool(success_flag)
 
