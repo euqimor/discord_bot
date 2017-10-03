@@ -10,6 +10,22 @@ import random
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
 
+async def check_admin_rights(ctx):
+    try:
+        roles_list = ctx.author.roles
+    except AttributeError:
+        await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
+                       'doesn\'t know how to check if you have admin rights.')
+        return None
+    roles = []
+    for role in roles_list:
+        roles.append(role.name)
+    success_flag = 0
+    if 'Admin' in roles:
+        success_flag = 1
+    elif ctx.author.id == 'TODO':
+        success_flag = 1
+    return bool(success_flag)
 
 def load_game_suggestions():
     '''
@@ -247,6 +263,12 @@ async def update_games_banner(ctx):
         if suggestions:
             await channel.send(create_list_message(suggestions))
             await channel.send(create_games_message(suggestions))
+
+
+@bot.command()
+async def my_id(ctx):
+    id = ctx.author.id
+    await ctx.send(id)
 
 
 if __name__ == '__main__':
