@@ -202,7 +202,7 @@ async def adc(ctx, *, data: str):
 async def test_channel(ctx):
     guild = ctx.guild
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
-    update_list_banner(ctx)
+    await update_list_banner(ctx)
     await channel.send('success?')
 
 
