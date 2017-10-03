@@ -205,32 +205,32 @@ async def merriam(ctx, *, word: str):
         await message.delete()
 
 
-@bot.command()
-async def adc(ctx, *, data: str):
-    message = ctx.message
-    tshootdata = str(message.channel)+' | '+str(isinstance(message.channel, discord.DMChannel))
-    # channels = str(str(x)+'; ' for x in bot.get_all_channels())
-    await ctx.send(tshootdata)
-
-
-@bot.command()
-async def test_channel(ctx):
-    await update_games_banner(ctx)
+# @bot.command()
+# async def adc(ctx, *, data: str):
+#     message = ctx.message
+#     tshootdata = str(message.channel)+' | '+str(isinstance(message.channel, discord.DMChannel))
+#     # channels = str(str(x)+'; ' for x in bot.get_all_channels())
+#     await ctx.send(tshootdata)
 
 
 async def update_games_banner(ctx):
     guild = ctx.guild
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
     message_list = []
-    async for message in channel.history(limit=5):
+    async for message in channel.history(limit=100):
         if message.author.id == bot.user.id:
             message_list.append(message)
     if message_list:
-        await message_list[0].edit(content=create_games_message(suggestions))
-        await message_list[1].edit(content=create_list_message(suggestions))
+        if suggestions:
+            await message_list[0].edit(content=create_games_message(suggestions))
+            await message_list[1].edit(content=create_list_message(suggestions))
+        else:
+            message_list[0].delete()
+            message_list[1].delete()
     else:
-        await ctx.send(create_list_message(suggestions))
-        await ctx.send(create_games_message(suggestions))
+        if suggestions:
+            await ctx.send(create_list_message(suggestions))
+            await ctx.send(create_games_message(suggestions))
 
 
 if __name__ == '__main__':
