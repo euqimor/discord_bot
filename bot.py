@@ -203,11 +203,11 @@ async def test_channel(ctx):
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
     await channel.send(channel.name+'\n'+bot.user.name)
 
-def update_list_banner(ctx):
-    guild = ctx.guild
-    channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
-    async for message in channel.history(limit=200):
-        if message.author == bot.
+# def update_list_banner(ctx):
+#     guild = ctx.guild
+#     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
+#     async for message in channel.history(limit=200):
+#         if message.author == bot.
 
 if __name__ == '__main__':
     keys = load_data('keys')
