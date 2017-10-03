@@ -225,8 +225,8 @@ async def update_games_banner(ctx):
             await message_list[0].edit(content=create_games_message(suggestions))
             await message_list[1].edit(content=create_list_message(suggestions))
         else:
-            message_list[0].delete()
-            message_list[1].delete()
+            await message_list[0].delete()
+            await message_list[1].delete()
     else:
         if suggestions:
             await ctx.send(create_list_message(suggestions))
