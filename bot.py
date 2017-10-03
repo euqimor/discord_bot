@@ -278,7 +278,7 @@ async def set_prefix(ctx, message: str):
 
 
 @bot.command()
-async def set_nickname(ctx, message: str):
+async def set_nickname(ctx, *message: str):
     nickname = message.strip()
     if await check_admin_rights(ctx):
         bot_member = [x for x in bot.get_all_members() if x.bot and x.id == bot.user.id][0]
