@@ -219,7 +219,7 @@ async def merriam(ctx, *, word: str):
 
 
 async def update_games_banner(ctx):
-    guild = ctx.guild
+    guild = bot.guilds[0] #TODO think about fixing this. Or don't...
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
     message_list = []
     async for message in channel.history(limit=100):
