@@ -117,8 +117,10 @@ async def remove(ctx, *, data):
     name = str(ctx.author.name)
     game = ' '.join(data.split())
     success_flag = 0
+    game_not_found = 1
     if name in suggestions:
         if game in suggestions[name]:
+            game_not_found = 0
             suggestions[name].remove(game)
             if suggestions[name] == set({}):
                 del suggestions[name]
@@ -127,8 +129,11 @@ async def remove(ctx, *, data):
                 success_flag = 1
     if success_flag:
         await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
+    elif game_not_found:
+        await ctx.send('Game \"'+game+'\" not found in '+name+'\'s suggestions')
     else:
-        await ctx.send('You cannot delete a game you did naaaht suggest')
+        await ctx.send('Something went wrong')
+
 
 
 @bot.command()
