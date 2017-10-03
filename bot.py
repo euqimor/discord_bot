@@ -143,7 +143,8 @@ async def adminremove(ctx, *, data):
         role_obj_list = ctx.author.roles #TODO ?
     except AttributeError:
         await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
-                       'doesn\'t know how to check if you have admin rights. Can fix this if you poke me.')
+                       'doesn\'t know how to check if you have admin rights.')
+        return None
     game = ' '.join(data.split())
     roles = []
     names_to_delete = []
@@ -177,7 +178,8 @@ async def adminwipe(ctx):
         role_obj_list = ctx.author.roles #TODO ?
     except AttributeError:
         await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
-                       'doesn\'t know how to check if you have admin rights. Can fix this if you poke me.')
+                       'doesn\'t know how to check if you have admin rights.')
+        return None
     roles = []
     for role in role_obj_list:
         roles.append(role.name)
