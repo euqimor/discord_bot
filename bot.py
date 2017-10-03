@@ -212,10 +212,10 @@ async def adc(ctx, *, data: str):
 
 @bot.command()
 async def test_channel(ctx):
-    await update_list_banner(ctx)
+    await update_games_banner(ctx)
 
 
-async def update_list_banner(ctx):
+async def update_games_banner(ctx):
     guild = ctx.guild
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
     message_list = []
