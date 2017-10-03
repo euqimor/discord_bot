@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
 import dict_query
-import os
 from time import sleep
 import random
+
+#TODO change prefix, change playing with, add multi-server support(?)
 
 
 description = '''An awkward attempt at making a discord bot'''
@@ -55,35 +56,46 @@ async def on_ready():
     await bot.change_presence(game=discord.Game(name='with turrets'))
 
 
+def create_games_message(suggestions):
+    if suggestions:
+        message = '__**SUGGESTIONS BY AUTHOR**__\n\n'
+        for name in suggestions:
+            message += '**'+name+':**\n'+'```'
+            for game in suggestions[name]:
+                message += '\n' + game
+            message += '```'
+    else:
+        message = 'Nothing has been suggested yet'
+    return message
+
+
 @bot.command()
 async def games(ctx):
     """Prints games suggested so far grouped by suggestion author's name"""
-    message = ''
-    if suggestions:
-        for name in suggestions:
-            message+='```\n'+'Suggested by '+name+':'
-            for game in suggestions[name]:
-                message+='\n'+game
-            message+='```'
-        await ctx.send(message)
-    else:
-        await ctx.send('Nothing has been suggested yet')
+    message = create_games_message(suggestions)
+    await ctx.send(message)
 
-@bot.command()
-async def list(ctx):
-    """Prints games suggested so far in one list"""
+
+def create_list_message(suggestions):
     if suggestions:
         set_of_games = set({})
-        message = '```\nGames suggested so far:'
+        message = '__**SUGGESTED GAMES**__\n```\n'
         for name in suggestions:
             for game in suggestions[name]:
                 set_of_games.add(game)
         for game in set_of_games:
-            message+='\n'+game
-        message+='```'
-        await ctx.send(message)
+            message += '\n' + game
+        message += '```'
     else:
-        await ctx.send('Nothing has been suggested yet')
+        message = 'Nothing has been suggested yet'
+    return message
+
+
+@bot.command()
+async def list(ctx):
+    """Prints games suggested so far in one list"""
+    message = create_list_message(suggestions)
+    await ctx.send(message)
 
 
 @bot.command()
@@ -96,6 +108,7 @@ async def suggest(ctx, *, data):
     else:
         suggestions[name] = {game}
     save_data(suggestions, 'suggestions')
+    await update_games_banner(ctx)
     await ctx.send(name+' suggested '+game)
 
 
@@ -105,23 +118,34 @@ async def remove(ctx, *, data):
     name = str(ctx.author.name)
     game = ' '.join(data.split())
     success_flag = 0
+    game_not_found = 1
     if name in suggestions:
         if game in suggestions[name]:
+            game_not_found = 0
             suggestions[name].remove(game)
             if suggestions[name] == set({}):
                 del suggestions[name]
-                save_data(suggestions, 'suggestions')
-                success_flag = 1
+            save_data(suggestions, 'suggestions')
+            await update_games_banner(ctx)
+            success_flag = 1
     if success_flag:
         await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
+    elif game_not_found:
+        await ctx.send('Game \"'+game+'\" not found in '+name+'\'s suggestions')
     else:
-        await ctx.send('You cannot delete a game you did naaaht suggest')
+        await ctx.send('Something went wrong')
+
 
 
 @bot.command()
 async def adminremove(ctx, *, data):
     """Removes the game from every list, command only available to Admin role"""
-    role_obj_list = ctx.author.roles
+    try:
+        role_obj_list = ctx.author.roles #TODO ?
+    except AttributeError:
+        await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
+                       'doesn\'t know how to check if you have admin rights.')
+        return None
     game = ' '.join(data.split())
     roles = []
     names_to_delete = []
@@ -138,6 +162,7 @@ async def adminremove(ctx, *, data):
         for name in names_to_delete:
             del suggestions[name]
             save_data(suggestions, 'suggestions')
+            await update_games_banner(ctx)
         if success_flag:
             await ctx.send('Successfully deleted ' + game + ' from suggestions')
         else:
@@ -150,7 +175,12 @@ async def adminremove(ctx, *, data):
 @bot.command()
 async def adminwipe(ctx):
     """Purges the game suggestions list, command only available to Admin role"""
-    role_obj_list = ctx.author.roles
+    try:
+        role_obj_list = ctx.author.roles #TODO ?
+    except AttributeError:
+        await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
+                       'doesn\'t know how to check if you have admin rights.')
+        return None
     roles = []
     for role in role_obj_list:
         roles.append(role.name)
@@ -158,6 +188,7 @@ async def adminwipe(ctx):
         global suggestions
         suggestions = {}
         save_data(suggestions, 'suggestions')
+        await update_games_banner(ctx)
         await ctx.send('The list is empty now :\'(')
     else:
         await ctx.send(random.choice(rejections))
@@ -196,6 +227,26 @@ async def merriam(ctx, *, word: str):
 #     tshootdata = str(message.channel)+' | '+str(isinstance(message.channel, discord.DMChannel))
 #     # channels = str(str(x)+'; ' for x in bot.get_all_channels())
 #     await ctx.send(tshootdata)
+
+
+async def update_games_banner(ctx):
+    guild = bot.guilds[0] #TODO think about fixing this. Or don't...
+    channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
+    message_list = []
+    async for message in channel.history(limit=100):
+        if message.author.id == bot.user.id:
+            message_list.append(message)
+    if message_list:
+        if suggestions:
+            await message_list[0].edit(content=create_games_message(suggestions))
+            await message_list[1].edit(content=create_list_message(suggestions))
+        else:
+            await message_list[0].delete()
+            await message_list[1].delete()
+    else:
+        if suggestions:
+            await channel.send(create_list_message(suggestions))
+            await channel.send(create_games_message(suggestions))
 
 
 if __name__ == '__main__':
