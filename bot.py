@@ -281,8 +281,9 @@ async def set_prefix(ctx, message: str):
 async def set_nickname(ctx, message: str):
     nickname = message.strip()
     if await check_admin_rights(ctx):
-        bot.user.nick = nickname
-        await ctx.send('The nickname is set to '+str(bot.user.nick))
+        bot_member = [x for x in bot.get_all_members() if x.bot and x.id == bot.user.id]
+        await bot_member.edit(nick=nickname)
+        await ctx.send('The nickname is set to '+str(bot.user.display_name))
     else:
         await ctx.send(random.choice(rejections))
 
