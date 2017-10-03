@@ -271,13 +271,25 @@ async def update_games_banner(ctx):
 async def set_prefix(ctx, message: str):
     prefix = message.strip()
     if await check_admin_rights(ctx):
-       bot.command_prefix = prefix
-    await ctx.send('The prefix is set to '+str(bot.command_prefix))
+        bot.command_prefix = prefix
+        await ctx.send('The prefix is set to '+str(bot.command_prefix))
+    else:
+        await ctx.send(random.choice(rejections))
+
+
+@bot.command()
+async def set_nickname(ctx, message: str):
+    nickname = message.strip()
+    if await check_admin_rights(ctx):
+        bot.user.display_name = nickname
+        await ctx.send('The nickname is set to '+str(bot.user.display_name))
+    else:
+        await ctx.send(random.choice(rejections))
 
 
 if __name__ == '__main__':
     keys = load_data('keys')
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
-                  'Stop trying that, or I\'ll report you to Nightmom!']
+                  'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     suggestions = load_game_suggestions()
     bot.run(keys['bot'])
