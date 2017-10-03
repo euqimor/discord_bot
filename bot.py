@@ -75,18 +75,24 @@ async def games(ctx):
     else:
         await ctx.send('Nothing has been suggested yet')
 
+
+def create_list_message(suggestions):
+    set_of_games = set({})
+    message = '```\nGames suggested so far:'
+    for name in suggestions:
+        for game in suggestions[name]:
+            set_of_games.add(game)
+    for game in set_of_games:
+        message += '\n' + game
+    message += '```'
+    return message
+
+
 @bot.command()
 async def list(ctx):
     """Prints games suggested so far in one list"""
     if suggestions:
-        set_of_games = set({})
-        message = '```\nGames suggested so far:'
-        for name in suggestions:
-            for game in suggestions[name]:
-                set_of_games.add(game)
-        for game in set_of_games:
-            message+='\n'+game
-        message+='```'
+        message = create_list_message(suggestions)
         await ctx.send(message)
     else:
         await ctx.send('Nothing has been suggested yet')
@@ -206,19 +212,23 @@ async def adc(ctx, *, data: str):
 
 @bot.command()
 async def test_channel(ctx):
-    guild = ctx.guild
-    channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
     await update_list_banner(ctx)
-    await channel.send('success?')
 
 
 async def update_list_banner(ctx):
     guild = ctx.guild
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
+    message_list = []
     async for message in channel.history(limit=5):
         if message.author.id == bot.user.id:
-            if 'success' in message.content:
-                await message.edit(content='hacked')
+            message_list.append(message)
+            if message_list:
+                await message_list[0].edit(content=create_list_message(suggestions))
+                await message_list[1].edit(content=create_games_message(suggestions))
+            else:
+                await ctx.send(create_list_message(suggestions))
+                await ctx.send(create_games_message(suggestions))
+
 
 if __name__ == '__main__':
     keys = load_data('keys')
