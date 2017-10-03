@@ -201,7 +201,7 @@ async def adc(ctx, *, data: str):
 async def test_channel(ctx):
     guild = ctx.guild
     channel = guild.get_channel('game_suggestions_bot')
-    await ctx.send('test', channel=channel)
+    await channel.send('test', channel=channel)
 
 if __name__ == '__main__':
     keys = load_data('keys')
