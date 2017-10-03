@@ -55,16 +55,22 @@ async def on_ready():
     await bot.change_presence(game=discord.Game(name='with turrets'))
 
 
+def create_games_message(suggestions):
+    message = ''
+    for name in suggestions:
+        message += '```\n' + 'Suggested by ' + name + ':'
+        for game in suggestions[name]:
+            message += '\n' + game
+        message += '```'
+    return message
+
+
 @bot.command()
 async def games(ctx):
     """Prints games suggested so far grouped by suggestion author's name"""
     message = ''
     if suggestions:
-        for name in suggestions:
-            message+='```\n'+'Suggested by '+name+':'
-            for game in suggestions[name]:
-                message+='\n'+game
-            message+='```'
+        message = create_games_message(suggestions)
         await ctx.send(message)
     else:
         await ctx.send('Nothing has been suggested yet')
