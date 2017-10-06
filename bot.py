@@ -4,7 +4,7 @@ import dict_query
 from time import sleep
 import random
 
-#TODO change prefix, change playing with, add multi-server support(?)
+#TODO PROVIDE HELP INSTRUCTIONS, separate commands into groups, add multi-server support(?)
 
 
 description = '''An awkward attempt at making a discord bot'''
