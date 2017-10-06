@@ -268,7 +268,7 @@ async def update_games_banner(ctx):
 
 
 @bot.command()
-async def set_prefix(ctx, message: str):
+async def set_prefix(ctx, message: str): #TODO save permanently
     prefix = message.strip()
     if await check_admin_rights(ctx):
         bot.command_prefix = prefix
