@@ -288,6 +288,16 @@ async def set_nick(ctx, *, message:str = ''):
         await ctx.send(random.choice(rejections))
 
 
+@bot.command()
+async def set_status(ctx, *, message:str = ''): #TODO save permanently?
+    status = message.strip()
+    if await check_admin_rights(ctx):
+        await bot.change_presence(game=discord.Game(name=status))
+        await ctx.send('Status set')
+    else:
+        await ctx.send(random.choice(rejections))
+
+
 if __name__ == '__main__':
     keys = load_data('keys')
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
