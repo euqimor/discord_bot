@@ -183,22 +183,22 @@ async def adminremove(ctx, *, data):
         return None
     game = ' '.join(data.split())
     roles = []
-    ids_to_delete = []
+    global suggestions
     for role in role_obj_list:
         roles.append(role.name)
     if 'Admin' in roles:
-        success_flag = 0
+        entries_to_delete = []
         for userid in suggestions:
-            if game in suggestions[userid]['games']:
-                suggestions[userid]['games'].remove(game)
-                success_flag = 1  # flag is placed here because below is only deletion of users with empty suggestions
-                if suggestions[userid]['games'] == set({}):
-                    ids_to_delete.append(userid)
-        for userid in ids_to_delete:
-            del suggestions[userid]
+            for existing_game in suggestions[userid]['games']:
+                if game.lower() == existing_game.lower():
+                    entries_to_delete.append({'userid':userid, 'game':existing_game})
+        if entries_to_delete:
+            for entry in entries_to_delete:
+                suggestions[entry['userid']]['games'].remove(entry['game'])
+                if suggestions[entry['userid']]['games'] == set({}):
+                    del suggestions[entry['userid']]
             save_data(suggestions, 'suggestions')
             await update_games_banner(ctx)
-        if success_flag:
             await ctx.send('Successfully deleted ' + game + ' from suggestions')
         else:
             await ctx.send('Game \"'+game+'\" not found in suggestions')
