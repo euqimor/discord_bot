@@ -5,7 +5,7 @@ from time import sleep
 import random
 
 #TODO PROVIDE HELP INSTRUCTIONS, separate commands into groups, add multi-server support(?)
-
+#TODO 2000 symbols limit for suggestions list
 
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
@@ -77,9 +77,9 @@ async def on_ready():
 def create_games_message(suggestions):
     if suggestions:
         message = '__**SUGGESTIONS BY AUTHOR**__\n\n'
-        for name in suggestions:
-            message += '**'+name+':**\n'+'```'
-            for game in suggestions[name]:
+        for id in suggestions:
+            message += '**'+suggestions[id]['username']+':**\n'+'```'
+            for game in suggestions[id]['games']:
                 message += '\n' + game
             message += '```'
     else:
@@ -98,8 +98,8 @@ def create_list_message(suggestions):
     if suggestions:
         set_of_games = set({})
         message = '__**SUGGESTED GAMES**__\n```\n'
-        for name in suggestions:
-            for game in suggestions[name]:
+        for id in suggestions:
+            for game in suggestions[id]['games']:
                 set_of_games.add(game)
         for game in set_of_games:
             message += '\n' + game
@@ -119,12 +119,16 @@ async def list(ctx):
 @bot.command()
 async def suggest(ctx, *, data):
     """Adds a game suggestion"""
+    id = ctx.author.id
     name = str(ctx.author.name)
     game = ' '.join(data.split())
-    if name in suggestions:
-        suggestions[name].add(game)
+    if id in suggestions:
+        suggestions[id]['games'].add(game)
+        if suggestions[id]['username'] != name:
+            suggestions[id]['username'] = name
     else:
-        suggestions[name] = {game}
+        suggestions[id]['username'] = name
+        suggestions[id]['games'] = {game}
     save_data(suggestions, 'suggestions')
     await update_games_banner(ctx)
     await ctx.send(name+' suggested '+game)
@@ -133,16 +137,17 @@ async def suggest(ctx, *, data):
 @bot.command()
 async def remove(ctx, *, data):
     """Removes the game suggestion if the game was suggested by the user issuing the command"""
+    id = ctx.author.id
     name = str(ctx.author.name)
     game = ' '.join(data.split())
     success_flag = 0
     game_not_found = 1
-    if name in suggestions:
-        if game in suggestions[name]:
+    if id in suggestions:
+        if game in suggestions[id]['games']:
             game_not_found = 0
-            suggestions[name].remove(game)
-            if suggestions[name] == set({}):
-                del suggestions[name]
+            suggestions[id]['games'].remove(game)
+            if suggestions[id]['games'] == set({}):
+                del suggestions[id] #note to self: should change this if anything else is to be stored for id except for name and game suggestions
             save_data(suggestions, 'suggestions')
             await update_games_banner(ctx)
             success_flag = 1
@@ -159,26 +164,26 @@ async def remove(ctx, *, data):
 async def adminremove(ctx, *, data):
     """Removes the game from every list, command only available to Admin role"""
     try:
-        role_obj_list = ctx.author.roles #TODO ?
+        role_obj_list = ctx.author.roles
     except AttributeError:
         await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
                        'doesn\'t know how to check if you have admin rights.')
         return None
     game = ' '.join(data.split())
     roles = []
-    names_to_delete = []
+    ids_to_delete = []
     for role in role_obj_list:
         roles.append(role.name)
     if 'Admin' in roles:
         success_flag = 0
-        for name in suggestions:
-            if game in suggestions[name]:
-                suggestions[name].remove(game)
+        for id in suggestions:
+            if game in suggestions[id]['games']:
+                suggestions[id]['games'].remove(game)
                 success_flag = 1 #flag is placed here because below is only deletion of users with empty suggestions
-                if suggestions[name] == set({}):
-                    names_to_delete.append(name)
-        for name in names_to_delete:
-            del suggestions[name]
+                if suggestions[id]['games'] == set({}):
+                    ids_to_delete.append(id)
+        for id in ids_to_delete:
+            del suggestions[id]
             save_data(suggestions, 'suggestions')
             await update_games_banner(ctx)
         if success_flag:
@@ -194,7 +199,7 @@ async def adminremove(ctx, *, data):
 async def adminwipe(ctx):
     """Purges the game suggestions list, command only available to Admin role"""
     try:
-        role_obj_list = ctx.author.roles #TODO ?
+        role_obj_list = ctx.author.roles
     except AttributeError:
         await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
                        'doesn\'t know how to check if you have admin rights.')
