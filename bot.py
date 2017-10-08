@@ -22,9 +22,10 @@ async def check_admin_rights(ctx):
     for role in roles_list:
         roles.append(role.name)
     success_flag = 0
-    if 'Admin' in roles:
-        success_flag = 1
-    elif ctx.author.id == 173747843314483210:
+    for role in roles:
+        if role.permissions.administrator:
+            success_flag = 1
+    if ctx.author.id == 173747843314483210:
         success_flag = 1
     return bool(success_flag)
 
