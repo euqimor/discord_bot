@@ -123,11 +123,12 @@ async def suggest(ctx, *, data):
     userid = ctx.author.id
     name = str(ctx.author.name)
     game = ' '.join(data.split())
+    already_suggested = 0
     if userid in suggestions:
         if game.lower() not in [x.lower() for x in suggestions[userid]['games']]:
             suggestions[userid]['games'].add(game)
         else:
-            await ctx.send('{} is in your suggestions already'.format(game))
+            already_suggested = 1
         if suggestions[userid]['username'] != name:
             suggestions[userid]['username'] = name
     else:
@@ -135,8 +136,11 @@ async def suggest(ctx, *, data):
         suggestions[userid]['username'] = name
         suggestions[userid]['games'] = {game}
     save_data(suggestions, 'suggestions')
-    await update_games_banner(ctx)
-    await ctx.send(name+' suggested '+game)
+    if already_suggested:
+        await ctx.send('{} is in your suggestions already'.format(game))
+    else:
+        await update_games_banner(ctx)
+        await ctx.send(name+' suggested '+game)
 
 
 @bot.command()
