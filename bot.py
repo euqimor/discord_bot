@@ -175,18 +175,9 @@ async def remove(ctx, *, data):
 @bot.command()
 async def adminremove(ctx, *, data):
     """Removes the game from every list, command only available to Admin role"""
-    try:
-        role_obj_list = ctx.author.roles
-    except AttributeError:
-        await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
-                       'doesn\'t know how to check if you have admin rights.')
-        return None
     game = ' '.join(data.split())
-    roles = []
     global suggestions
-    for role in role_obj_list:
-        roles.append(role.name)
-    if 'Admin' in roles:
+    if await check_admin_rights(ctx):
         entries_to_delete = []
         for userid in suggestions:
             for existing_game in suggestions[userid]['games']:
@@ -209,16 +200,7 @@ async def adminremove(ctx, *, data):
 @bot.command()
 async def adminwipe(ctx):
     """Purges the game suggestions list, command only available to Admin role"""
-    try:
-        role_obj_list = ctx.author.roles
-    except AttributeError:
-        await ctx.send('Something went wrong. If you tried this command in a DM, the bot '
-                       'doesn\'t know how to check if you have admin rights.')
-        return None
-    roles = []
-    for role in role_obj_list:
-        roles.append(role.name)
-    if 'Admin' in roles:
+    if await check_admin_rights(ctx):
         global suggestions
         suggestions = {}
         save_data(suggestions, 'suggestions')
