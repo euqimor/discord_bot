@@ -148,14 +148,16 @@ async def remove(ctx, *, data):
     success_flag = 0
     game_not_found = 1
     if userid in suggestions:
-        if game in suggestions[userid]['games']:
-            game_not_found = 0
-            suggestions[userid]['games'].remove(game)
-            if suggestions[userid]['games'] == set({}):
-                del suggestions[userid]  # note to self: should change this if anything else is to be stored for userid except for name and game suggestions
-            save_data(suggestions, 'suggestions')
-            await update_games_banner(ctx)
-            success_flag = 1
+        if suggestions[userid]['games'] != set({}):
+            for existing_game in suggestions[userid]['games']:
+                if game.lower() == existing_game.lower():
+                    game_not_found = 0
+                    suggestions[userid]['games'].remove(existing_game)
+        else:
+            del suggestions[userid]  # note to self: should change this if anything else is to be stored for userid except for name and game suggestions
+        save_data(suggestions, 'suggestions')
+        await update_games_banner(ctx)
+        success_flag = 1
     if success_flag:
         await ctx.send('Successfully deleted '+game+' from '+name+'\'s suggestions')
     elif game_not_found:
