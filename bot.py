@@ -127,6 +127,7 @@ async def suggest(ctx, *, data):
         if suggestions[id]['username'] != name:
             suggestions[id]['username'] = name
     else:
+        suggestions[id] = {}
         suggestions[id]['username'] = name
         suggestions[id]['games'] = {game}
     save_data(suggestions, 'suggestions')
