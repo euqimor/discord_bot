@@ -4,8 +4,8 @@ import dict_query
 from time import sleep
 import random
 
-#TODO PROVIDE HELP INSTRUCTIONS, separate commands into groups, add multi-server support(?)
-#TODO 2000 symbols limit for suggestions list
+# TODO PROVIDE HELP INSTRUCTIONS, separate commands into groups, add multi-server support(?)
+# TODO 2000 symbols limit for suggestions list
 
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
@@ -30,10 +30,10 @@ async def check_admin_rights(ctx):
 
 
 def load_game_suggestions():
-    '''
+    """
     :return: tries to load a dict of suggestions from a file,
     otherwise returns empty dict
-    '''
+    """
     suggestions = load_data('suggestions')
     if not suggestions:
         suggestions = {}
@@ -41,25 +41,25 @@ def load_game_suggestions():
 
 
 def save_data(data, filename):
-    '''
+    """
     :param data: data to be stored into a file
     :param filename: filename to save data to
     :return: None, saves dict as a file for future usage
-    '''
+    """
     with open(filename, 'w') as file:
         file.write(str(data))
 
 
 def load_data(filename):
-    '''
+    """
     :param filename: file from which to load the data
     :return: returns eval() of the file contents
-    '''
+    """
     try:
         with open(filename) as file:
             data = eval(file.read())
         return data
-    except(FileNotFoundError):
+    except FileNotFoundError:
         print('File not found')
     except:
         print('Something went wrong during data evaluation')
@@ -77,9 +77,9 @@ async def on_ready():
 def create_games_message(suggestions):
     if suggestions:
         message = '__**SUGGESTIONS BY AUTHOR**__\n\n'
-        for id in suggestions:
-            message += '**'+suggestions[id]['username']+':**\n'+'```'
-            for game in suggestions[id]['games']:
+        for userid in suggestions:
+            message += '**'+suggestions[userid]['username']+':**\n'+'```'
+            for game in suggestions[userid]['games']:
                 message += '\n' + game
             message += '```'
     else:
@@ -88,7 +88,7 @@ def create_games_message(suggestions):
 
 
 @bot.command()
-async def games(ctx):
+async def games_full(ctx):
     """Prints games suggested so far grouped by suggestion author's name"""
     message = create_games_message(suggestions)
     await ctx.send(message)
@@ -98,9 +98,10 @@ def create_list_message(suggestions):
     if suggestions:
         set_of_games = set({})
         message = '__**SUGGESTED GAMES**__\n```\n'
-        for id in suggestions:
-            for game in suggestions[id]['games']:
-                set_of_games.add(game)
+        for userid in suggestions:
+            for game in suggestions[userid]['games']:
+                if game.lower() not in [x.lower() for x in set_of_games]:
+                    set_of_games.add(game)
         for game in set_of_games:
             message += '\n' + game
         message += '```'
@@ -110,7 +111,7 @@ def create_list_message(suggestions):
 
 
 @bot.command()
-async def list(ctx):
+async def games_list(ctx):
     """Prints games suggested so far in one list"""
     message = create_list_message(suggestions)
     await ctx.send(message)
@@ -119,17 +120,20 @@ async def list(ctx):
 @bot.command()
 async def suggest(ctx, *, data):
     """Adds a game suggestion"""
-    id = ctx.author.id
+    userid = ctx.author.id
     name = str(ctx.author.name)
     game = ' '.join(data.split())
-    if id in suggestions:
-        suggestions[id]['games'].add(game)
-        if suggestions[id]['username'] != name:
-            suggestions[id]['username'] = name
+    if userid in suggestions:
+        if game.lower() not in [x.lower() for x in suggestions[userid]['games']]:
+            suggestions[userid]['games'].add(game)
+        else:
+            await ctx.send('{} is in your suggestions already'.format(game))
+        if suggestions[userid]['username'] != name:
+            suggestions[userid]['username'] = name
     else:
-        suggestions[id] = {}
-        suggestions[id]['username'] = name
-        suggestions[id]['games'] = {game}
+        suggestions[userid] = {}
+        suggestions[userid]['username'] = name
+        suggestions[userid]['games'] = {game}
     save_data(suggestions, 'suggestions')
     await update_games_banner(ctx)
     await ctx.send(name+' suggested '+game)
@@ -138,17 +142,17 @@ async def suggest(ctx, *, data):
 @bot.command()
 async def remove(ctx, *, data):
     """Removes the game suggestion if the game was suggested by the user issuing the command"""
-    id = ctx.author.id
+    userid = ctx.author.id
     name = str(ctx.author.name)
     game = ' '.join(data.split())
     success_flag = 0
     game_not_found = 1
-    if id in suggestions:
-        if game in suggestions[id]['games']:
+    if userid in suggestions:
+        if game in suggestions[userid]['games']:
             game_not_found = 0
-            suggestions[id]['games'].remove(game)
-            if suggestions[id]['games'] == set({}):
-                del suggestions[id] #note to self: should change this if anything else is to be stored for id except for name and game suggestions
+            suggestions[userid]['games'].remove(game)
+            if suggestions[userid]['games'] == set({}):
+                del suggestions[userid]  # note to self: should change this if anything else is to be stored for userid except for name and game suggestions
             save_data(suggestions, 'suggestions')
             await update_games_banner(ctx)
             success_flag = 1
@@ -158,7 +162,6 @@ async def remove(ctx, *, data):
         await ctx.send('Game \"'+game+'\" not found in '+name+'\'s suggestions')
     else:
         await ctx.send('Something went wrong')
-
 
 
 @bot.command()
@@ -177,14 +180,14 @@ async def adminremove(ctx, *, data):
         roles.append(role.name)
     if 'Admin' in roles:
         success_flag = 0
-        for id in suggestions:
-            if game in suggestions[id]['games']:
-                suggestions[id]['games'].remove(game)
-                success_flag = 1 #flag is placed here because below is only deletion of users with empty suggestions
-                if suggestions[id]['games'] == set({}):
-                    ids_to_delete.append(id)
-        for id in ids_to_delete:
-            del suggestions[id]
+        for userid in suggestions:
+            if game in suggestions[userid]['games']:
+                suggestions[userid]['games'].remove(game)
+                success_flag = 1  # flag is placed here because below is only deletion of users with empty suggestions
+                if suggestions[userid]['games'] == set({}):
+                    ids_to_delete.append(userid)
+        for userid in ids_to_delete:
+            del suggestions[userid]
             save_data(suggestions, 'suggestions')
             await update_games_banner(ctx)
         if success_flag:
@@ -193,7 +196,6 @@ async def adminremove(ctx, *, data):
             await ctx.send('Game \"'+game+'\" not found in suggestions')
     else:
         await ctx.send(random.choice(rejections))
-
 
 
 @bot.command()
@@ -218,13 +220,13 @@ async def adminwipe(ctx):
         await ctx.send(random.choice(rejections))
 
 
-@bot.command(aliases=['miriam', 'Miriam' ,'MIRIAM','GODDAMITMIRIAM', 'word', 'mw', 'Merriam'])
+@bot.command(aliases=['miriam', 'Miriam', 'MIRIAM', 'GODDAMITMIRIAM', 'word', 'mw', 'Merriam'])
 async def merriam(ctx, *, word: str):
     """Queries Merriam-Webster's Collegiate Dictionary for a word definition. Well, tries to at least..."""
     word = ' '.join(word.split())
     # try:
     query_result = dict_query.query_merriam(word, keys['merriam_webster'])
-    cases = query_result #the word may have changed if you queried for the past tense for example
+    cases = query_result  # the word may have changed if you queried for the past tense for example
     # except:
     #     await ctx.send('Something went wrong during online query')
     # try:
@@ -254,7 +256,7 @@ async def merriam(ctx, *, word: str):
 
 
 async def update_games_banner(ctx):
-    guild = bot.guilds[0] #TODO think about fixing this. Or don't...
+    guild = bot.guilds[0]  # TODO think about fixing this. Or don't... Remember that right now ctx is not used
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
     message_list = []
     async for message in channel.history(limit=100):
@@ -274,7 +276,7 @@ async def update_games_banner(ctx):
 
 
 @bot.command()
-async def set_prefix(ctx, message: str): #TODO save permanently
+async def set_prefix(ctx, message: str):  # TODO save permanently
     prefix = message.strip()
     if await check_admin_rights(ctx):
         bot.command_prefix = prefix
@@ -284,7 +286,7 @@ async def set_prefix(ctx, message: str): #TODO save permanently
 
 
 @bot.command()
-async def set_nick(ctx, *, message:str = ''):
+async def set_nick(ctx, *, message: str = ''):
     nickname = message.strip()
     if await check_admin_rights(ctx):
         bot_member = [x for x in bot.get_all_members() if x.bot and x.id == bot.user.id][0]
@@ -295,7 +297,7 @@ async def set_nick(ctx, *, message:str = ''):
 
 
 @bot.command()
-async def set_status(ctx, *, message:str = ''): #TODO save permanently?
+async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
     status = message.strip()
     if await check_admin_rights(ctx):
         await bot.change_presence(game=discord.Game(name=status))
