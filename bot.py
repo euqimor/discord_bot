@@ -273,7 +273,7 @@ async def set_prefix(ctx, message: str):  # TODO save permanently
         await ctx.send(random.choice(rejections))
 
 
-@bot.command()
+@bot.command(aliases=['set_nickname'])
 async def set_nick(ctx, *, message: str = ''):
     nickname = message.strip()
     if await check_admin_rights(ctx):
@@ -284,7 +284,7 @@ async def set_nick(ctx, *, message: str = ''):
         await ctx.send(random.choice(rejections))
 
 
-@bot.command()
+@bot.command(aliases=['set_playing'])
 async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
     status = message.strip()
     if await check_admin_rights(ctx):
