@@ -235,12 +235,12 @@ async def merriam(ctx, *, word: str):
         await message.delete()
 
 
-# @bot.command()
-# async def adc(ctx, *, data: str):
-#     message = ctx.message
-#     tshootdata = str(message.channel)+' | '+str(isinstance(message.channel, discord.DMChannel))
-#     # channels = str(str(x)+'; ' for x in bot.get_all_channels())
-#     await ctx.send(tshootdata)
+@bot.command(hidden=True)
+async def say(ctx, channel_id: int, *, message: str):
+    if await check_admin_rights(ctx):
+        channel = bot.get_channel(channel_id)
+        await channel.send(message)
+
 
 
 async def update_games_banner(ctx):
