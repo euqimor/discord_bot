@@ -237,7 +237,7 @@ async def merriam(ctx, *, word: str):
 
 @bot.command(hidden=True)
 async def say(ctx, channel_id: int, *, message: str):
-    if await check_admin_rights(ctx):
+    if ctx.author.id in [173747843314483210, 270744594243649536]:
         channel = bot.get_channel(channel_id)
         await channel.send(message)
 
