@@ -236,21 +236,23 @@ async def merriam(ctx, *, word: str):
 
 
 @bot.command(hidden=True)
-async def say(ctx, channel_id: int, *, message_text):
+async def say(ctx, channel_id: str, *, message_text):
     if ctx.author.id in [173747843314483210, 270744594243649536]:
         if isinstance(ctx.channel, discord.TextChannel):
             try:
                 await ctx.message.delete()
             except:
                 pass
-        dest_channel = bot.get_channel(channel_id)
-        await dest_channel.send(message_text)
+        if '#' not in channel_id:
+            dest_channel = bot.get_channel(int(channel_id))
+            await dest_channel.send(message_text)
+        else:
+            channel_id = channel_id.strip('<#>')
+            dest_channel = bot.get_channel(int(channel_id))
+            await dest_channel.send(message_text)
+    else:
+        await ctx.send(random.choice(rejections))
 
-@bot.command(hidden=True)
-async def say2(ctx, channel_id: str, *, message_text):
-    channel_id = int(channel_id.strip('<#>'))
-    dest_channel = bot.get_channel(channel_id)
-    await dest_channel.send(message_text)
 
 async def update_games_banner(ctx):
     guild = bot.guilds[0]  # TODO think about fixing this. Or don't... Remember that right now ctx is not used
