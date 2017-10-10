@@ -246,8 +246,10 @@ async def say(ctx, channel_id: int, *, message_text):
         dest_channel = bot.get_channel(channel_id)
         await dest_channel.send(message_text)
 
-
-
+@bot.command(hidden=True)
+async def say2(ctx, channel_id: str, *, message_text):
+    channel_id = channel_id.strip('<#')
+    await ctx.send('{}: {}'.format(channel_id, message_text))
 
 async def update_games_banner(ctx):
     guild = bot.guilds[0]  # TODO think about fixing this. Or don't... Remember that right now ctx is not used
