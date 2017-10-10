@@ -240,7 +240,8 @@ async def say(ctx, channel_id: int, *, message):
     if ctx.author.id in [173747843314483210, 270744594243649536]:
         channel = bot.get_channel(channel_id)
         await channel.send(message)
-
+        if isinstance(ctx.channel, discord.TextChannel):
+            await channel.send('TextChannel')
 
 
 async def update_games_banner(ctx):
