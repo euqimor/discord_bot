@@ -236,12 +236,17 @@ async def merriam(ctx, *, word: str):
 
 
 @bot.command(hidden=True)
-async def say(ctx, channel_id: int, *, message):
+async def say(ctx, channel_id: int, *, message_text):
     if ctx.author.id in [173747843314483210, 270744594243649536]:
-        channel = bot.get_channel(channel_id)
-        await channel.send(message)
         if isinstance(ctx.channel, discord.TextChannel):
-            await channel.send('TextChannel')
+            try:
+                await ctx.message.delete()
+            except:
+                pass
+        dest_channel = bot.get_channel(channel_id)
+        await dest_channel.send(message_text)
+
+
 
 
 async def update_games_banner(ctx):
