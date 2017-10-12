@@ -148,7 +148,7 @@ async def suggest(ctx, *, data):
     game = ' '.join(data.split())
     already_suggested = 0
     if userid in suggestions:
-        if not 'games' in suggestions[userid]:
+        if 'games' not in suggestions[userid]:
             suggestions[userid]['games'] = set({})
         if game.lower() not in [x.lower() for x in suggestions[userid]['games']]:
             suggestions[userid]['games'].add(game)
@@ -176,7 +176,7 @@ async def suggest_movie(ctx, *, data):
     movie = ' '.join(data.split())
     already_suggested = 0
     if userid in suggestions:
-        if not 'movies' in suggestions[userid]:
+        if 'movies' not in suggestions[userid]:
             suggestions[userid]['movies'] = set({})
         if movie.lower() not in [x.lower() for x in suggestions[userid]['movies']]:
             suggestions[userid]['movies'].add(movie)
@@ -261,7 +261,7 @@ async def adminremove(ctx, *, data):
             if 'games' in suggestions[userid]:
                 for existing_game in suggestions[userid]['games']:
                     if game.lower() == existing_game.lower():
-                        entries_to_delete.append({'userid':userid, 'game':existing_game})
+                        entries_to_delete.append({'userid': userid, 'game': existing_game})
         if entries_to_delete:
             for entry in entries_to_delete:
                 suggestions[entry['userid']]['games'].remove(entry['game'])
@@ -285,7 +285,7 @@ async def adminremove_movie(ctx, *, data):
             if 'movies' in suggestions[userid]:
                 for existing_movie in suggestions[userid]['movies']:
                     if movie.lower() == existing_movie.lower():
-                        entries_to_delete.append({'userid':userid, 'movie':existing_movie})
+                        entries_to_delete.append({'userid': userid, 'movie': existing_movie})
         if entries_to_delete:
             for entry in entries_to_delete:
                 suggestions[entry['userid']]['movies'].remove(entry['movie'])
