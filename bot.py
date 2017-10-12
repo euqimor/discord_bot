@@ -318,7 +318,7 @@ async def adminwipe_movies(ctx):
         await ctx.send(random.choice(rejections))
 
 
-@bot.command(aliases=['miriam', 'Miriam', 'MIRIAM', 'GODDAMITMIRIAM', 'word', 'mw', 'Merriam', 'word', 'dict'])
+@bot.command(aliases=['miriam', 'Miriam', 'MIRIAM', 'GODDAMITMIRIAM', 'word', 'mw', 'Merriam', 'dict'])
 async def merriam(ctx, *, word: str):
     """Queries Merriam-Webster's Collegiate Dictionary for a word definition. Well, tries to at least..."""
     word = ' '.join(word.split())
