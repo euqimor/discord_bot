@@ -76,7 +76,7 @@ def create_games_message(suggestions):
     message = ''
     if suggestions:
         for userid in suggestions:
-            if suggestions[userid]['games']:
+            if 'games' in suggestions[userid] and suggestions[userid]['games']:
                 message += '**'+suggestions[userid]['username']+':**\n'+'```'
                 for game in suggestions[userid]['games']:
                     message += '\n' + game
