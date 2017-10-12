@@ -148,6 +148,8 @@ async def suggest(ctx, *, data):
     game = ' '.join(data.split())
     already_suggested = 0
     if userid in suggestions:
+        if not 'games' in suggestions[userid]:
+            suggestions[userid]['games'] = set({})
         if game.lower() not in [x.lower() for x in suggestions[userid]['games']]:
             suggestions[userid]['games'].add(game)
         else:
@@ -174,6 +176,8 @@ async def suggest_movie(ctx, *, data):
     movie = ' '.join(data.split())
     already_suggested = 0
     if userid in suggestions:
+        if not 'movies' in suggestions[userid]:
+            suggestions[userid]['movies'] = set({})
         if movie.lower() not in [x.lower() for x in suggestions[userid]['movies']]:
             suggestions[userid]['movies'].add(movie)
         else:
