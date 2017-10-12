@@ -97,22 +97,6 @@ async def games_full(ctx):
     await ctx.send(message)
 
 
-# def create_list_message(suggestions):
-#     if suggestions:
-#         set_of_games = set({})
-#         message = '__**SUGGESTED GAMES**__\n```\n'
-#         for userid in suggestions:
-#             for game in suggestions[userid]['games']:
-#                 if game.lower() not in [x.lower() for x in set_of_games]:
-#                     set_of_games.add(game)
-#         for game in set_of_games:
-#             message += '\n' + game
-#         message += '```'
-#     else:
-#         message = 'Nothing has been suggested yet'
-#     return message
-
-
 def create_item_list_message(suggestions, entry_name: str):
     if suggestions:
         set_of_items = set({})
@@ -370,26 +354,6 @@ async def say(ctx, channel_id: str, *, message_text):
             await dest_channel.send(message_text)
     else:
         await ctx.send(random.choice(rejections))
-
-
-# async def update_games_banner(ctx):
-#     guild = bot.guilds[0]  # TODO think about fixing this. Or don't... Remember that right now ctx is not used
-#     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
-#     message_list = []
-#     async for message in channel.history(limit=100):
-#         if message.author.id == bot.user.id:
-#             message_list.append(message)
-#     if message_list:
-#         if suggestions:
-#             await message_list[0].edit(content=create_games_message(suggestions))
-#             await message_list[1].edit(content=create_item_list_message(suggestions, 'games'))
-#         else:
-#             await message_list[0].delete()
-#             await message_list[1].delete()
-#     else:
-#         if suggestions:
-#             await channel.send(create_item_list_message(suggestions, 'games'))
-#             await channel.send(create_games_message(suggestions))
 
 
 async def update_banner(banner_type):
