@@ -117,7 +117,7 @@ def create_item_list_message(suggestions, entry_name: str):
     if suggestions:
         set_of_items = set({})
         for userid in suggestions:
-            if suggestions[userid][entry_name]:
+            if entry_name in suggestions[userid]:
                 for item in suggestions[userid][entry_name]:
                     if item.lower() not in [x.lower() for x in set_of_items]:
                         set_of_items.add(item)
@@ -205,15 +205,16 @@ async def remove(ctx, *, data):
     success_flag = 0
     game_found = ('', 0)
     if userid in suggestions:
-        for existing_game in suggestions[userid]['games']:
-            if game.lower() == existing_game.lower():
-                game_found = (existing_game, 1)
-                break
-        if game_found[1]:
-            suggestions[userid]['games'].remove(game_found[0])
-            save_data_to_file(suggestions, 'suggestions')
-            await update_banner('games')
-            success_flag = 1
+        if 'games' in suggestions[userid]:
+            for existing_game in suggestions[userid]['games']:
+                if game.lower() == existing_game.lower():
+                    game_found = (existing_game, 1)
+                    break
+            if game_found[1]:
+                suggestions[userid]['games'].remove(game_found[0])
+                save_data_to_file(suggestions, 'suggestions')
+                await update_banner('games')
+                success_flag = 1
     if success_flag:
         await ctx.send('Successfully deleted '+game+' from '+name+'\'s game suggestions')
     elif not game_found[1]:
@@ -231,15 +232,16 @@ async def remove_movie(ctx, *, data):
     success_flag = 0
     movie_found = ('', 0)
     if userid in suggestions:
-        for existing_movie in suggestions[userid]['movies']:
-            if movie.lower() == existing_movie.lower():
-                movie_found = (existing_movie, 1)
-                break
-        if movie_found[1]:
-            suggestions[userid]['movies'].remove(movie_found[0])
-            save_data_to_file(suggestions, 'suggestions')
-            await update_banner('movies')
-            success_flag = 1
+        if 'games' in suggestions[userid]:
+            for existing_movie in suggestions[userid]['movies']:
+                if movie.lower() == existing_movie.lower():
+                    movie_found = (existing_movie, 1)
+                    break
+            if movie_found[1]:
+                suggestions[userid]['movies'].remove(movie_found[0])
+                save_data_to_file(suggestions, 'suggestions')
+                await update_banner('movies')
+                success_flag = 1
     if success_flag:
         await ctx.send('Successfully deleted '+movie+' from '+name+'\'s movie suggestions')
     elif not movie_found[1]:
@@ -256,9 +258,10 @@ async def adminremove(ctx, *, data):
     if await check_admin_rights(ctx):
         entries_to_delete = []
         for userid in suggestions:
-            for existing_game in suggestions[userid]['games']:
-                if game.lower() == existing_game.lower():
-                    entries_to_delete.append({'userid':userid, 'game':existing_game})
+            if 'games' in suggestions[userid]:
+                for existing_game in suggestions[userid]['games']:
+                    if game.lower() == existing_game.lower():
+                        entries_to_delete.append({'userid':userid, 'game':existing_game})
         if entries_to_delete:
             for entry in entries_to_delete:
                 suggestions[entry['userid']]['games'].remove(entry['game'])
@@ -279,9 +282,10 @@ async def adminremove_movie(ctx, *, data):
     if await check_admin_rights(ctx):
         entries_to_delete = []
         for userid in suggestions:
-            for existing_movie in suggestions[userid]['movies']:
-                if movie.lower() == existing_movie.lower():
-                    entries_to_delete.append({'userid':userid, 'movie':existing_movie})
+            if 'movies' in suggestions[userid]:
+                for existing_movie in suggestions[userid]['movies']:
+                    if movie.lower() == existing_movie.lower():
+                        entries_to_delete.append({'userid':userid, 'movie':existing_movie})
         if entries_to_delete:
             for entry in entries_to_delete:
                 suggestions[entry['userid']]['movies'].remove(entry['movie'])
