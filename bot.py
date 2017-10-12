@@ -127,9 +127,9 @@ def create_item_list_message(suggestions, entry_name: str):
                 message += '\n' + item
             message += '```'
         else:
-            message = '__**SUGGESTED {}**__\n```\nNothing has been suggested yet'.format(entry_name.upper())
+            message = '__**SUGGESTED {}**__\n\nNothing has been suggested yet'.format(entry_name.upper())
     else:
-        message = '__**SUGGESTED {}**__\n```\nNothing has been suggested yet'.format(entry_name.upper())
+        message = '__**SUGGESTED {}**__\n\nNothing has been suggested yet'.format(entry_name.upper())
     return message
 
 
