@@ -234,7 +234,7 @@ async def remove_movie(ctx, *, data):
         await ctx.send('Something went wrong')
 
 
-@bot.command()
+@bot.command(aliases=['admin_remove'])
 async def adminremove(ctx, *, data):
     """Removes the game from every list, command only available to Admin role"""
     game = ' '.join(data.split())
@@ -258,7 +258,7 @@ async def adminremove(ctx, *, data):
         await ctx.send(random.choice(rejections))
 
 
-@bot.command(aliases=['movie_adminremove'])
+@bot.command(aliases=['movie_adminremove, adminremove_movie, admin_remove_movie'])
 async def adminremove_movie(ctx, *, data):
     """Removes the movie from every list, command only available to Admin role"""
     movie = ' '.join(data.split())
