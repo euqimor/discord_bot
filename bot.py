@@ -187,10 +187,10 @@ async def adminwipe_games(ctx):
     """Purges the game suggestions list, command only available to Admin role"""
     if await check_admin_rights(ctx):
         with closing(sqlite3.connect('cube.db')) as con:
-            exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;','game').fetchall()
+            exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', ('game',)).fetchall()
             if exists:
-                con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;','game')
-                exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;','game').fetchall()
+                con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;',('game',))
+                exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('game',)).fetchall()
                 if not exists:
                     await update_banner('games')
                     await ctx.send('Successfully deleted all the game suggestions')
@@ -207,10 +207,10 @@ async def adminwipe_movies(ctx):
     """Purges the movie suggestions list, command only available to Admin role"""
     if await check_admin_rights(ctx):
         with closing(sqlite3.connect('cube.db')) as con:
-            exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;','movie').fetchall()
+            exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('movie',)).fetchall()
             if exists:
-                con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;','movie')
-                exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;','movie').fetchall()
+                con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;',('movie',))
+                exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('movie',)).fetchall()
                 if not exists:
                     await update_banner('movies')
                     await ctx.send('Successfully deleted all the movie suggestions')
@@ -319,7 +319,7 @@ async def update_banner(banner_type):
 
     def suggestions_exist(suggestion_type):
         with closing(sqlite3.connect('cube.db')) as con:
-            if con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', suggestion_type).fetchall():
+            if con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', (suggestion_type,)).fetchall():
                 return True
         return False
 
