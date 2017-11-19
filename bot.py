@@ -1,12 +1,14 @@
 import discord
 from discord.ext import commands
 import dict_query
-from time import sleep
 import random
 import sqlite3
+import os
+import sys
+from time import sleep
 from collections import defaultdict
 from contextlib import closing
-from os import environ as env
+from urllib.request import pathname2url
 
 # TODO MAKE EXISTS CHECK A SEPARATE FUNCTION!!!
 # TODO PROVIDE HELP INSTRUCTIONS, separate commands into groups, add multi-server support(?)
@@ -15,6 +17,40 @@ from os import environ as env
 
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
+db_name = 'cube.db'
+
+
+def check_database(db_name):
+    path = os.path.realpath(db_name)
+    db_uri = 'file:{}?mode=rw'.format(pathname2url(path))
+    con = None
+    try:
+        con = sqlite3.connect(db_uri, uri=True)
+        print('Database connection test successful: {}'.format(path))
+        return True
+    except sqlite3.OperationalError:
+        print('Database not found: {}\nAttempting to create a new database'.format(path))
+        try:
+            con = sqlite3.connect(db_name)
+            commands = [
+                'CREATE TABLE Users(user_id INT PRIMARY KEY, username TEXT);',
+                'CREATE TABLE Suggestions (id INTEGER PRIMARY KEY, user_id INT, suggestion TEXT, suggestion_type TEXT,\
+                 FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE,\
+                 UNIQUE (suggestion COLLATE NOCASE, suggestion_type));',
+            ]
+            for command in commands:
+                con.execute(command)
+            print('New database created: {}'.format(path))
+            return True
+        except sqlite3.Error as e:
+            print('Database creation failed: {}'.format(e))
+    finally:
+        if con:
+            con.close()
+        else:
+            return False
+
+
 
 
 @bot.event
@@ -48,7 +84,7 @@ async def suggest(ctx, *, data):
     user_id = ctx.author.id
     username = str(ctx.author.name)
     game = ' '.join(data.split())
-    with closing(sqlite3.connect('cube.db')) as con:
+    with closing(sqlite3.connect(db_name)) as con:
         with con:
             con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
             con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
@@ -67,7 +103,7 @@ async def suggest_movie(ctx, *, data):
     user_id = ctx.author.id
     username = str(ctx.author.name)
     movie = ' '.join(data.split())
-    with closing(sqlite3.connect('cube.db')) as con:
+    with closing(sqlite3.connect(db_name)) as con:
         with con:
             con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
             con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
@@ -86,7 +122,7 @@ async def remove(ctx, *, data):
     user_id = ctx.author.id
     username = str(ctx.author.name)
     game = ' '.join(data.split())
-    with closing(sqlite3.connect('cube.db')) as con:
+    with closing(sqlite3.connect(db_name)) as con:
         with con:
             con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
             con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
@@ -114,7 +150,7 @@ async def remove_movie(ctx, *, data):
     user_id = ctx.author.id
     username = str(ctx.author.name)
     movie = ' '.join(data.split())
-    with closing(sqlite3.connect('cube.db')) as con:
+    with closing(sqlite3.connect(db_name)) as con:
         with con:
             con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
             con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
@@ -138,10 +174,10 @@ async def remove_movie(ctx, *, data):
 
 @bot.command(aliases=['admin_remove'])
 async def adminremove(ctx, *, data):
-    """Removes the game from suggestions, command only available to Admin role"""
+    """Removes the game from suggestions, command available only to Admin role"""
     game = ' '.join(data.split())
     if await check_admin_rights(ctx):
-        with closing(sqlite3.connect('cube.db')) as con:
+        with closing(sqlite3.connect(db_name)) as con:
             with con:
                 exists = con.execute('SELECT * FROM Suggestions \
                                               WHERE suggestion LIKE ? AND suggestion_type=?;',
@@ -167,10 +203,10 @@ async def adminremove(ctx, *, data):
 
 @bot.command(aliases=['movie_adminremove, adminremove_movie, admin_remove_movie'])
 async def adminremove_movie(ctx, *, data):
-    """Removes the movie from suggestions, command only available to Admin role"""
+    """Removes the movie from suggestions, command available only to Admin role"""
     movie = ' '.join(data.split())
     if await check_admin_rights(ctx):
-        with closing(sqlite3.connect('cube.db')) as con:
+        with closing(sqlite3.connect(db_name)) as con:
             with con:
                 exists = con.execute('SELECT * FROM Suggestions \
                                       WHERE suggestion LIKE ? AND suggestion_type=?;',
@@ -195,10 +231,10 @@ async def adminremove_movie(ctx, *, data):
 
 
 @bot.command()
-async def adminwipe_games(ctx):
-    """Purges the game suggestions list, command only available to Admin role"""
+async def wipe_games(ctx):
+    """Purges the game suggestions list, command available only to Admin role"""
     if await check_admin_rights(ctx):
-        with closing(sqlite3.connect('cube.db')) as con:
+        with closing(sqlite3.connect(db_name)) as con:
             with con:
                 exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', ('game',)).fetchall()
             if exists:
@@ -217,10 +253,10 @@ async def adminwipe_games(ctx):
 
 
 @bot.command()
-async def adminwipe_movies(ctx):
-    """Purges the movie suggestions list, command only available to Admin role"""
+async def wipe_movies(ctx):
+    """Purges the movie suggestions list, command available only to Admin role"""
     if await check_admin_rights(ctx):
-        with closing(sqlite3.connect('cube.db')) as con:
+        with closing(sqlite3.connect(db_name)) as con:
             with con:
                 exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('movie',)).fetchall()
             if exists:
@@ -238,8 +274,34 @@ async def adminwipe_movies(ctx):
         await ctx.send(random.choice(rejections))
 
 
+@bot.command()
+async def wipe_user(ctx, user_id:str):
+    """Purges the user and all related content from the database, command available only to Admin role"""
+    if await check_admin_rights(ctx):
+        user_id = user_id.strip('<@>')
+        with closing(sqlite3.connect(db_name)) as con:
+            with con:
+                exists = con.execute('SELECT username FROM Users WHERE user_id=? LIMIT 1;',(user_id,)).fetchall()
+            if exists:
+                username = exists[0]
+                with con:
+                    con.execute('PRAGMA FOREIGN_KEYS=ON;')
+                    con.execute('DELETE FROM Users WHERE user_id=?;',(user_id,))
+                    exists = con.execute('SELECT username FROM Users WHERE user_id=? LIMIT 1;', (user_id,)).fetchall()
+                if not exists:
+                    await update_banner('movies')
+                    await update_banner('games')
+                    await ctx.send('Successfully deleted user {} from the database'.format(username))
+                else:
+                    await ctx.send('Couldn\'t delete the user, please contact Euqimor for troubleshooting')
+            else:
+                await ctx.send('User not found in the database')
+    else:
+        await ctx.send(random.choice(rejections))
+
+
 def message_games_by_author():
-    with closing(sqlite3.connect('cube.db')) as con:
+    with closing(sqlite3.connect(db_name)) as con:
         with con:
             suggestions = con.execute('SELECT username, suggestion \
                                         FROM Users NATURAL JOIN \
@@ -260,7 +322,7 @@ def message_games_by_author():
 
 
 def message_suggestions_in_category(suggestion_type: str):
-    with closing(sqlite3.connect('cube.db')) as con:
+    with closing(sqlite3.connect(db_name)) as con:
         with con:
             suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
         if suggestions:
@@ -292,7 +354,7 @@ async def merriam(ctx, *, word: str):
     """Queries Merriam-Webster's Collegiate Dictionary for a word definition. Well, tries to at least..."""
     word = ' '.join(word.split())
     # try:
-    query_result = dict_query.query_merriam(word, env['MERRIAM'])
+    query_result = dict_query.query_merriam(word, os.environ['MERRIAM'])
     cases = query_result  # the word may have changed if you queried for the past tense for example
     # except:
     #     await ctx.send('Something went wrong during online query')
@@ -336,7 +398,7 @@ async def say(ctx, channel_id: str, *, message_text):
 async def update_banner(banner_type):
 
     def suggestions_exist(suggestion_type):
-        with closing(sqlite3.connect('cube.db')) as con:
+        with closing(sqlite3.connect(db_name)) as con:
             with con:
                 if con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', (suggestion_type,)).fetchall():
                     return True
@@ -398,4 +460,7 @@ async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
 if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
-    bot.run(env['BOT_KEY'])
+    if check_database(db_name):
+        bot.run(os.environ['BOT_KEY'])
+    else:
+        sys.exit(1)
