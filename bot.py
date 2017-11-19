@@ -178,7 +178,7 @@ async def remove_movie(ctx, *, data):
                 await ctx.send('"{}" not found in {}\'s movie suggestions'.format(movie, username))
 
 
-async def adminremove(ctx, *, data):
+async def adminremove(ctx, data):
     """Removes the game from any user's suggestions"""
     game = ' '.join(data.split())
     with closing(sqlite3.connect(db_name)) as con:
@@ -203,7 +203,7 @@ async def adminremove(ctx, *, data):
             await ctx.send('"{}" not found in game suggestions'.format(game))
 
 
-async def adminremove_movie(ctx, *, data):
+async def adminremove_movie(ctx, data):
     """Removes the movie from any user's suggestions"""
     movie = ' '.join(data.split())
     with closing(sqlite3.connect(db_name)) as con:
