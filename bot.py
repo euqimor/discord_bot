@@ -178,62 +178,54 @@ async def remove_movie(ctx, *, data):
                 await ctx.send('"{}" not found in {}\'s movie suggestions'.format(movie, username))
 
 
-@bot.command(aliases=['admin_remove'], hidden=True)
 async def adminremove(ctx, *, data):
-    """Removes the game from suggestions, command available only to Admin role"""
+    """Removes the game from any user's suggestions"""
     game = ' '.join(data.split())
-    if await check_admin_rights(ctx):
-        with closing(sqlite3.connect(db_name)) as con:
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            exists = con.execute('SELECT * FROM Suggestions \
+                                          WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                 (game, 'game')).fetchall()
+        if exists:
             with con:
+                con.execute('DELETE FROM Suggestions WHERE suggestion LIKE ? AND suggestion_type=?;',
+                            (game, 'game'))
                 exists = con.execute('SELECT * FROM Suggestions \
                                               WHERE suggestion LIKE ? AND suggestion_type=?;',
                                      (game, 'game')).fetchall()
-            if exists:
-                with con:
-                    con.execute('DELETE FROM Suggestions WHERE suggestion LIKE ? AND suggestion_type=?;',
-                                (game, 'game'))
-                    exists = con.execute('SELECT * FROM Suggestions \
-                                                  WHERE suggestion LIKE ? AND suggestion_type=?;',
-                                         (game, 'game')).fetchall()
-                if not exists:
-                    await update_banner('games')
-                    await ctx.send('Successfully deleted "{}" from game suggestions'.format(game))
-                else:
-                    await ctx.send('Couldn\'t delete "{}" from game suggestions, please contact Euqimor for troubleshooting'
-                                   .format(game))
+            if not exists:
+                await update_banner('games')
+                await ctx.send('Successfully deleted "{}" from game suggestions'.format(game))
             else:
-                await ctx.send('"{}" not found in game suggestions'.format(game))
-    else:
-        await ctx.send(random.choice(rejections))
+                await ctx.send('Couldn\'t delete "{}" from game suggestions, please contact Euqimor for troubleshooting'
+                               .format(game))
+        else:
+            await ctx.send('"{}" not found in game suggestions'.format(game))
 
 
-@bot.command(aliases=['movie_adminremove, adminremove_movie, admin_remove_movie'], hidden=True)
 async def adminremove_movie(ctx, *, data):
-    """Removes the movie from suggestions, command available only to Admin role"""
+    """Removes the movie from any user's suggestions"""
     movie = ' '.join(data.split())
-    if await check_admin_rights(ctx):
-        with closing(sqlite3.connect(db_name)) as con:
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            exists = con.execute('SELECT * FROM Suggestions \
+                                  WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                 (movie, 'movie')).fetchall()
+        if exists:
             with con:
+                con.execute('DELETE FROM Suggestions WHERE suggestion LIKE ? AND suggestion_type=?;',(movie, 'movie'))
                 exists = con.execute('SELECT * FROM Suggestions \
                                       WHERE suggestion LIKE ? AND suggestion_type=?;',
                                      (movie, 'movie')).fetchall()
-            if exists:
-                with con:
-                    con.execute('DELETE FROM Suggestions WHERE suggestion LIKE ? AND suggestion_type=?;',(movie, 'movie'))
-                    exists = con.execute('SELECT * FROM Suggestions \
-                                          WHERE suggestion LIKE ? AND suggestion_type=?;',
-                                         (movie, 'movie')).fetchall()
-                if not exists:
-                    await update_banner('movies')
-                    await ctx.send('Successfully deleted "{}" from movie suggestions'.format(movie))
-                else:
-                    await ctx.send(
-                        'Couldn\'t delete "{}" from movie suggestions, please contact Euqimor for troubleshooting'
-                        .format(movie))
+            if not exists:
+                await update_banner('movies')
+                await ctx.send('Successfully deleted "{}" from movie suggestions'.format(movie))
             else:
-                await ctx.send('"{}" not found in movie suggestions'.format(movie))
-    else:
-        await ctx.send(random.choice(rejections))
+                await ctx.send(
+                    'Couldn\'t delete "{}" from movie suggestions, please contact Euqimor for troubleshooting'
+                    .format(movie))
+        else:
+            await ctx.send('"{}" not found in movie suggestions'.format(movie))
 
 
 @bot.command()
