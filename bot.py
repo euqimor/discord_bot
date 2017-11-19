@@ -10,6 +10,8 @@ from collections import defaultdict
 from contextlib import closing
 from urllib.request import pathname2url
 
+# TODO Fix the bug where removing the last suggestion deletes it from the DB, but leaves hanging in the channel
+
 # TODO MAKE EXISTS CHECK A SEPARATE FUNCTION!!!
 # TODO PROVIDE HELP INSTRUCTIONS, separate commands into groups, add multi-server support(?)
 # TODO 2000 symbols limit for suggestions list
@@ -18,6 +20,15 @@ from urllib.request import pathname2url
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
 db_name = 'cube.db'
+
+
+@bot.event
+async def on_ready():
+    print('Logged in as')
+    print(bot.user.name)
+    print(bot.user.id)
+    print('------')
+    await bot.change_presence(game=discord.Game(name='with turrets'))
 
 
 def check_database(db_name):
@@ -49,17 +60,6 @@ def check_database(db_name):
             con.close()
         else:
             return False
-
-
-
-
-@bot.event
-async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
-    await bot.change_presence(game=discord.Game(name='with turrets'))
 
 
 async def check_admin_rights(ctx):
