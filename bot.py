@@ -49,10 +49,12 @@ async def suggest(ctx, *, data):
     username = str(ctx.author.name)
     game = ' '.join(data.split())
     with closing(sqlite3.connect('cube.db')) as con:
-        con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
-        con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
+        with con:
+            con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
+            con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
         try:
-            con.execute('INSERT INTO Suggestions(user_id, suggestion, suggestion_type) VALUES(?, ?, ?);',(user_id, game, 'game'))
+            with con:
+                con.execute('INSERT INTO Suggestions(user_id, suggestion, suggestion_type) VALUES(?, ?, ?);',(user_id, game, 'game'))
             await update_banner('games')
             await ctx.send('{} suggested {} for stream'.format(username, game))
         except sqlite3.IntegrityError:
@@ -66,10 +68,12 @@ async def suggest_movie(ctx, *, data):
     username = str(ctx.author.name)
     movie = ' '.join(data.split())
     with closing(sqlite3.connect('cube.db')) as con:
-        con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
-        con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
+        with con:
+            con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
+            con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
         try:
-            con.execute('INSERT INTO Suggestions(user_id, suggestion, suggestion_type) VALUES(?, ?, ?);',(user_id, movie, 'movie'))
+            with con:
+                con.execute('INSERT INTO Suggestions(user_id, suggestion, suggestion_type) VALUES(?, ?, ?);',(user_id, movie, 'movie'))
             await update_banner('movies')
             await ctx.send('{} suggested {} for movie night'.format(username, movie))
         except sqlite3.IntegrityError:
@@ -83,16 +87,18 @@ async def remove(ctx, *, data):
     username = str(ctx.author.name)
     game = ' '.join(data.split())
     with closing(sqlite3.connect('cube.db')) as con:
-        con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
-        con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
-        exists = con.execute('SELECT * FROM Suggestions \
-                              WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
-                             (user_id, game, 'game')).fetchall()
-        if exists:
-            con.execute('DELETE FROM Suggestions WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',(user_id, game, 'game'))
+        with con:
+            con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
+            con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
             exists = con.execute('SELECT * FROM Suggestions \
                                   WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
                                  (user_id, game, 'game')).fetchall()
+        if exists:
+            with con:
+                con.execute('DELETE FROM Suggestions WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',(user_id, game, 'game'))
+                exists = con.execute('SELECT * FROM Suggestions \
+                                      WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
+                                     (user_id, game, 'game')).fetchall()
             if not exists:
                 await update_banner('games')
                 await ctx.send('Successfully deleted {} from {}\'s game suggestions'.format(username, game))
@@ -109,16 +115,18 @@ async def remove_movie(ctx, *, data):
     username = str(ctx.author.name)
     movie = ' '.join(data.split())
     with closing(sqlite3.connect('cube.db')) as con:
-        con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
-        con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
-        exists = con.execute('SELECT * FROM Suggestions \
-                              WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
-                             (user_id, movie, 'movie')).fetchall()
-        if exists:
-            con.execute('DELETE FROM Suggestions WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',(user_id, movie, 'movie'))
+        with con:
+            con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
+            con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
             exists = con.execute('SELECT * FROM Suggestions \
                                   WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
                                  (user_id, movie, 'movie')).fetchall()
+        if exists:
+            with con:
+                con.execute('DELETE FROM Suggestions WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',(user_id, movie, 'movie'))
+                exists = con.execute('SELECT * FROM Suggestions \
+                                      WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
+                                     (user_id, movie, 'movie')).fetchall()
             if not exists:
                 await update_banner('movies')
                 await ctx.send('Successfully deleted {} from {}\'s movie suggestions'.format(username, movie))
@@ -134,15 +142,17 @@ async def adminremove(ctx, *, data):
     game = ' '.join(data.split())
     if await check_admin_rights(ctx):
         with closing(sqlite3.connect('cube.db')) as con:
-            exists = con.execute('SELECT * FROM Suggestions \
-                                          WHERE suggestion LIKE ? AND suggestion_type=?;',
-                                 (game, 'game')).fetchall()
-            if exists:
-                con.execute('DELETE FROM Suggestions WHERE suggestion LIKE ? AND suggestion_type=?;',
-                            (game, 'game'))
+            with con:
                 exists = con.execute('SELECT * FROM Suggestions \
                                               WHERE suggestion LIKE ? AND suggestion_type=?;',
                                      (game, 'game')).fetchall()
+            if exists:
+                with con:
+                    con.execute('DELETE FROM Suggestions WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                (game, 'game'))
+                    exists = con.execute('SELECT * FROM Suggestions \
+                                                  WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                         (game, 'game')).fetchall()
                 if not exists:
                     await update_banner('games')
                     await ctx.send('Successfully deleted {} from game suggestions'.format(game))
@@ -161,14 +171,16 @@ async def adminremove_movie(ctx, *, data):
     movie = ' '.join(data.split())
     if await check_admin_rights(ctx):
         with closing(sqlite3.connect('cube.db')) as con:
-            exists = con.execute('SELECT * FROM Suggestions \
-                                  WHERE suggestion LIKE ? AND suggestion_type=?;',
-                                 (movie, 'movie')).fetchall()
-            if exists:
-                con.execute('DELETE FROM Suggestions WHERE suggestion LIKE ? AND suggestion_type=?;',(movie, 'movie'))
+            with con:
                 exists = con.execute('SELECT * FROM Suggestions \
                                       WHERE suggestion LIKE ? AND suggestion_type=?;',
                                      (movie, 'movie')).fetchall()
+            if exists:
+                with con:
+                    con.execute('DELETE FROM Suggestions WHERE suggestion LIKE ? AND suggestion_type=?;',(movie, 'movie'))
+                    exists = con.execute('SELECT * FROM Suggestions \
+                                          WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                         (movie, 'movie')).fetchall()
                 if not exists:
                     await update_banner('movies')
                     await ctx.send('Successfully deleted {} from movie suggestions'.format(movie))
@@ -187,10 +199,12 @@ async def adminwipe_games(ctx):
     """Purges the game suggestions list, command only available to Admin role"""
     if await check_admin_rights(ctx):
         with closing(sqlite3.connect('cube.db')) as con:
-            exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', ('game',)).fetchall()
+            with con:
+                exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', ('game',)).fetchall()
             if exists:
-                con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;',('game',))
-                exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('game',)).fetchall()
+                with con:
+                    con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;',('game',))
+                    exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('game',)).fetchall()
                 if not exists:
                     await update_banner('games')
                     await ctx.send('Successfully deleted all the game suggestions')
@@ -207,10 +221,12 @@ async def adminwipe_movies(ctx):
     """Purges the movie suggestions list, command only available to Admin role"""
     if await check_admin_rights(ctx):
         with closing(sqlite3.connect('cube.db')) as con:
-            exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('movie',)).fetchall()
-            if exists:
-                con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;',('movie',))
+            with con:
                 exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('movie',)).fetchall()
+            if exists:
+                with con:
+                    con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;',('movie',))
+                    exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('movie',)).fetchall()
                 if not exists:
                     await update_banner('movies')
                     await ctx.send('Successfully deleted all the movie suggestions')
@@ -224,9 +240,10 @@ async def adminwipe_movies(ctx):
 
 def message_games_by_author():
     with closing(sqlite3.connect('cube.db')) as con:
-        suggestions = con.execute('SELECT username, suggestion \
-                                    FROM Users NATURAL JOIN \
-                                    (SELECT * FROM Suggestions WHERE suggestion_type=="game") Q;').fetchall()
+        with con:
+            suggestions = con.execute('SELECT username, suggestion \
+                                        FROM Users NATURAL JOIN \
+                                        (SELECT * FROM Suggestions WHERE suggestion_type=="game") Q;').fetchall()
         if suggestions:
             message = '__**SUGGESTIONS BY AUTHOR**__\n\n'
             suggestions_dict = defaultdict(list)
@@ -244,7 +261,8 @@ def message_games_by_author():
 
 def message_suggestions_in_category(suggestion_type: str):
     with closing(sqlite3.connect('cube.db')) as con:
-        suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
+        with con:
+            suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
         if suggestions:
             message = '__**SUGGESTED {}**__\n```\n'.format(suggestion_type.upper())
             for entry in suggestions:
@@ -319,8 +337,9 @@ async def update_banner(banner_type):
 
     def suggestions_exist(suggestion_type):
         with closing(sqlite3.connect('cube.db')) as con:
-            if con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', (suggestion_type,)).fetchall():
-                return True
+            with con:
+                if con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', (suggestion_type,)).fetchall():
+                    return True
         return False
 
     guild = bot.guilds[0]
