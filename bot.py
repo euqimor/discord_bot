@@ -10,6 +10,7 @@ from collections import defaultdict
 from contextlib import closing
 from urllib.request import pathname2url
 
+
 # TODO Fix the bug where removing the last suggestion deletes it from the DB, but leaves hanging in the channel
 # TODO Sort output list by id
 
@@ -334,14 +335,14 @@ def message_suggestions_in_category(suggestion_type: str):
         return message
 
 
-@bot.command()
+@bot.command(hidden=True)
 async def games_full(ctx):
     """Prints games suggested so far grouped by suggestion author's name"""
     message = message_games_by_author()
     await ctx.send(message)
 
 
-@bot.command()
+@bot.command(hidden=True)
 async def games_list(ctx):
     """Prints games suggested so far in one list"""
     message = message_suggestions_in_category('game')
