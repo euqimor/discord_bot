@@ -92,9 +92,9 @@ async def suggest(ctx, *, data):
             with con:
                 con.execute('INSERT INTO Suggestions(user_id, suggestion, suggestion_type) VALUES(?, ?, ?);',(user_id, game, 'game'))
             await update_banner('games')
-            await ctx.send('{} suggested {} for stream'.format(username, game))
+            await ctx.send('{} suggested "{}" for stream'.format(username, game))
         except sqlite3.IntegrityError:
-            await ctx.send('{} has already been suggested'.format(game))
+            await ctx.send('"{}" has already been suggested'.format(game))
 
 
 @bot.command(aliases=['movie'])
@@ -111,9 +111,9 @@ async def suggest_movie(ctx, *, data):
             with con:
                 con.execute('INSERT INTO Suggestions(user_id, suggestion, suggestion_type) VALUES(?, ?, ?);',(user_id, movie, 'movie'))
             await update_banner('movies')
-            await ctx.send('{} suggested {} for movie night'.format(username, movie))
+            await ctx.send('{} suggested "{}" for movie night'.format(username, movie))
         except sqlite3.IntegrityError:
-            await ctx.send('{} has already been suggested'.format(movie))
+            await ctx.send('"{}" has already been suggested'.format(movie))
 
 
 @bot.command()
@@ -137,11 +137,11 @@ async def remove(ctx, *, data):
                                      (user_id, game, 'game')).fetchall()
             if not exists:
                 await update_banner('games')
-                await ctx.send('Successfully deleted {} from {}\'s game suggestions'.format(game, username))
+                await ctx.send('Successfully deleted "{}" from {}\'s game suggestions'.format(game, username))
             else:
-                await ctx.send('Couldn\'t delete {} from {}\'s game suggestions, please contact Euqimor for troubleshooting'.format(game, username))
+                await ctx.send('Couldn\'t delete "{}" from {}\'s game suggestions, please contact Euqimor for troubleshooting'.format(game, username))
         else:
-            await ctx.send('{} not found in {}\'s game suggestions'.format(game, username))
+            await ctx.send('"{}" not found in {}\'s game suggestions'.format(game, username))
 
 
 @bot.command(aliases=['movie_remove'])
@@ -165,11 +165,11 @@ async def remove_movie(ctx, *, data):
                                      (user_id, movie, 'movie')).fetchall()
             if not exists:
                 await update_banner('movies')
-                await ctx.send('Successfully deleted {} from {}\'s movie suggestions'.format(movie, username))
+                await ctx.send('Successfully deleted "{}" from {}\'s movie suggestions'.format(movie, username))
             else:
-                await ctx.send('Couldn\'t delete {} from {}\'s movie suggestions, please contact Euqimor for troubleshooting'.format(movie, username))
+                await ctx.send('Couldn\'t delete "{}" from {}\'s movie suggestions, please contact Euqimor for troubleshooting'.format(movie, username))
         else:
-            await ctx.send('{} not found in {}\'s movie suggestions'.format(movie, username))
+            await ctx.send('"{}" not found in {}\'s movie suggestions'.format(movie, username))
 
 
 @bot.command(aliases=['admin_remove'])
@@ -191,12 +191,12 @@ async def adminremove(ctx, *, data):
                                          (game, 'game')).fetchall()
                 if not exists:
                     await update_banner('games')
-                    await ctx.send('Successfully deleted {} from game suggestions'.format(game))
+                    await ctx.send('Successfully deleted "{}" from game suggestions'.format(game))
                 else:
-                    await ctx.send('Couldn\'t delete {} from game suggestions, please contact Euqimor for troubleshooting'
+                    await ctx.send('Couldn\'t delete "{}" from game suggestions, please contact Euqimor for troubleshooting'
                                    .format(game))
             else:
-                await ctx.send('{} not found in game suggestions'.format(game))
+                await ctx.send('"{}" not found in game suggestions'.format(game))
     else:
         await ctx.send(random.choice(rejections))
 
@@ -219,13 +219,13 @@ async def adminremove_movie(ctx, *, data):
                                          (movie, 'movie')).fetchall()
                 if not exists:
                     await update_banner('movies')
-                    await ctx.send('Successfully deleted {} from movie suggestions'.format(movie))
+                    await ctx.send('Successfully deleted "{}" from movie suggestions'.format(movie))
                 else:
                     await ctx.send(
-                        'Couldn\'t delete {} from movie suggestions, please contact Euqimor for troubleshooting'
+                        'Couldn\'t delete "{}" from movie suggestions, please contact Euqimor for troubleshooting'
                         .format(movie))
             else:
-                await ctx.send('{} not found in movie suggestions'.format(movie))
+                await ctx.send('"{}" not found in movie suggestions'.format(movie))
     else:
         await ctx.send(random.choice(rejections))
 
@@ -283,7 +283,7 @@ async def wipe_user(ctx, user_id:str):
             with con:
                 exists = con.execute('SELECT username FROM Users WHERE user_id=? LIMIT 1;',(user_id,)).fetchall()
             if exists:
-                username = exists[0]
+                username = exists[0][0]
                 with con:
                     con.execute('PRAGMA FOREIGN_KEYS=ON;')
                     con.execute('DELETE FROM Users WHERE user_id=?;',(user_id,))
