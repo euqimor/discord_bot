@@ -137,11 +137,11 @@ async def remove(ctx, *, data):
                                      (user_id, game, 'game')).fetchall()
             if not exists:
                 await update_banner('games')
-                await ctx.send('Successfully deleted {} from {}\'s game suggestions'.format(username, game))
+                await ctx.send('Successfully deleted {} from {}\'s game suggestions'.format(game, username))
             else:
-                await ctx.send('Couldn\'t delete {} from {}\'s game suggestions, please contact Euqimor for troubleshooting'.format(username, game))
+                await ctx.send('Couldn\'t delete {} from {}\'s game suggestions, please contact Euqimor for troubleshooting'.format(game, username))
         else:
-            await ctx.send('{} not found in {}\'s game suggestions'.format(username, game))
+            await ctx.send('{} not found in {}\'s game suggestions'.format(game, username))
 
 
 @bot.command(aliases=['movie_remove'])
@@ -165,11 +165,11 @@ async def remove_movie(ctx, *, data):
                                      (user_id, movie, 'movie')).fetchall()
             if not exists:
                 await update_banner('movies')
-                await ctx.send('Successfully deleted {} from {}\'s movie suggestions'.format(username, movie))
+                await ctx.send('Successfully deleted {} from {}\'s movie suggestions'.format(movie, username))
             else:
-                await ctx.send('Couldn\'t delete {} from {}\'s movie suggestions, please contact Euqimor for troubleshooting'.format(username, movie))
+                await ctx.send('Couldn\'t delete {} from {}\'s movie suggestions, please contact Euqimor for troubleshooting'.format(movie, username))
         else:
-            await ctx.send('{} not found in {}\'s movie suggestions'.format(username, movie))
+            await ctx.send('{} not found in {}\'s movie suggestions'.format(movie, username))
 
 
 @bot.command(aliases=['admin_remove'])
@@ -196,7 +196,7 @@ async def adminremove(ctx, *, data):
                     await ctx.send('Couldn\'t delete {} from game suggestions, please contact Euqimor for troubleshooting'
                                    .format(game))
             else:
-                await ctx.send('{} not found in suggestions'.format(game))
+                await ctx.send('{} not found in game suggestions'.format(game))
     else:
         await ctx.send(random.choice(rejections))
 
@@ -225,7 +225,7 @@ async def adminremove_movie(ctx, *, data):
                         'Couldn\'t delete {} from movie suggestions, please contact Euqimor for troubleshooting'
                         .format(movie))
             else:
-                await ctx.send('{} not found in suggestions'.format(movie))
+                await ctx.send('{} not found in movie suggestions'.format(movie))
     else:
         await ctx.send(random.choice(rejections))
 
