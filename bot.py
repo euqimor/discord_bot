@@ -119,60 +119,66 @@ async def suggest_movie(ctx, *, data):
 @bot.command()
 async def remove(ctx, *, data):
     """Removes the game suggestion if the game was suggested by the user issuing the command"""
-    user_id = ctx.author.id
-    username = str(ctx.author.name)
-    game = ' '.join(data.split())
-    with closing(sqlite3.connect(db_name)) as con:
-        with con:
-            con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
-            con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
-            exists = con.execute('SELECT * FROM Suggestions \
-                                  WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
-                                 (user_id, game, 'game')).fetchall()
-        if exists:
+    if await check_admin_rights(ctx):
+        adminremove(ctx, data)
+    else:
+        user_id = ctx.author.id
+        username = str(ctx.author.name)
+        game = ' '.join(data.split())
+        with closing(sqlite3.connect(db_name)) as con:
             with con:
-                con.execute('DELETE FROM Suggestions WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',(user_id, game, 'game'))
+                con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
+                con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
                 exists = con.execute('SELECT * FROM Suggestions \
                                       WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
                                      (user_id, game, 'game')).fetchall()
-            if not exists:
-                await update_banner('games')
-                await ctx.send('Successfully deleted "{}" from {}\'s game suggestions'.format(game, username))
+            if exists:
+                with con:
+                    con.execute('DELETE FROM Suggestions WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',(user_id, game, 'game'))
+                    exists = con.execute('SELECT * FROM Suggestions \
+                                          WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
+                                         (user_id, game, 'game')).fetchall()
+                if not exists:
+                    await update_banner('games')
+                    await ctx.send('Successfully deleted "{}" from {}\'s game suggestions'.format(game, username))
+                else:
+                    await ctx.send('Couldn\'t delete "{}" from {}\'s game suggestions, please contact Euqimor for troubleshooting'.format(game, username))
             else:
-                await ctx.send('Couldn\'t delete "{}" from {}\'s game suggestions, please contact Euqimor for troubleshooting'.format(game, username))
-        else:
-            await ctx.send('"{}" not found in {}\'s game suggestions'.format(game, username))
+                await ctx.send('"{}" not found in {}\'s game suggestions'.format(game, username))
 
 
 @bot.command(aliases=['movie_remove'])
 async def remove_movie(ctx, *, data):
     """Removes the movie suggestion if the movie was suggested by the user issuing the command"""
-    user_id = ctx.author.id
-    username = str(ctx.author.name)
-    movie = ' '.join(data.split())
-    with closing(sqlite3.connect(db_name)) as con:
-        with con:
-            con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
-            con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
-            exists = con.execute('SELECT * FROM Suggestions \
-                                  WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
-                                 (user_id, movie, 'movie')).fetchall()
-        if exists:
+    if await check_admin_rights(ctx):
+        adminremove_movie(ctx, data)
+    else:
+        user_id = ctx.author.id
+        username = str(ctx.author.name)
+        movie = ' '.join(data.split())
+        with closing(sqlite3.connect(db_name)) as con:
             with con:
-                con.execute('DELETE FROM Suggestions WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',(user_id, movie, 'movie'))
+                con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
+                con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
                 exists = con.execute('SELECT * FROM Suggestions \
                                       WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
                                      (user_id, movie, 'movie')).fetchall()
-            if not exists:
-                await update_banner('movies')
-                await ctx.send('Successfully deleted "{}" from {}\'s movie suggestions'.format(movie, username))
+            if exists:
+                with con:
+                    con.execute('DELETE FROM Suggestions WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',(user_id, movie, 'movie'))
+                    exists = con.execute('SELECT * FROM Suggestions \
+                                          WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
+                                         (user_id, movie, 'movie')).fetchall()
+                if not exists:
+                    await update_banner('movies')
+                    await ctx.send('Successfully deleted "{}" from {}\'s movie suggestions'.format(movie, username))
+                else:
+                    await ctx.send('Couldn\'t delete "{}" from {}\'s movie suggestions, please contact Euqimor for troubleshooting'.format(movie, username))
             else:
-                await ctx.send('Couldn\'t delete "{}" from {}\'s movie suggestions, please contact Euqimor for troubleshooting'.format(movie, username))
-        else:
-            await ctx.send('"{}" not found in {}\'s movie suggestions'.format(movie, username))
+                await ctx.send('"{}" not found in {}\'s movie suggestions'.format(movie, username))
 
 
-@bot.command(aliases=['admin_remove'])
+@bot.command(aliases=['admin_remove'], hidden=True)
 async def adminremove(ctx, *, data):
     """Removes the game from suggestions, command available only to Admin role"""
     game = ' '.join(data.split())
@@ -201,7 +207,7 @@ async def adminremove(ctx, *, data):
         await ctx.send(random.choice(rejections))
 
 
-@bot.command(aliases=['movie_adminremove, adminremove_movie, admin_remove_movie'])
+@bot.command(aliases=['movie_adminremove, adminremove_movie, admin_remove_movie'], hidden=True)
 async def adminremove_movie(ctx, *, data):
     """Removes the movie from suggestions, command available only to Admin role"""
     movie = ' '.join(data.split())
