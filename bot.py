@@ -120,7 +120,7 @@ async def suggest_movie(ctx, *, data):
 async def remove(ctx, *, data):
     """Removes the game suggestion if the game was suggested by the user issuing the command"""
     if await check_admin_rights(ctx):
-        adminremove(ctx, data)
+        await adminremove(ctx, data)
     else:
         user_id = ctx.author.id
         username = str(ctx.author.name)
@@ -151,7 +151,7 @@ async def remove(ctx, *, data):
 async def remove_movie(ctx, *, data):
     """Removes the movie suggestion if the movie was suggested by the user issuing the command"""
     if await check_admin_rights(ctx):
-        adminremove_movie(ctx, data)
+        await adminremove_movie(ctx, data)
     else:
         user_id = ctx.author.id
         username = str(ctx.author.name)
