@@ -11,6 +11,7 @@ from contextlib import closing
 from urllib.request import pathname2url
 
 # TODO Fix the bug where removing the last suggestion deletes it from the DB, but leaves hanging in the channel
+# TODO Sort output list by id
 
 # TODO MAKE EXISTS CHECK A SEPARATE FUNCTION!!!
 # TODO PROVIDE HELP INSTRUCTIONS, separate commands into groups, add multi-server support(?)
