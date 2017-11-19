@@ -3,12 +3,27 @@ from discord.ext import commands
 import dict_query
 from time import sleep
 import random
+import sqlite3
+from collections import defaultdict
+from contextlib import closing
+from os import environ as env
 
+# TODO MAKE EXISTS CHECK A SEPARATE FUNCTION!!!
 # TODO PROVIDE HELP INSTRUCTIONS, separate commands into groups, add multi-server support(?)
 # TODO 2000 symbols limit for suggestions list
 
+
 description = '''An awkward attempt at making a discord bot'''
 bot = commands.Bot(command_prefix='$', description=description)
+
+
+@bot.event
+async def on_ready():
+    print('Logged in as')
+    print(bot.user.name)
+    print(bot.user.id)
+    print('------')
+    await bot.change_presence(game=discord.Game(name='with turrets'))
 
 
 async def check_admin_rights(ctx):
@@ -27,257 +42,142 @@ async def check_admin_rights(ctx):
     return bool(success_flag)
 
 
-def load_suggestions():
-    """
-    :return: tries to load a dict of suggestions from a file,
-    otherwise returns empty dict
-    """
-    suggestions = load_data_from_file('suggestions')
-    if not suggestions:
-        suggestions = {}
-    return suggestions
-
-
-def save_data_to_file(data, filename):
-    """
-    :param data: data to be stored into a file
-    :param filename: filename to save data to
-    :return: None, saves dict as a file for future usage
-    """
-    with open(filename, 'w') as file:
-        file.write(str(data))
-
-
-def load_data_from_file(filename):
-    """
-    :param filename: file from which to load the data
-    :return: returns eval() of the file contents
-    """
-    try:
-        with open(filename) as file:
-            data = eval(file.read())
-        return data
-    except FileNotFoundError:
-        print('File not found')
-    except:
-        print('Something went wrong during data evaluation')
-
-
-@bot.event
-async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
-    await bot.change_presence(game=discord.Game(name='with turrets'))
-
-
-def create_games_message(suggestions):
-    message = ''
-    if suggestions:
-        for userid in suggestions:
-            if 'games' in suggestions[userid] and suggestions[userid]['games']:
-                message += '**'+suggestions[userid]['username']+':**\n'+'```'
-                for game in suggestions[userid]['games']:
-                    message += '\n' + game
-                message += '```'
-        if message == '':
-            message = '__**SUGGESTIONS BY AUTHOR**__\n\nNothing has been suggested yet'
-        else:
-            message = '__**SUGGESTIONS BY AUTHOR**__\n\n' + message
-    else:
-        message = '__**SUGGESTIONS BY AUTHOR**__\n\nNothing has been suggested yet'
-    return message
-
-
-@bot.command()
-async def games_full(ctx):
-    """Prints games suggested so far grouped by suggestion author's name"""
-    message = create_games_message(suggestions)
-    await ctx.send(message)
-
-
-def create_item_list_message(suggestions, entry_name: str):
-    if suggestions:
-        set_of_items = set({})
-        for userid in suggestions:
-            if entry_name in suggestions[userid]:
-                for item in suggestions[userid][entry_name]:
-                    if item.lower() not in [x.lower() for x in set_of_items]:
-                        set_of_items.add(item)
-        if set_of_items:
-            message = '__**SUGGESTED {}**__\n```\n'.format(entry_name.upper())
-            for item in set_of_items:
-                message += '\n' + item
-            message += '```'
-        else:
-            message = '__**SUGGESTED {}**__\n\nNothing has been suggested yet'.format(entry_name.upper())
-    else:
-        message = '__**SUGGESTED {}**__\n\nNothing has been suggested yet'.format(entry_name.upper())
-    return message
-
-
-@bot.command()
-async def games_list(ctx):
-    """Prints games suggested so far in one list"""
-    message = create_item_list_message(suggestions, 'games')
-    await ctx.send(message)
-
-
 @bot.command()
 async def suggest(ctx, *, data):
     """Adds a game suggestion"""
-    userid = ctx.author.id
-    name = str(ctx.author.name)
+    user_id = ctx.author.id
+    username = str(ctx.author.name)
     game = ' '.join(data.split())
-    already_suggested = 0
-    if userid in suggestions:
-        if 'games' not in suggestions[userid]:
-            suggestions[userid]['games'] = set({})
-        if game.lower() not in [x.lower() for x in suggestions[userid]['games']]:
-            suggestions[userid]['games'].add(game)
-        else:
-            already_suggested = 1
-        if suggestions[userid]['username'] != name:
-            suggestions[userid]['username'] = name
-    else:
-        suggestions[userid] = {}
-        suggestions[userid]['username'] = name
-        suggestions[userid]['games'] = {game}
-    save_data_to_file(suggestions, 'suggestions')
-    if already_suggested:
-        await ctx.send('{} is in your game suggestions already'.format(game))
-    else:
-        await update_banner('games')
-        await ctx.send('{} suggested {} for stream'.format(name, game))
+    with closing(sqlite3.connect('cube.db')) as con:
+        con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
+        con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
+        try:
+            con.execute('INSERT INTO Suggestions(user_id, suggestion, suggestion_type) VALUES(?, ?, ?);',(user_id, game, 'game'))
+            await update_banner('games')
+            await ctx.send('{} suggested {} for stream'.format(username, game))
+        except sqlite3.IntegrityError:
+            await ctx.send('{} has already been suggested'.format(game))
 
 
 @bot.command(aliases=['movie'])
 async def suggest_movie(ctx, *, data):
-    """Adds a game suggestion"""
-    userid = ctx.author.id
-    name = str(ctx.author.name)
+    """Adds a movie suggestion"""
+    user_id = ctx.author.id
+    username = str(ctx.author.name)
     movie = ' '.join(data.split())
-    already_suggested = 0
-    if userid in suggestions:
-        if 'movies' not in suggestions[userid]:
-            suggestions[userid]['movies'] = set({})
-        if movie.lower() not in [x.lower() for x in suggestions[userid]['movies']]:
-            suggestions[userid]['movies'].add(movie)
-        else:
-            already_suggested = 1
-        if suggestions[userid]['username'] != name:
-            suggestions[userid]['username'] = name
-    else:
-        suggestions[userid] = {}
-        suggestions[userid]['username'] = name
-        suggestions[userid]['movies'] = {movie}
-    save_data_to_file(suggestions, 'suggestions')
-    if already_suggested:
-        await ctx.send('{} is in your movie suggestions already'.format(movie))
-    else:
-        await update_banner('movies')
-        await ctx.send('{} suggested {} for movie night'.format(name, movie))
+    with closing(sqlite3.connect('cube.db')) as con:
+        con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
+        con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
+        try:
+            con.execute('INSERT INTO Suggestions(user_id, suggestion, suggestion_type) VALUES(?, ?, ?);',(user_id, movie, 'movie'))
+            await update_banner('movies')
+            await ctx.send('{} suggested {} for movie night'.format(username, movie))
+        except sqlite3.IntegrityError:
+            await ctx.send('{} has already been suggested'.format(movie))
 
 
 @bot.command()
 async def remove(ctx, *, data):
     """Removes the game suggestion if the game was suggested by the user issuing the command"""
-    userid = ctx.author.id
-    name = str(ctx.author.name)
+    user_id = ctx.author.id
+    username = str(ctx.author.name)
     game = ' '.join(data.split())
-    success_flag = 0
-    game_found = ('', 0)
-    if userid in suggestions:
-        if 'games' in suggestions[userid]:
-            for existing_game in suggestions[userid]['games']:
-                if game.lower() == existing_game.lower():
-                    game_found = (existing_game, 1)
-                    break
-            if game_found[1]:
-                suggestions[userid]['games'].remove(game_found[0])
-                save_data_to_file(suggestions, 'suggestions')
+    with closing(sqlite3.connect('cube.db')) as con:
+        con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
+        con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
+        exists = con.execute('SELECT * FROM Suggestions \
+                              WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
+                             (user_id, game, 'game')).fetchall()
+        if exists:
+            con.execute('DELETE FROM Suggestions WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',(user_id, game, 'game'))
+            exists = con.execute('SELECT * FROM Suggestions \
+                                  WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
+                                 (user_id, game, 'game')).fetchall()
+            if not exists:
                 await update_banner('games')
-                success_flag = 1
-    if success_flag:
-        await ctx.send('Successfully deleted '+game+' from '+name+'\'s game suggestions')
-    elif not game_found[1]:
-        await ctx.send('\"'+game+'\" not found in '+name+'\'s game suggestions')
-    else:
-        await ctx.send('Something went wrong')
+                await ctx.send('Successfully deleted {} from {}\'s game suggestions'.format(username, game))
+            else:
+                await ctx.send('Couldn\'t delete {} from {}\'s game suggestions, please contact Euqimor for troubleshooting'.format(username, game))
+        else:
+            await ctx.send('{} not found in {}\'s game suggestions'.format(username, game))
 
 
 @bot.command(aliases=['movie_remove'])
 async def remove_movie(ctx, *, data):
     """Removes the movie suggestion if the movie was suggested by the user issuing the command"""
-    userid = ctx.author.id
-    name = str(ctx.author.name)
+    user_id = ctx.author.id
+    username = str(ctx.author.name)
     movie = ' '.join(data.split())
-    success_flag = 0
-    movie_found = ('', 0)
-    if userid in suggestions:
-        if 'games' in suggestions[userid]:
-            for existing_movie in suggestions[userid]['movies']:
-                if movie.lower() == existing_movie.lower():
-                    movie_found = (existing_movie, 1)
-                    break
-            if movie_found[1]:
-                suggestions[userid]['movies'].remove(movie_found[0])
-                save_data_to_file(suggestions, 'suggestions')
+    with closing(sqlite3.connect('cube.db')) as con:
+        con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;',(username, user_id))
+        con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);',(username, user_id))
+        exists = con.execute('SELECT * FROM Suggestions \
+                              WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
+                             (user_id, movie, 'movie')).fetchall()
+        if exists:
+            con.execute('DELETE FROM Suggestions WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',(user_id, movie, 'movie'))
+            exists = con.execute('SELECT * FROM Suggestions \
+                                  WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
+                                 (user_id, movie, 'movie')).fetchall()
+            if not exists:
                 await update_banner('movies')
-                success_flag = 1
-    if success_flag:
-        await ctx.send('Successfully deleted '+movie+' from '+name+'\'s movie suggestions')
-    elif not movie_found[1]:
-        await ctx.send('\"'+movie+'\" not found in '+name+'\'s movie suggestions')
-    else:
-        await ctx.send('Something went wrong')
+                await ctx.send('Successfully deleted {} from {}\'s movie suggestions'.format(username, movie))
+            else:
+                await ctx.send('Couldn\'t delete {} from {}\'s movie suggestions, please contact Euqimor for troubleshooting'.format(username, movie))
+        else:
+            await ctx.send('{} not found in {}\'s movie suggestions'.format(username, movie))
 
 
 @bot.command(aliases=['admin_remove'])
 async def adminremove(ctx, *, data):
-    """Removes the game from every list, command only available to Admin role"""
+    """Removes the game from suggestions, command only available to Admin role"""
     game = ' '.join(data.split())
-    global suggestions
     if await check_admin_rights(ctx):
-        entries_to_delete = []
-        for userid in suggestions:
-            if 'games' in suggestions[userid]:
-                for existing_game in suggestions[userid]['games']:
-                    if game.lower() == existing_game.lower():
-                        entries_to_delete.append({'userid': userid, 'game': existing_game})
-        if entries_to_delete:
-            for entry in entries_to_delete:
-                suggestions[entry['userid']]['games'].remove(entry['game'])
-            save_data_to_file(suggestions, 'suggestions')
-            await update_banner('games')
-            await ctx.send('Successfully deleted ' + game + ' from suggestions')
-        else:
-            await ctx.send('Game \"'+game+'\" not found in suggestions')
+        with closing(sqlite3.connect('cube.db')) as con:
+            exists = con.execute('SELECT * FROM Suggestions \
+                                          WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                 (game, 'game')).fetchall()
+            if exists:
+                con.execute('DELETE FROM Suggestions WHERE suggestion LIKE ? AND suggestion_type=?;',
+                            (game, 'game'))
+                exists = con.execute('SELECT * FROM Suggestions \
+                                              WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                     (game, 'game')).fetchall()
+                if not exists:
+                    await update_banner('games')
+                    await ctx.send('Successfully deleted {} from game suggestions'.format(game))
+                else:
+                    await ctx.send('Couldn\'t delete {} from game suggestions, please contact Euqimor for troubleshooting'
+                                   .format(game))
+            else:
+                await ctx.send('{} not found in suggestions'.format(game))
     else:
         await ctx.send(random.choice(rejections))
 
 
 @bot.command(aliases=['movie_adminremove, adminremove_movie, admin_remove_movie'])
 async def adminremove_movie(ctx, *, data):
-    """Removes the movie from every list, command only available to Admin role"""
+    """Removes the movie from suggestions, command only available to Admin role"""
     movie = ' '.join(data.split())
-    global suggestions
     if await check_admin_rights(ctx):
-        entries_to_delete = []
-        for userid in suggestions:
-            if 'movies' in suggestions[userid]:
-                for existing_movie in suggestions[userid]['movies']:
-                    if movie.lower() == existing_movie.lower():
-                        entries_to_delete.append({'userid': userid, 'movie': existing_movie})
-        if entries_to_delete:
-            for entry in entries_to_delete:
-                suggestions[entry['userid']]['movies'].remove(entry['movie'])
-            save_data_to_file(suggestions, 'suggestions')
-            await update_banner('movies')
-            await ctx.send('Successfully deleted ' + movie + ' from movie suggestions')
-        else:
-            await ctx.send('\"'+movie+'\" not found in movie suggestions')
+        with closing(sqlite3.connect('cube.db')) as con:
+            exists = con.execute('SELECT * FROM Suggestions \
+                                  WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                 (movie, 'movie')).fetchall()
+            if exists:
+                con.execute('DELETE FROM Suggestions WHERE suggestion LIKE ? AND suggestion_type=?;',(movie, 'movie'))
+                exists = con.execute('SELECT * FROM Suggestions \
+                                      WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                     (movie, 'movie')).fetchall()
+                if not exists:
+                    await update_banner('movies')
+                    await ctx.send('Successfully deleted {} from movie suggestions'.format(movie))
+                else:
+                    await ctx.send(
+                        'Couldn\'t delete {} from movie suggestions, please contact Euqimor for troubleshooting'
+                        .format(movie))
+            else:
+                await ctx.send('{} not found in suggestions'.format(movie))
     else:
         await ctx.send(random.choice(rejections))
 
@@ -286,12 +186,18 @@ async def adminremove_movie(ctx, *, data):
 async def adminwipe_games(ctx):
     """Purges the game suggestions list, command only available to Admin role"""
     if await check_admin_rights(ctx):
-        global suggestions
-        for userid in suggestions:
-            suggestions[userid]['games'] = set({})
-        save_data_to_file(suggestions, 'suggestions')
-        await update_banner('games')
-        await ctx.send('All game suggestions successfully deleted')
+        with closing(sqlite3.connect('cube.db')) as con:
+            exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;','game').fetchall()
+            if exists:
+                con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;','game')
+                exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;','game').fetchall()
+                if not exists:
+                    await update_banner('games')
+                    await ctx.send('Successfully deleted all the game suggestions')
+                else:
+                    await ctx.send('Couldn\'t delete the game suggestions, please contact Euqimor for troubleshooting')
+            else:
+                await ctx.send('No game suggestions found')
     else:
         await ctx.send(random.choice(rejections))
 
@@ -300,14 +206,67 @@ async def adminwipe_games(ctx):
 async def adminwipe_movies(ctx):
     """Purges the movie suggestions list, command only available to Admin role"""
     if await check_admin_rights(ctx):
-        global suggestions
-        for userid in suggestions:
-            suggestions[userid]['movies'] = set({})
-        save_data_to_file(suggestions, 'suggestions')
-        await update_banner('movies')
-        await ctx.send('All movie suggestions successfully deleted')
+        with closing(sqlite3.connect('cube.db')) as con:
+            exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;','movie').fetchall()
+            if exists:
+                con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;','movie')
+                exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;','movie').fetchall()
+                if not exists:
+                    await update_banner('movies')
+                    await ctx.send('Successfully deleted all the movie suggestions')
+                else:
+                    await ctx.send('Couldn\'t delete the movie suggestions, please contact Euqimor for troubleshooting')
+            else:
+                await ctx.send('No movie suggestions found')
     else:
         await ctx.send(random.choice(rejections))
+
+
+def message_games_by_author():
+    with closing(sqlite3.connect('cube.db')) as con:
+        suggestions = con.execute('SELECT username, suggestion \
+                                    FROM Users NATURAL JOIN \
+                                    (SELECT * FROM Suggestions WHERE suggestion_type=="game") Q;').fetchall()
+        if suggestions:
+            message = '__**SUGGESTIONS BY AUTHOR**__\n\n'
+            suggestions_dict = defaultdict(list)
+            for username, game in suggestions:
+                suggestions_dict[username].append(game)
+            for username in suggestions_dict:
+                message += '**{}:**\n```'.format(username)
+                for game in suggestions_dict[username]:
+                    message += '\n{}'.format(game)
+                message += '```'
+        else:
+            message = '__**SUGGESTIONS BY AUTHOR**__\n\nNothing has been suggested yet'
+        return message
+
+
+def message_suggestions_in_category(suggestion_type: str):
+    with closing(sqlite3.connect('cube.db')) as con:
+        suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
+        if suggestions:
+            message = '__**SUGGESTED {}**__\n```\n'.format(suggestion_type.upper())
+            for entry in suggestions:
+                message += '\n{}'.format(entry[0])
+            message += '```'
+        else:
+            message = '__**SUGGESTED {}**__\n\nNothing has been suggested yet'.format(suggestion_type.upper())
+        return message
+
+
+@bot.command()
+async def games_full(ctx):
+    """Prints games suggested so far grouped by suggestion author's name"""
+    message = message_games_by_author()
+    await ctx.send(message)
+
+
+@bot.command()
+async def games_list(ctx):
+    """Prints games suggested so far in one list"""
+    message = message_suggestions_in_category('game')
+    await ctx.send(message)
 
 
 @bot.command(aliases=['miriam', 'Miriam', 'MIRIAM', 'GODDAMITMIRIAM', 'word', 'mw', 'Merriam', 'dict'])
@@ -315,7 +274,7 @@ async def merriam(ctx, *, word: str):
     """Queries Merriam-Webster's Collegiate Dictionary for a word definition. Well, tries to at least..."""
     word = ' '.join(word.split())
     # try:
-    query_result = dict_query.query_merriam(word, keys['merriam_webster'])
+    query_result = dict_query.query_merriam(word, env['merriam_webster'])
     cases = query_result  # the word may have changed if you queried for the past tense for example
     # except:
     #     await ctx.send('Something went wrong during online query')
@@ -343,7 +302,7 @@ async def say(ctx, channel_id: str, *, message_text):
         if isinstance(ctx.channel, discord.TextChannel):
             try:
                 await ctx.message.delete()
-            except:
+            except:  # TODO find the proper name for the permissions exception
                 pass
         if '#' not in channel_id:
             dest_channel = bot.get_channel(int(channel_id))
@@ -357,6 +316,13 @@ async def say(ctx, channel_id: str, *, message_text):
 
 
 async def update_banner(banner_type):
+
+    def suggestions_exist(suggestion_type):
+        with closing(sqlite3.connect('cube.db')) as con:
+            if con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', suggestion_type).fetchall():
+                return True
+        return False
+
     guild = bot.guilds[0]
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
     message_list = []
@@ -364,20 +330,19 @@ async def update_banner(banner_type):
         if message.author.id == bot.user.id:
             message_list.append(message)
     if message_list:
-        if suggestions:
-            if banner_type == 'games':
-                await message_list[2].edit(content=create_item_list_message(suggestions, 'games'))
-                await message_list[1].edit(content=create_games_message(suggestions))
-            elif banner_type == 'movies':
-                await message_list[0].edit(content=create_item_list_message(suggestions, 'movies'))
+        if banner_type == 'games' and suggestions_exist('game'):
+            await message_list[2].edit(content=message_suggestions_in_category('game'))
+            await message_list[1].edit(content=message_games_by_author())
+        elif banner_type == 'movies' and suggestions_exist('movie'):
+            await message_list[0].edit(content=message_suggestions_in_category('movie'))
         else:
             for message in message_list:
                 message.delete()
     else:
-        if suggestions:
-            await channel.send(create_item_list_message(suggestions, 'games'))
-            await channel.send(create_games_message(suggestions))
-            await channel.send(create_item_list_message(suggestions, 'movies'))
+        if suggestions_exist('game') or suggestions_exist('movie'):
+            await channel.send(message_suggestions_in_category('game'))
+            await channel.send(message_games_by_author())
+            await channel.send(message_suggestions_in_category('movie'))
 
 
 @bot.command()
@@ -412,8 +377,6 @@ async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
 
 
 if __name__ == '__main__':
-    keys = load_data_from_file('keys')
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
-    suggestions = load_suggestions()
-    bot.run(keys['bot'])
+    bot.run(env['bot_key'])
