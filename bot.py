@@ -99,7 +99,7 @@ async def test(ctx):
         if 'gold' in item.name:
             emoji = item
             break
-    await ctx.send(str(emoji)+'\n {}'.format(emoji[0]))
+    await ctx.send(str(emoji)+'\n {}'.format(emoji))
 
 
 @bot.command()
