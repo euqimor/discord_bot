@@ -80,6 +80,17 @@ async def check_admin_rights(ctx):
     return bool(success_flag)
 
 
+@bot.command(aliases=['proverb','wise','darksouls', 'DarlSouls', 'DS'])
+async def wisdom(ctx):
+    """Inspirational words of wisdom"""
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            max_id = con.execute('SELECT MAX(ROWID) FROM Proverbs;').fetchone()[0]
+            id = random.randint(1, max_id)
+            line = con.execute('SELECT proverb FROM Proverbs WHERE ROWID=?', (id,)).fetchone()[0]
+    await ctx.send(line)
+
+
 @bot.command()
 async def suggest(ctx, *, data):
     """Adds a game suggestion"""
@@ -461,6 +472,6 @@ if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     if check_database(db_name):
-        bot.run(os.environ['BOT_PROD'])
+        bot.run(os.environ['BOT_KEY'])
     else:
         sys.exit(1)
