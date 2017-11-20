@@ -88,7 +88,12 @@ async def wisdom(ctx):
             max_id = con.execute('SELECT MAX(ROWID) FROM Proverbs;').fetchone()[0]
             id = random.randint(1, max_id)
             line = con.execute('SELECT proverb FROM Proverbs WHERE ROWID=?', (id,)).fetchone()[0]
-    await ctx.send(line)
+    emoji = ''
+    for item in ctx.guild.emojis:
+        if item.name == 'praisegold' or item.name == 'praise_golden':
+            emoji = item
+            break
+    await ctx.send('{} {}'.format(line, emoji))
 
 
 @bot.command()
