@@ -93,7 +93,12 @@ async def wisdom(ctx):
 
 @bot.command()
 async def test(ctx):
-    emoji = ctx.guild.emojis
+    emojis = ctx.guild.emojis
+    emoji = ''
+    for item in emojis:
+        if 'gold' in item.name:
+            emoji = item
+            break
     await ctx.send(str(emoji)+'\n {}'.format(emoji[0]))
 
 
