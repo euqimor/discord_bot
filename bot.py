@@ -92,6 +92,12 @@ async def wisdom(ctx):
 
 
 @bot.command()
+async def test(ctx):
+    emoji = ctx.guild.emojis
+    await ctx.send(str(emoji)+'\n {}'.format(emoji[0]))
+
+
+@bot.command()
 async def suggest(ctx, *, data):
     """Adds a game suggestion"""
     user_id = ctx.author.id
