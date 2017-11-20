@@ -100,17 +100,6 @@ async def wisdom(ctx):
 
 
 @bot.command()
-async def test(ctx):
-    emojis = ctx.guild.emojis
-    emoji = ''
-    for item in emojis:
-        if 'gold' in item.name:
-            emoji = item
-            break
-    await ctx.send(str(emoji)+'\n {}'.format(emoji))
-
-
-@bot.command()
 async def suggest(ctx, *, data):
     """Adds a game suggestion"""
     user_id = ctx.author.id
@@ -491,6 +480,6 @@ if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     if check_database(db_name):
-        bot.run(os.environ['BOT_KEY'])
+        bot.run(os.environ['BOT_PROD'])
     else:
         sys.exit(1)
