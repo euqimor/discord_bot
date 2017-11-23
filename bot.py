@@ -87,10 +87,14 @@ async def wisdom(ctx, *, data=''):
     Add one or more words after the command to try and search for a proverb with the given words
     Get a random proverb otherwise or if the words weren't found
     """
+    line = ''
     with closing(sqlite3.connect(db_name)) as con:
         if data:
+            data = '%{}%'.format(data.strip())
             with con:
-                line = con.execute('SELECT proverb FROM Proverbs WHERE proverb LIKE ?', (data,)).fetchone()[0]
+                line = con.execute('SELECT proverb FROM Proverbs WHERE proverb LIKE ?', (data,)).fetchone()
+        if line:
+            line = line[0]
         else:
             with con:
                 max_id = con.execute('SELECT MAX(ROWID) FROM Proverbs;').fetchone()[0]
