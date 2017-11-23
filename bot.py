@@ -81,13 +81,21 @@ async def check_admin_rights(ctx):
 
 
 @bot.command(aliases=['proverb','wise','darksouls', 'DarlSouls', 'DS'])
-async def wisdom(ctx):
-    """Inspirational words of wisdom"""
+async def wisdom(ctx, *, data):
+    """
+    Inspirational words of wisdom
+    Add one or more words after the command to try and search for a proverb with the given words
+    Get a random proverb otherwise or if the words weren't found
+    """
     with closing(sqlite3.connect(db_name)) as con:
-        with con:
-            max_id = con.execute('SELECT MAX(ROWID) FROM Proverbs;').fetchone()[0]
-            id = random.randint(1, max_id)
-            line = con.execute('SELECT proverb FROM Proverbs WHERE ROWID=?', (id,)).fetchone()[0]
+        if data:
+            with con:
+                line = con.execute('SELECT proverb FROM Proverbs WHERE proverb LIKE ?', (data,)).fetchone()[0]
+        else:
+            with con:
+                max_id = con.execute('SELECT MAX(ROWID) FROM Proverbs;').fetchone()[0]
+                id = random.randint(1, max_id)
+                line = con.execute('SELECT proverb FROM Proverbs WHERE ROWID=?', (id,)).fetchone()[0]
     emoji = ''
     try:
         for item in ctx.guild.emojis:
@@ -480,6 +488,6 @@ if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     if check_database(db_name):
-        bot.run(os.environ['BOT_PROD'])
+        bot.run(os.environ['BOT_KEY'])
     else:
         sys.exit(1)
