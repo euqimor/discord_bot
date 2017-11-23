@@ -81,7 +81,7 @@ async def check_admin_rights(ctx):
 
 
 @bot.command(aliases=['proverb','wise','darksouls', 'DarlSouls', 'DS'])
-async def wisdom(ctx, *, data):
+async def wisdom(ctx, *, data=''):
     """
     Inspirational words of wisdom
     Add one or more words after the command to try and search for a proverb with the given words
