@@ -84,8 +84,8 @@ async def check_admin_rights(ctx):
 async def wisdom(ctx, *, data=''):
     """
     Inspirational words of wisdom
-    Add one or more words after the command to try and search for a proverb with the given words
-    Get a random proverb otherwise or if the words weren't found
+    Add one or more words after the command to try and search for a proverb with the given word or phrase
+    Get a random proverb if the words weren't provided or found
     """
     line = ''
     with closing(sqlite3.connect(db_name)) as con:
