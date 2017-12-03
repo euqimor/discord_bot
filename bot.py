@@ -80,8 +80,8 @@ async def check_admin_rights(ctx):
     return bool(success_flag)
 
 
-@bot.command(aliases=['proverb','wise','darksouls', 'DarlSouls', 'DS'])
-async def wisdom(ctx, *, data=''):
+@bot.command()
+async def wisdom(ctx, *, word_or_phrase=''):
     """
     Inspirational words of wisdom
     Add one or more words after the command to try and search for a proverb with the given word or phrase
@@ -89,10 +89,10 @@ async def wisdom(ctx, *, data=''):
     """
     line = ''
     with closing(sqlite3.connect(db_name)) as con:
-        if data:
-            data = '%{}%'.format(data.strip())
+        if word_or_phrase:
+            word_or_phrase = '%{}%'.format(word_or_phrase.strip())
             with con:
-                line = con.execute('SELECT proverb FROM Proverbs WHERE proverb LIKE ?', (data,)).fetchone()
+                line = con.execute('SELECT proverb FROM Proverbs WHERE proverb LIKE ?', (word_or_phrase,)).fetchone()
         if line:
             line = line[0]
         else:
@@ -488,10 +488,13 @@ async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
         await ctx.send(random.choice(rejections))
 
 
+
+
+
 if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     if check_database(db_name):
-        bot.run(os.environ['BOT_PROD'])
+        bot.run(os.environ['BOT_KEY'])
     else:
         sys.exit(1)
