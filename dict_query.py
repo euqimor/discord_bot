@@ -6,11 +6,50 @@ import os
 
 
 
-def query_oxford(word, key):
-    base_url = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/'
-    app_id = os.environ['OXFORD_APP_ID']
-    app_key = os.environ['OXFORD_APP_KEY']
+def query_oxford(word, category, app_id, app_key):
+    """
+    :param word: the word to look up in the dictionary
+    :param category: noun, verb, adjective, etc.
+    :param app_id: oxford api id
+    :param app_key: oxford api key
+    :return: a tuple, (data, result_code)
+    :result_codes: 0 - fail; 1 - success; 2 - original word not found, provides definitions for the closest match
+    """
+    word_in_url_format = '%20'.join(word.lower().strip().split(' '))
+    lexicalCategory = ''
+    if category:
+        lexicalCategory = ';lexicalCategory={}'.format(category)
+    url = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/{}/definitions{}'.format(word_in_url_format, lexicalCategory)
+    r = requests.get(url, headers = {'app_id': app_id, 'app_key': app_key})
+    if  r.status_code == 200:
+        data = r.json()
+        result_code = 1
+        return data, result_code
+    elif r.status_code == 404:
+        url_s = 'https://od-api.oxforddictionaries.com/api/v1/search/en?q={}&prefix=false'.format(word_in_url_format)
+        r_search = requests.get(url_s, headers = {'app_id': app_id, 'app_key': app_key})
+        if r_search.status_code == 200:
+            word_new = r_search.json()['results'][0]['word']
+            word_new_in_url_format = '%20'.join(word_new.lower().strip().split(' '))
+            url_new = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/{}/definitions{}'.format(word_new_in_url_format, lexicalCategory)
+            r_new = requests.get(url_new, headers = {'app_id': app_id, 'app_key': app_key})
+            if r_new.status_code == 200:
+                data = r_new.json()
+                result_code = 2
+                return data, result_code
+    result_code = 0
+    return None, result_code
 
+
+def parse_oxford(data, code):
+    if code == 0:
+        return None
+    else:
+        fields = []
+        for entry in data['results'][0]['lexicalEntries'][0]['entries']:
+            for sense in entry['senses']:
+                # if...
+                print(sense['definitions'][0])
 
 
 def query_merriam(word, key):
