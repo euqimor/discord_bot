@@ -2,6 +2,15 @@ import requests
 from string import ascii_lowercase as alphabet
 from bs4 import BeautifulSoup as Soup
 from bs4 import NavigableString
+import os
+
+
+
+def query_oxford(word, key):
+    base_url = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/'
+    app_id = os.environ['OXFORD_APP_ID']
+    app_key = os.environ['OXFORD_APP_KEY']
+
 
 
 def query_merriam(word, key):
@@ -127,3 +136,4 @@ def split_message(message):
         for item in split_message(message[i:]):
             message_list.append(item)
     return message_list
+

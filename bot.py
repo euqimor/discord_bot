@@ -488,9 +488,17 @@ async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
         await ctx.send(random.choice(rejections))
 
 
+
+
+
+
+
+
+
 @bot.command()
 async def embed(ctx):
     e = discord.Embed(colour=discord.Colour.blurple(), title='Test tag')
+    e.url = 'https://duckduckgo.com/'
     e.set_footer(text='This is a footer')
     e.add_field(name='First add_field', value='First field, inline=False', inline=False)
     e.add_field(name='Second add_field', value='Second field, inline=False', inline=False)
@@ -502,6 +510,6 @@ if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     if check_database(db_name):
-        bot.run(os.environ['BOT_KEY'])
+        bot.run(os.environ['BOT_TEST'])
     else:
         sys.exit(1)
