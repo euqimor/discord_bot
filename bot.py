@@ -488,7 +488,13 @@ async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
         await ctx.send(random.choice(rejections))
 
 
-
+@bot.command()
+def embed():
+    e = discord.Embed(colour=discord.Colour.blurple(), title='Test tag')
+    e.set_footer(text='This is a footer')
+    e.add_field(name='First add_field', value='First field, inline=False', inline=False)
+    e.add_field(name='Second add_field', value='Second field, inline=False', inline=False)
+    e.add_field(name='Third add_field', value='Third field, inline=True', inline=True)
 
 
 if __name__ == '__main__':
