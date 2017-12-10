@@ -424,7 +424,7 @@ async def oxford(ctx, *, word: str):
             parsed_data = dict_query.parse_oxford(json_data[0])
         elif code == 2:  # if the word couldn't be found and we are being redirected to the closest match
             redirect_data = json_data[0]
-            word = redirect_data['results'][0]['word']
+            word = ' '.join(redirect_data['results'][0]['word'].split('_'))
             json_data = dict_query.query_oxford(word, app_id, app_key)
             parsed_data = dict_query.parse_oxford(json_data[0])
         fields = parsed_data[2]
