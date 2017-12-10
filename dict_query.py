@@ -28,7 +28,7 @@ def query_oxford(word, app_id, app_key, category=None):
     elif r.status_code == 404:
         url_s = 'https://od-api.oxforddictionaries.com/api/v1/search/en?q={}&prefix=false'.format(word_in_url_format)
         r_search = requests.get(url_s, headers = {'app_id': app_id, 'app_key': app_key})
-        if r_search.status_code == 200:
+        if r_search.status_code == 200 and r_search.json()['results']:
             word_new = r_search.json()['results'][0]['word']
             word_new_in_url_format = '%20'.join(word_new.lower().strip().split(' '))
             url_new = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/{}/definitions{}'.format(word_new_in_url_format, lexicalCategory)
