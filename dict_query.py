@@ -49,7 +49,7 @@ def parse_oxford(data):
     the oxford dictionary; a list of dictionaries to create embed fields from, the keys are 'name' and 'value'
     """
     word = data['results'][0]['word'].capitalize()
-    url = 'https://en.oxforddictionaries.com/definition/{}'.format(word.lower())
+    url = 'https://en.oxforddictionaries.com/definition/{}'.format('%20'.join(word.lower().strip().split(' ')))
     embed_fields = []
     for lexicalEntry in data['results'][0]['lexicalEntries']:
         i = 1
