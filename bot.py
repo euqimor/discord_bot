@@ -407,6 +407,35 @@ async def merriam(ctx, *, word: str):
         await message.delete()
 
 
+@bot.command()
+async def oxford(ctx, *, word: str):
+    """Query Oxford Dictionary for a word definition."""
+    word = ' '.join(word.split())
+    app_id = os.environ['OXFORD_APP_ID']
+    app_key = os.environ['OXFORD_APP_KEY']
+    json_data = dict_query.query_oxford(word, app_id, app_key)
+    code = json_data[1]
+    if code == 0:
+        message = await ctx.send('Could not find the word or something went wrong with the request')
+        sleep(4)
+        await message.delete()
+    else:
+        if code == 1:  # if API returned the definition
+            parsed_data = dict_query.parse_oxford(json_data[0])
+        elif code == 2:  # if the word couldn't be found and we are being redirected to the closest match
+            redirect_data = json_data[0]
+            word = redirect_data['results'][0]['word']
+            json_data = dict_query.query_oxford(word, app_id, app_key)
+            parsed_data = dict_query.parse_oxford(json_data[0])
+        fields = parsed_data[2]
+        title = '{} | Oxford Dictionary'.format(parsed_data[0])
+        e = discord.Embed(colour=discord.Colour.blurple(), title=title)
+        e.url = parsed_data[1]
+        for field in fields:
+            e.add_field(name=field['name'], value=field['value'])
+        await ctx.send(embed=e)
+
+
 @bot.command(hidden=True)
 async def say(ctx, channel_id: str, *, message_text):
     if ctx.author.id in [173747843314483210, 270744594243649536]:
@@ -486,51 +515,6 @@ async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
         await ctx.send('Status set')
     else:
         await ctx.send(random.choice(rejections))
-
-
-
-
-
-@bot.command()
-async def oxford(ctx, *, word: str):
-    """Query Oxford Dictionary for a word definition."""
-    word = ' '.join(word.split())
-    app_id = os.environ['OXFORD_APP_ID']
-    app_key = os.environ['OXFORD_APP_KEY']
-    json_data = dict_query.query_oxford(word, app_id, app_key)
-    code = json_data[1]
-    if code == 0:
-        message = await ctx.send('Could not find the word or something went wrong with the request')
-        sleep(4)
-        await message.delete()
-    else:
-        if code == 1:
-            parsed_data = dict_query.parse_oxford(json_data[0])
-        elif code == 2:
-            redirect_data = json_data[0]
-            word = redirect_data['results'][0]['word']
-            json_data = dict_query.query_oxford(word, app_id, app_key)
-            parsed_data = dict_query.parse_oxford(json_data[0])
-        fields = parsed_data[2]
-        title = '{} | Oxford Dictionary'.format(parsed_data[0])
-        e = discord.Embed(colour=discord.Colour.blurple(), title=title)
-        e.url = parsed_data[1]
-        for field in fields:
-            e.add_field(name=field['name'], value=field['value'])
-        await ctx.send(embed=e)
-
-
-
-
-@bot.command()
-async def embed(ctx):
-    e = discord.Embed(colour=discord.Colour.blurple(), title='Test tag')
-    e.url = 'https://duckduckgo.com/'
-    e.set_footer(text='This is a footer')
-    e.add_field(name='First add_field', value='First field, inline=False', inline=False)
-    e.add_field(name='Second add_field', value='Second field, inline=False', inline=False)
-    e.add_field(name='Third add_field', value='Third field, inline=True', inline=True)
-    await ctx.send(embed=e)
 
 
 if __name__ == '__main__':

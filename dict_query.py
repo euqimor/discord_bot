@@ -19,7 +19,7 @@ def query_oxford(word, app_id, app_key, category=None):
     lexicalCategory = ''
     if category:
         lexicalCategory = ';lexicalCategory={}'.format(category)
-    url = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/{}/definitions{}'.format(word_in_url_format, lexicalCategory)
+    url = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/{}/definitions;domains{}'.format(word_in_url_format, lexicalCategory)
     r = requests.get(url, headers = {'app_id': app_id, 'app_key': app_key})
     if  r.status_code == 200:
         data = r.json()
@@ -44,7 +44,6 @@ def query_oxford(word, app_id, app_key, category=None):
 def parse_oxford(data):
     """
     :param data: JSON, the result of the oxford API query
-    :param code: API request result: 0 - fail; 1 - success; 2 - original word not found, provides definitions for the closest match
     :return: a tuple (word, url, embed_fields). The word as it's stated in the API's reply; url link to the word in \
     the oxford dictionary; a list of dictionaries to create embed fields from, the keys are 'name' and 'value'
     """
@@ -54,7 +53,7 @@ def parse_oxford(data):
     for lexicalEntry in data['results'][0]['lexicalEntries']:
         i = 1
         d = {}
-        d['name'] = '{}, *{}*'.format(word, lexicalEntry['lexicalCategory'])
+        d['name'] = '{}, *{}*'.format(word, lexicalEntry['lexicalCategory'].lower())
         d['value'] = ''
         for entry in lexicalEntry['entries']:
             for sense in entry['senses']:
