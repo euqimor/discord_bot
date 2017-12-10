@@ -432,7 +432,7 @@ async def oxford(ctx, *, word: str):
         e = discord.Embed(colour=discord.Colour.blurple(), title=title)
         e.url = parsed_data[1]
         for field in fields:
-            e.add_field(name=field['name'], value=field['value'])
+            e.add_field(name=field['name'], value=field['value'], inline=False)
         await ctx.send(embed=e)
 
 
