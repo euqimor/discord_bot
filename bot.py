@@ -498,8 +498,19 @@ async def oxford(ctx, *, word: str):
     app_id = os.environ['OXFORD_APP_ID']
     app_key = os.environ['OXFORD_APP_KEY']
     json_data = dict_query.query_oxford(word, app_id, app_key)
-    parsed_data = dict_query.parse_oxford(json_data[0], json_data[1])
-    if parsed_data:
+    code = json_data[1]
+    if code == 0:
+        message = await ctx.send('Could not find the word or something went wrong with the request')
+        sleep(4)
+        await message.delete()
+    else:
+        if code == 1:
+            parsed_data = dict_query.parse_oxford(json_data[0])
+        elif code == 2:
+            redirect_data = json_data[0]
+            word = redirect_data['results'][0]['word']
+            json_data = dict_query.query_oxford(word, app_id, app_key)
+            parsed_data = dict_query.parse_oxford(json_data[0])
         fields = parsed_data[2]
         title = '{} | Oxford Dictionary'.format(parsed_data[0])
         e = discord.Embed(colour=discord.Colour.blurple(), title=title)
@@ -507,10 +518,6 @@ async def oxford(ctx, *, word: str):
         for field in fields:
             e.add_field(name=field['name'], value=field['value'])
         await ctx.send(embed=e)
-    else:
-        message = await ctx.send('Could not find the word or something went wrong with the request')
-        sleep(4)
-        await message.delete()
 
 
 
