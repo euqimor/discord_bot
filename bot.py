@@ -491,6 +491,25 @@ async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
 
 
 
+@bot.command()
+async def oxford(ctx, *, word: str):
+    """Query Oxford Dictionary for a word definition."""
+    word = ' '.join(word.split())
+    app_id = os.environ['OXFORD_APP_ID']
+    app_key = os.environ['OXFORD_APP_KEY']
+    json_data = dict_query.query_oxford(word, app_id, app_key)
+    parsed_data = dict_query.parse_oxford(json_data[0], json_data[1])
+    if parsed_data:
+        fields = parsed_data[2]
+        e = discord.Embed(colour=discord.Colour.blurple(), title=parsed_data[0])
+        e.url = parsed_data[1]
+        for field in fields:
+            e.add_field(name=field['name'], value=field['value'])
+        await ctx.send(embed=e)
+    else:
+        message = await ctx.send('Could not find the word or something went wrong with the request')
+        sleep(4)
+        await message.delete()
 
 
 

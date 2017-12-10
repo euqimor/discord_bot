@@ -6,13 +6,13 @@ import os
 
 
 
-def query_oxford(word, category, app_id, app_key):
+def query_oxford(word, app_id, app_key, category=None):
     """
     :param word: the word to look up in the dictionary
     :param category: noun, verb, adjective, etc.
     :param app_id: oxford api id
     :param app_key: oxford api key
-    :return: a tuple, (data, result_code)
+    :return: a tuple, (data: JSON, result_code: int)
     :result_codes: 0 - fail; 1 - success; 2 - original word not found, provides definitions for the closest match
     """
     word_in_url_format = '%20'.join(word.lower().strip().split(' '))
@@ -42,14 +42,32 @@ def query_oxford(word, category, app_id, app_key):
 
 
 def parse_oxford(data, code):
+    """
+    :param data: JSON, the result of the oxford API query
+    :param code: API request result: 0 - fail; 1 - success; 2 - original word not found, provides definitions for the closest match
+    :return: a tuple (word, url, embed_fields). The word as it's stated in the API's reply; url link to the word in \
+    the oxford dictionary; a list of dictionaries to create embed fields from, the keys are 'name' and 'value'
+    """
     if code == 0:
         return None
     else:
-        fields = []
-        for entry in data['results'][0]['lexicalEntries'][0]['entries']:
-            for sense in entry['senses']:
-                # if...
-                print(sense['definitions'][0])
+        word = data['results'][0]['word']
+        url = 'https://en.oxforddictionaries.com/definition/{}'.format(word)
+        embed_fields = []
+        for lexicalEntry in data['results'][0]['lexicalEntries']:
+            d = {}
+            d['name'] = '{}, *{}*'.format(word, lexicalEntry['lexicalCategory'])
+            d['value'] = ''
+            for entry in lexicalEntry['entries']:
+                for i, sense in enumerate(entry['senses']):
+                    if sense.get('domains'):
+                        domain = sense['domains'][0]
+                    else:
+                        domain = ''
+                    definition = sense['definitions'][0]
+                    d['value'] += '{}. {}{}\n'.format(i, '*'+domain+'*: ' if domain else '', definition)
+            embed_fields.append(d)
+        return word, url, embed_fields
 
 
 def query_merriam(word, key):
