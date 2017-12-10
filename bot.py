@@ -501,7 +501,8 @@ async def oxford(ctx, *, word: str):
     parsed_data = dict_query.parse_oxford(json_data[0], json_data[1])
     if parsed_data:
         fields = parsed_data[2]
-        e = discord.Embed(colour=discord.Colour.blurple(), title=parsed_data[0])
+        title = '{} | Oxford Dictionary'.format(parsed_data[0])
+        e = discord.Embed(colour=discord.Colour.blurple(), title=title)
         e.url = parsed_data[1]
         for field in fields:
             e.add_field(name=field['name'], value=field['value'])

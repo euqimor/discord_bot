@@ -55,17 +55,19 @@ def parse_oxford(data, code):
         url = 'https://en.oxforddictionaries.com/definition/{}'.format(word)
         embed_fields = []
         for lexicalEntry in data['results'][0]['lexicalEntries']:
+            i = 1
             d = {}
-            d['name'] = '{}, *{}*'.format(word, lexicalEntry['lexicalCategory'])
+            d['name'] = '{}, *{}*'.format(word.capitalize(), lexicalEntry['lexicalCategory'])
             d['value'] = ''
             for entry in lexicalEntry['entries']:
-                for i, sense in enumerate(entry['senses']):
+                for sense in entry['senses']:
                     if sense.get('domains'):
                         domain = sense['domains'][0]
                     else:
                         domain = ''
                     definition = sense['definitions'][0]
                     d['value'] += '{}. {}{}\n'.format(i, '*'+domain+'*: ' if domain else '', definition)
+                    i += 1
             embed_fields.append(d)
         return word, url, embed_fields
 
