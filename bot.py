@@ -378,7 +378,7 @@ def embed_suggestions_in_category(suggestion_type: str):
             text = ''
             for i, entry in enumerate(suggestions):
                 text += '{}. {}\n'.format(i+1, entry[0])
-            e.add_field(name=title, value=text[:-2], inline=False)
+            e.add_field(name=title, value=title+'\n'+text[:-2], inline=False)
         else:
             text = 'Nothing has been suggested yet'
             e.add_field(name=title, value=text, inline=False)
