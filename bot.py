@@ -124,7 +124,7 @@ async def suggest(ctx, *, data):
         try:
             with con:
                 con.execute('INSERT INTO Suggestions(user_id, suggestion, suggestion_type) VALUES(?, ?, ?);',(user_id, game, 'game'))
-            await update_banner('games')
+            await update_banner(ctx, 'games')
             await ctx.send('{} suggested "{}" for stream'.format(username, game))
         except sqlite3.IntegrityError:
             await ctx.send('"{}" has already been suggested'.format(game))
@@ -143,7 +143,7 @@ async def suggest_movie(ctx, *, data):
         try:
             with con:
                 con.execute('INSERT INTO Suggestions(user_id, suggestion, suggestion_type) VALUES(?, ?, ?);',(user_id, movie, 'movie'))
-            await update_banner('movies')
+            await update_banner(ctx, 'movies')
             await ctx.send('{} suggested "{}" for movie night'.format(username, movie))
         except sqlite3.IntegrityError:
             await ctx.send('"{}" has already been suggested'.format(movie))
@@ -172,7 +172,7 @@ async def remove(ctx, *, data):
                                           WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
                                          (user_id, game, 'game')).fetchall()
                 if not exists:
-                    await update_banner('games')
+                    await update_banner(ctx, 'games')
                     await ctx.send('Successfully deleted "{}" from {}\'s game suggestions'.format(game, username))
                 else:
                     await ctx.send('Couldn\'t delete "{}" from {}\'s game suggestions, please contact Euqimor for troubleshooting'.format(game, username))
@@ -203,7 +203,7 @@ async def remove_movie(ctx, *, data):
                                           WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
                                          (user_id, movie, 'movie')).fetchall()
                 if not exists:
-                    await update_banner('movies')
+                    await update_banner(ctx, 'movies')
                     await ctx.send('Successfully deleted "{}" from {}\'s movie suggestions'.format(movie, username))
                 else:
                     await ctx.send('Couldn\'t delete "{}" from {}\'s movie suggestions, please contact Euqimor for troubleshooting'.format(movie, username))
@@ -227,7 +227,7 @@ async def adminremove(ctx, data):
                                               WHERE suggestion LIKE ? AND suggestion_type=?;',
                                      (game, 'game')).fetchall()
             if not exists:
-                await update_banner('games')
+                await update_banner(ctx, 'games')
                 await ctx.send('Successfully deleted "{}" from game suggestions'.format(game))
             else:
                 await ctx.send('Couldn\'t delete "{}" from game suggestions, please contact Euqimor for troubleshooting'
@@ -251,7 +251,7 @@ async def adminremove_movie(ctx, data):
                                       WHERE suggestion LIKE ? AND suggestion_type=?;',
                                      (movie, 'movie')).fetchall()
             if not exists:
-                await update_banner('movies')
+                await update_banner(ctx, 'movies')
                 await ctx.send('Successfully deleted "{}" from movie suggestions'.format(movie))
             else:
                 await ctx.send(
@@ -273,7 +273,7 @@ async def wipe_games(ctx):
                     con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;',('game',))
                     exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('game',)).fetchall()
                 if not exists:
-                    await update_banner('games')
+                    await update_banner(ctx, 'games')
                     await ctx.send('Successfully deleted all the game suggestions')
                 else:
                     await ctx.send('Couldn\'t delete the game suggestions, please contact Euqimor for troubleshooting')
@@ -295,7 +295,7 @@ async def wipe_movies(ctx):
                     con.execute('DELETE FROM Suggestions WHERE suggestion_type=?;',('movie',))
                     exists = con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;',('movie',)).fetchall()
                 if not exists:
-                    await update_banner('movies')
+                    await update_banner(ctx, 'movies')
                     await ctx.send('Successfully deleted all the movie suggestions')
                 else:
                     await ctx.send('Couldn\'t delete the movie suggestions, please contact Euqimor for troubleshooting')
@@ -320,8 +320,8 @@ async def wipe_user(ctx, user_id:str):
                     con.execute('DELETE FROM Users WHERE user_id=?;',(user_id,))
                     exists = con.execute('SELECT username FROM Users WHERE user_id=? LIMIT 1;', (user_id,)).fetchall()
                 if not exists:
-                    await update_banner('movies')
-                    await update_banner('games')
+                    await update_banner(ctx, 'movies')
+                    await update_banner(ctx, 'games')
                     await ctx.send('Successfully deleted user {} from the database'.format(username))
                 else:
                     await ctx.send('Couldn\'t delete the user, please contact Euqimor for troubleshooting')
@@ -357,13 +357,30 @@ def message_suggestions_in_category(suggestion_type: str):
         with con:
             suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
         if suggestions:
-            message = '__**SUGGESTED {}**__\n```\n'.format(suggestion_type.upper())
+            message = '__**SUGGESTED {}S**__\n```\n'.format(suggestion_type.upper())
             for entry in suggestions:
                 message += '\n{}'.format(entry[0])
             message += '```'
         else:
-            message = '__**SUGGESTED {}**__\n\nNothing has been suggested yet'.format(suggestion_type.upper())
+            message = '__**SUGGESTED {}S**__\n\nNothing has been suggested yet'.format(suggestion_type.upper())
         return message
+
+
+def embed_suggestions_in_category(suggestion_type: str):
+    title = 'SUGGESTED {}S'.format(suggestion_type.upper())
+    e = discord.Embed(colour=discord.Colour.teal(), title=title)
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
+        if suggestions:
+            text = ''
+            for entry in suggestions:
+                text += '{}\n'.format(entry[0])
+            e.add_field(name='', value=text[:-2], inline=False)
+        else:
+            text = 'Nothing has been suggested yet'
+            e.add_field(name='', value=text, inline=False)
+        return e
 
 
 @bot.command(hidden=True)
@@ -376,8 +393,8 @@ async def games_full(ctx):
 @bot.command(hidden=True)
 async def games_list(ctx):
     """Prints games suggested so far in one list"""
-    message = message_suggestions_in_category('game')
-    await ctx.send(message)
+    e = embed_suggestions_in_category('game')
+    await ctx.send(embed=e)
 
 
 @bot.command(aliases=['miriam', 'Miriam', 'MIRIAM', 'GODDAMITMIRIAM', 'word', 'mw', 'Merriam', 'dict'])
@@ -455,7 +472,7 @@ async def say(ctx, channel_id: str, *, message_text):
         await ctx.send(random.choice(rejections))
 
 
-async def update_banner(banner_type):
+async def update_banner(ctx, banner_type):
 
     def suggestions_exist(suggestion_type):
         with closing(sqlite3.connect(db_name)) as con:
@@ -464,7 +481,7 @@ async def update_banner(banner_type):
                     return True
         return False
 
-    guild = bot.guilds[0]
+    guild = ctx.guild
     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
     message_list = []
     async for message in channel.history(limit=100):
@@ -521,6 +538,6 @@ if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     if check_database(db_name):
-        bot.run(os.environ['BOT_PROD'])
+        bot.run(os.environ['BOT_TEST'])
     else:
         sys.exit(1)
