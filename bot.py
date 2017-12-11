@@ -376,10 +376,10 @@ def embed_suggestions_in_category(suggestion_type: str):
             text = ''
             for entry in suggestions:
                 text += '{}\n'.format(entry[0])
-            e.add_field(name='', value=text[:-2], inline=False)
+            e.add_field(name=' ', value=text[:-2], inline=False)
         else:
             text = 'Nothing has been suggested yet'
-            e.add_field(name='', value=text, inline=False)
+            e.add_field(name=' ', value=text, inline=False)
         return e
 
 
