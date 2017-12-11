@@ -368,7 +368,8 @@ def message_suggestions_in_category(suggestion_type: str):
 
 def embed_suggestions_in_category(suggestion_type: str):
     title = 'SUGGESTED {}S'.format(suggestion_type.upper())
-    e = discord.Embed(colour=discord.Colour.teal(), title=title)
+    e = discord.Embed(colour=discord.Colour.teal())
+    e.set_thumbnail(url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png')
     with closing(sqlite3.connect(db_name)) as con:
         with con:
             suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
@@ -376,10 +377,10 @@ def embed_suggestions_in_category(suggestion_type: str):
             text = ''
             for entry in suggestions:
                 text += '{}\n'.format(entry[0])
-            e.add_field(name='test', value=text[:-2], inline=False)
+            e.add_field(name=title, value=text[:-2], inline=False)
         else:
             text = 'Nothing has been suggested yet'
-            e.add_field(name='test', value=text, inline=False)
+            e.add_field(name=title, value=text, inline=False)
         return e
 
 
