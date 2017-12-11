@@ -370,7 +370,7 @@ def embed_suggestions_in_category(suggestion_type: str):
     title = 'SUGGESTED {}S'.format(suggestion_type.upper())
     e = discord.Embed(colour=discord.Colour.teal())
     e.set_thumbnail(url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png')
-    e.thumbnail.proxy_url = 'https://duckduckgo.com'
+    e.url = 'https://duckduckgo.com'
     with closing(sqlite3.connect(db_name)) as con:
         with con:
             suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
