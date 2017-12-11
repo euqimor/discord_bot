@@ -368,7 +368,7 @@ def message_suggestions_in_category(suggestion_type: str):
 
 def embed_suggestions_in_category(suggestion_type: str):
     title = 'SUGGESTED {}S'.format(suggestion_type.upper())
-    e = discord.Embed(colour=discord.Colour.teal())
+    e = discord.Embed(colour=discord.Colour.teal(), title=title)
     e.set_thumbnail(url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png')
     e.url = 'https://duckduckgo.com'
     with closing(sqlite3.connect(db_name)) as con:
