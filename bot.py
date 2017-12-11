@@ -368,7 +368,8 @@ def message_suggestions_in_category(suggestion_type: str):
 
 def embed_suggestions_in_category(suggestion_type: str):
     title = 'SUGGESTED {}S'.format(suggestion_type.upper())
-    e = discord.Embed(colour=discord.Colour.teal(), title=title)
+    subtitle = '~~~~~~~~~~~~~~~~~~~~~~~'
+    e = discord.Embed(colour=discord.Colour.purple(), title=title)
     e.set_thumbnail(url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png')
     e.url = 'https://duckduckgo.com'
     with closing(sqlite3.connect(db_name)) as con:
@@ -376,12 +377,12 @@ def embed_suggestions_in_category(suggestion_type: str):
             suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
         if suggestions:
             text = ''
-            for entry in suggestions:
-                text += '{}\n'.format(entry[0])
-            e.add_field(name=title, value=text[:-2], inline=False)
+            for i, entry in enumerate(suggestions):
+                text += '{}. {}\n'.format(i+1, entry[0])
+            e.add_field(name=subtitle, value=text[:-2], inline=False)
         else:
             text = 'Nothing has been suggested yet'
-            e.add_field(name=title, value=text, inline=False)
+            e.add_field(name=subtitle, value=text, inline=False)
         return e
 
 
