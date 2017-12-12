@@ -367,8 +367,8 @@ def embed_games_by_author():
             for username in suggestions_dict:
                 games = ''
                 for game in suggestions_dict[username]:
-                    games += '{}\n'.format(game)
-                e.add_field(name=username, value=games[:-2], inline=False)
+                    games += '- {}\n'.format(game)
+                e.add_field(name=username, value=games[:-1], inline=False)
         else:
             e.add_field(name='Nothing has been suggested yet', value=':(', inline=False)
         return e
@@ -398,7 +398,7 @@ def embed_suggestions_in_category(suggestion_type: str):
             text = ''
             for entry in suggestions:
                 text += '{}\n'.format(entry[0])
-            e.add_field(name=title, value=text[:-2], inline=False)
+            e.add_field(name=title, value=text[:-1], inline=False)
         else:
             text = 'Nothing has been suggested yet'
             e.add_field(name=title, value=text, inline=False)
