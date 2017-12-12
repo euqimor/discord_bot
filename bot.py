@@ -574,11 +574,19 @@ async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
 
 
 @bot.command(hidden=True)
-async def test(ctx, *, message: str):
+async def wipe_banners(ctx):
     if await bot.is_owner(ctx.author):
-        await ctx.send('success')
+        guild = ctx.guild
+        channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
+        message_list = []
+        async for message in channel.history(limit=100):
+            if message.author.id == bot.user.id:
+                message_list.append(message)
+        if message_list:
+            for message in message_list:
+                await message.delete()
     else:
-        await ctx.send('fail')
+        await ctx.send(random.choice(rejections))
 
 
 if __name__ == '__main__':
