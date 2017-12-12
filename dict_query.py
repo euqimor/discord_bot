@@ -18,8 +18,8 @@ def query_oxford(word, app_id, app_key, category=None):
     word_in_url_format = '%20'.join(word.lower().strip().split(' '))
     lexicalCategory = ''
     if category:
-        lexicalCategory = ';lexicalCategory={}'.format(category)
-    url = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/{}/definitions;domains{}'.format(word_in_url_format, lexicalCategory)
+        lexicalCategory = '/lexicalCategory={}'.format(category)
+    url = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/{}{}'.format(word_in_url_format, lexicalCategory)
     r = requests.get(url, headers={'app_id': app_id, 'app_key': app_key})
     if r.status_code == 200:
         data = r.json()
