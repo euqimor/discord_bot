@@ -352,6 +352,28 @@ def message_games_by_author():
         return message
 
 
+def embed_games_by_author():
+    title = 'SUGGESTIONS BY AUTHOR'
+    e = discord.Embed(colour=discord.Colour.purple(), title=title)
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            suggestions = con.execute('SELECT username, suggestion \
+                                        FROM Users NATURAL JOIN \
+                                        (SELECT * FROM Suggestions WHERE suggestion_type=="game") Q;').fetchall()
+        if suggestions:
+            suggestions_dict = defaultdict(list)
+            for username, game in suggestions:
+                suggestions_dict[username].append(game)
+            for username in suggestions_dict:
+                games = ''
+                for game in suggestions_dict[username]:
+                    games += '{}\n'.format(game)
+                e.add_field(name=username, value=games[:-2], inline=False)
+        else:
+            e.add_field(name='Nothing has been suggested yet', value=':(', inline=False)
+        return e
+
+
 def message_suggestions_in_category(suggestion_type: str):
     with closing(sqlite3.connect(db_name)) as con:
         with con:
@@ -369,16 +391,13 @@ def message_suggestions_in_category(suggestion_type: str):
 def embed_suggestions_in_category(suggestion_type: str):
     title = 'SUGGESTED {}S'.format(suggestion_type.upper())
     e = discord.Embed(colour=discord.Colour.purple())
-    # author_pic_url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
-    # e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
-    # e.set_author(name='AuthorQ', url='https://duckduckgo.com', icon_url=author_pic_url)
     with closing(sqlite3.connect(db_name)) as con:
         with con:
             suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
         if suggestions:
             text = ''
-            for i, entry in enumerate(suggestions):
-                text += '{}. {}\n'.format(i+1, entry[0])
+            for entry in suggestions:
+                text += '{}\n'.format(entry[0])
             e.add_field(name=title, value=text[:-2], inline=False)
         else:
             text = 'Nothing has been suggested yet'
@@ -399,7 +418,7 @@ async def games_list(ctx):
     e = embed_suggestions_in_category('game')
     author_pic_url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
     e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
-    e.set_author(name='AuthorQ', url='https://duckduckgo.com', icon_url=author_pic_url)
+    e.set_author(name='AellaQ', url='https://www.twitch.tv/aellaq', icon_url=author_pic_url)
     await ctx.send(embed=e)
 
 
@@ -529,9 +548,9 @@ async def update_banner(ctx, banner_type):
             e = embed_suggestions_in_category('game')
             author_pic_url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
             e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
-            e.set_author(name='AuthorQ', url='https://duckduckgo.com', icon_url=author_pic_url)
+            e.set_author(name='AellaQ', url='https://www.twitch.tv/aellaq', icon_url=author_pic_url)
             await message_list[2].edit(embed=e)
-            await message_list[1].edit(content=message_games_by_author())
+            await message_list[1].edit(embed=embed_games_by_author())
         elif banner_type == 'movies' and suggestions_exist('movie'):
             await message_list[0].edit(embed=embed_suggestions_in_category('movie'))
         else:
@@ -542,9 +561,9 @@ async def update_banner(ctx, banner_type):
             e = embed_suggestions_in_category('game')
             author_pic_url = 'https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
             e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
-            e.set_author(name='AuthorQ', url='https://duckduckgo.com', icon_url=author_pic_url)
+            e.set_author(name='AellaQ', url='https://www.twitch.tv/aellaq', icon_url=author_pic_url)
             await channel.send(embed=e)
-            await channel.send(message_games_by_author())
+            await channel.send(embed=embed_games_by_author())
             await channel.send(embed=embed_suggestions_in_category('movie'))
 
 
