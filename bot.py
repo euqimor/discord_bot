@@ -371,7 +371,7 @@ def embed_suggestions_in_category(suggestion_type: str):
     e = discord.Embed(colour=discord.Colour.purple())
     author_pic_url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
     # e.url = 'https://duckduckgo.com'
-    e.thumbnail.url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png'
+    e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
     e.set_author(name='AuthorQ', url='https://duckduckgo.com', icon_url=author_pic_url)
     with closing(sqlite3.connect(db_name)) as con:
         with con:
