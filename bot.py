@@ -369,10 +369,9 @@ def message_suggestions_in_category(suggestion_type: str):
 def embed_suggestions_in_category(suggestion_type: str):
     title = 'SUGGESTED {}S'.format(suggestion_type.upper())
     e = discord.Embed(colour=discord.Colour.purple())
-    author_pic_url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
-    # e.url = 'https://duckduckgo.com'
-    e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
-    e.set_author(name='AuthorQ', url='https://duckduckgo.com', icon_url=author_pic_url)
+    # author_pic_url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
+    # e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
+    # e.set_author(name='AuthorQ', url='https://duckduckgo.com', icon_url=author_pic_url)
     with closing(sqlite3.connect(db_name)) as con:
         with con:
             suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type==?;',(suggestion_type,)).fetchall()
@@ -398,6 +397,9 @@ async def games_full(ctx):
 async def games_list(ctx):
     """Prints games suggested so far in one list"""
     e = embed_suggestions_in_category('game')
+    author_pic_url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
+    e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
+    e.set_author(name='AuthorQ', url='https://duckduckgo.com', icon_url=author_pic_url)
     await ctx.send(embed=e)
 
 
@@ -476,6 +478,37 @@ async def say(ctx, channel_id: str, *, message_text):
         await ctx.send(random.choice(rejections))
 
 
+# async def update_banner(ctx, banner_type):
+#
+#     def suggestions_exist(suggestion_type):
+#         with closing(sqlite3.connect(db_name)) as con:
+#             with con:
+#                 if con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', (suggestion_type,)).fetchall():
+#                     return True
+#         return False
+#
+#     guild = ctx.guild
+#     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
+#     message_list = []
+#     async for message in channel.history(limit=100):
+#         if message.author.id == bot.user.id:
+#             message_list.append(message)
+#     if message_list:
+#         if banner_type == 'games' and suggestions_exist('game'):
+#             await message_list[2].edit(content=message_suggestions_in_category('game'))
+#             await message_list[1].edit(content=message_games_by_author())
+#         elif banner_type == 'movies' and suggestions_exist('movie'):
+#             await message_list[0].edit(content=message_suggestions_in_category('movie'))
+#         else:
+#             for message in message_list:
+#                 message.delete()
+#     else:
+#         if suggestions_exist('game') or suggestions_exist('movie'):
+#             await channel.send(message_suggestions_in_category('game'))
+#             await channel.send(message_games_by_author())
+#             await channel.send(message_suggestions_in_category('movie'))
+
+
 async def update_banner(ctx, banner_type):
 
     def suggestions_exist(suggestion_type):
@@ -493,18 +526,26 @@ async def update_banner(ctx, banner_type):
             message_list.append(message)
     if message_list:
         if banner_type == 'games' and suggestions_exist('game'):
-            await message_list[2].edit(content=message_suggestions_in_category('game'))
+            e = message_suggestions_in_category('game')
+            author_pic_url='https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
+            e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
+            e.set_author(name='AuthorQ', url='https://duckduckgo.com', icon_url=author_pic_url)
+            await message_list[2].edit(embed=e)
             await message_list[1].edit(content=message_games_by_author())
         elif banner_type == 'movies' and suggestions_exist('movie'):
-            await message_list[0].edit(content=message_suggestions_in_category('movie'))
+            await message_list[0].edit(embed=message_suggestions_in_category('movie'))
         else:
             for message in message_list:
                 message.delete()
     else:
         if suggestions_exist('game') or suggestions_exist('movie'):
-            await channel.send(message_suggestions_in_category('game'))
+            e = message_suggestions_in_category('game')
+            author_pic_url = 'https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
+            e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
+            e.set_author(name='AuthorQ', url='https://duckduckgo.com', icon_url=author_pic_url)
+            await channel.send(embed=e)
             await channel.send(message_games_by_author())
-            await channel.send(message_suggestions_in_category('movie'))
+            await channel.send(embed=message_suggestions_in_category('movie'))
 
 
 @bot.command()
