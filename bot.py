@@ -552,7 +552,10 @@ async def update_banner(ctx, banner_type):
             await message_list[2].edit(embed=e)
             await message_list[1].edit(embed=embed_games_by_author())
         elif banner_type == 'movies' and suggestions_exist('movie'):
-            await message_list[0].edit(embed=embed_suggestions_in_category('movie'))
+            e = embed_suggestions_in_category('movie')
+            e.colour = discord.Colour.orange()
+            e.set_thumbnail(url='https://lh3.googleusercontent.com/TAzWe4fpDp8T7od9EoLTj4zJLV6EJQwBZjJ4mVjyzmKNzd5mVMdLU3k8J7XvErqsg59X2i71SQ=w50-h50-e365')
+            await message_list[0].edit(embed=e)
         else:
             for message in message_list:
                 message.delete()
@@ -567,7 +570,7 @@ async def update_banner(ctx, banner_type):
             e = embed_suggestions_in_category('movie')
             e.colour = discord.Colour.orange()
             e.set_thumbnail(url='https://lh3.googleusercontent.com/TAzWe4fpDp8T7od9EoLTj4zJLV6EJQwBZjJ4mVjyzmKNzd5mVMdLU3k8J7XvErqsg59X2i71SQ=w50-h50-e365')
-            await channel.send(embed=embed_suggestions_in_category('movie'))
+            await channel.send(embed=e)
 
 
 @bot.command()
