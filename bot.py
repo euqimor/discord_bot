@@ -497,37 +497,6 @@ async def say(ctx, channel_id: str, *, message_text):
         await ctx.send(random.choice(rejections))
 
 
-# async def update_banner(ctx, banner_type):
-#
-#     def suggestions_exist(suggestion_type):
-#         with closing(sqlite3.connect(db_name)) as con:
-#             with con:
-#                 if con.execute('SELECT * FROM Suggestions WHERE suggestion_type=? LIMIT 1;', (suggestion_type,)).fetchall():
-#                     return True
-#         return False
-#
-#     guild = ctx.guild
-#     channel = [x for x in guild.text_channels if x.name == 'game_suggestions_bot'][0]
-#     message_list = []
-#     async for message in channel.history(limit=100):
-#         if message.author.id == bot.user.id:
-#             message_list.append(message)
-#     if message_list:
-#         if banner_type == 'games' and suggestions_exist('game'):
-#             await message_list[2].edit(content=message_suggestions_in_category('game'))
-#             await message_list[1].edit(content=message_games_by_author())
-#         elif banner_type == 'movies' and suggestions_exist('movie'):
-#             await message_list[0].edit(content=message_suggestions_in_category('movie'))
-#         else:
-#             for message in message_list:
-#                 message.delete()
-#     else:
-#         if suggestions_exist('game') or suggestions_exist('movie'):
-#             await channel.send(message_suggestions_in_category('game'))
-#             await channel.send(message_games_by_author())
-#             await channel.send(message_suggestions_in_category('movie'))
-
-
 async def update_banner(ctx, banner_type):
 
     def suggestions_exist(suggestion_type):
@@ -602,6 +571,14 @@ async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
         await ctx.send('Status set')
     else:
         await ctx.send(random.choice(rejections))
+
+
+@bot.command(hidden=True)
+async def test(ctx, *, message: str):
+    if await bot.is_owner(ctx.author):
+        await ctx.send('success')
+    else:
+        await ctx.send('fail')
 
 
 if __name__ == '__main__':
