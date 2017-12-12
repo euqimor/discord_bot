@@ -20,8 +20,8 @@ def query_oxford(word, app_id, app_key, category=None):
     if category:
         lexicalCategory = ';lexicalCategory={}'.format(category)
     url = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/{}/definitions;domains{}'.format(word_in_url_format, lexicalCategory)
-    r = requests.get(url, headers = {'app_id': app_id, 'app_key': app_key})
-    if  r.status_code == 200:
+    r = requests.get(url, headers={'app_id': app_id, 'app_key': app_key})
+    if r.status_code == 200:
         data = r.json()
         result_code = 1
         return data, result_code
@@ -57,12 +57,15 @@ def parse_oxford(data):
         d['value'] = ''
         for entry in lexicalEntry['entries']:
             for sense in entry['senses']:
-                if sense.get('domains'):
-                    domain = sense['domains'][0]
-                else:
-                    domain = ''
-                definition = sense['definitions'][0]
-                d['value'] += '{}. {}{}\n'.format(i, '*'+domain+'*: ' if domain else '', definition)
+                if sense.get('definitions'):
+                    if sense.get('domains'):
+                        domain = sense['domains'][0]
+                    else:
+                        domain = ''
+                    definition = sense['definitions'][0]
+                    d['value'] += '{}. {}{}\n'.format(i, '*'+domain+'*: ' if domain else '', definition)
+                elif sense.get('crossReferenceMarkers'):
+                    d['value'] += '{}. {}\n'.format(i, sense['crossReferenceMarkers'][0])
                 i += 1
         embed_fields.append(d)
     return word, url, embed_fields
