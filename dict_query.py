@@ -52,7 +52,7 @@ def parse_oxford(data):
     embed_fields = []
     for lexicalEntry in data['results'][0]['lexicalEntries']:
         i = 1
-        d = {}
+        d = dict()
         d['name'] = '{}, *{}*'.format(word, lexicalEntry['lexicalCategory'].lower())
         d['value'] = ''
         for entry in lexicalEntry['entries']:
