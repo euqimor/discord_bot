@@ -113,7 +113,7 @@ async def wisdom(ctx, *, word_or_phrase=''):
 
 @wisdom.command()
 async def test(ctx):
-    ctx.send('success')
+    await ctx.send('success')
 
 
 @bot.command()
