@@ -125,12 +125,12 @@ async def use(ctx, *, word_or_phrase=''):
     emoji = ''
     try:
         roll = random.randint(1, 100)
-        if roll <= 0:
+        if roll <= 20:
             for item in ctx.guild.emojis:
                 if item.name == 'praisegold' or item.name == 'praise_golden':
                     emoji = item
                     break
-        elif -1 < roll <= 0:
+        elif 20 < roll <= 60:
             for item in ctx.guild.emojis:
                 if item.name == 'thonk':
                     emoji = item
