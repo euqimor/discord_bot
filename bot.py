@@ -121,7 +121,7 @@ async def use(ctx, *, word_or_phrase=''):
             max_id = con.execute('SELECT MAX(ROWID) FROM Proverbs;').fetchone()[0]
             id = random.randint(1, max_id)
             line = con.execute('SELECT proverb FROM Proverbs WHERE ROWID=?', (id,)).fetchone()[0]
-    line.replace('The Dark Souls', word_or_phrase)
+    line = line.replace('The Dark Souls', word_or_phrase)
     await ctx.send(line)
 
 
