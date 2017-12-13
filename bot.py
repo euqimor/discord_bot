@@ -122,7 +122,25 @@ async def use(ctx, *, word_or_phrase=''):
             id = random.randint(1, max_id)
             line = con.execute('SELECT proverb FROM Proverbs WHERE ROWID=?', (id,)).fetchone()[0]
     line = line.replace('The Dark Souls', word_or_phrase)
-    await ctx.send(line)
+    emoji = ''
+    try:
+        roll = random.randint(1, 100)
+        if roll <= 30:
+            for item in ctx.guild.emojis:
+                if item.name == 'praisegold' or item.name == 'praise_golden':
+                    emoji = item
+                    break
+        elif 30 < roll <= 80:
+            for item in ctx.guild.emojis:
+                if item.name == 'thonk':
+                    emoji = item
+                    break
+        else:
+            roll_emoji = random.randint(len(ctx.guild.emojis))
+            emoji = ctx.guild.emojis[roll_emoji]
+    except:
+        pass
+    await ctx.send('{} {}'.format(line, emoji))
 
 
 @bot.command()
