@@ -589,9 +589,10 @@ async def wipe_banners(ctx):
         await ctx.send(random.choice(rejections))
 
 
-@commands.group(invoke_without_command=True)
+@bot.commands.group(invoke_without_command=True)
 async def test(ctx):
     await ctx.send('+')
+
 
 @test.command()
 async def ping(ctx):
