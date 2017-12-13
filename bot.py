@@ -138,8 +138,8 @@ async def use(ctx, *, word_or_phrase=''):
         else:
             roll_emoji = random.randint(len(ctx.guild.emojis))
             emoji = ctx.guild.emojis[roll_emoji]
-    except:
-        pass
+    except Exception as e:
+        await ctx.send(str(e))
     await ctx.send('{} {}'.format(line, emoji))
 
 
