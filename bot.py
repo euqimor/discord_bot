@@ -80,7 +80,7 @@ async def check_admin_rights(ctx):
     return bool(success_flag)
 
 
-@bot.command()
+@bot.group(invoke_without_command=True)
 async def wisdom(ctx, *, word_or_phrase=''):
     """
     Inspirational words of wisdom
@@ -109,6 +109,11 @@ async def wisdom(ctx, *, word_or_phrase=''):
     except:
         pass
     await ctx.send('{} {}'.format(line, emoji))
+
+
+@wisdom.command()
+async def test(ctx):
+    ctx.send('success')
 
 
 @bot.command()
