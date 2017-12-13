@@ -112,8 +112,17 @@ async def wisdom(ctx, *, word_or_phrase=''):
 
 
 @wisdom.command()
-async def test(ctx):
-    await ctx.send('success')
+async def use(ctx, *, word_or_phrase=''):
+    """
+    Replaces "The Dark Souls" with supplied word or phrase
+    """
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            max_id = con.execute('SELECT MAX(ROWID) FROM Proverbs;').fetchone()[0]
+            id = random.randint(1, max_id)
+            line = con.execute('SELECT proverb FROM Proverbs WHERE ROWID=?', (id,)).fetchone()[0]
+    line.replace('The Dark Souls', word_or_phrase)
+    await ctx.send(line)
 
 
 @bot.command()
