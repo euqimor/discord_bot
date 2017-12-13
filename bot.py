@@ -603,16 +603,6 @@ async def wipe_banners(ctx):
         await ctx.send(random.choice(rejections))
 
 
-@bot.group(invoke_without_command=True)
-async def test(ctx,  *, message: str = ''):
-    await ctx.send('+, message = "{}"'.format(message))
-
-
-@test.command()
-async def ping(ctx):
-    await ctx.send('pong')
-
-
 if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
