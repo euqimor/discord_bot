@@ -590,8 +590,8 @@ async def wipe_banners(ctx):
 
 
 @bot.group(invoke_without_command=True)
-async def test(ctx):
-    await ctx.send('+')
+async def test(ctx,  *, message: str = ''):
+    await ctx.send('+, message = "{}"'.format(message))
 
 
 @test.command()
