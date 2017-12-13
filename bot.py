@@ -589,7 +589,7 @@ async def wipe_banners(ctx):
         await ctx.send(random.choice(rejections))
 
 
-@bot.commands.group(invoke_without_command=True)
+@bot.group(invoke_without_command=True)
 async def test(ctx):
     await ctx.send('+')
 
