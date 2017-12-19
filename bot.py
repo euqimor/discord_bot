@@ -162,7 +162,7 @@ async def suggest(ctx, *, data):
             await ctx.send('"{}" has already been suggested'.format(game))
 
 
-@bot.command(aliases=['movie'])
+@bot.command(aliases=['movie_suggest'])
 async def suggest_movie(ctx, *, data):
     """Adds a movie suggestion"""
     user_id = ctx.author.id
