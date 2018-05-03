@@ -36,11 +36,12 @@ async def on_ready():
 @bot.event
 async def on_member_update(before, after):
     guild = before.guild
-    # channel = [x for x in guild.text_channels if x.name == 'secluded_cave'][0]
+    channel = [x for x in guild.text_channels if x.name == 'secluded_cave'][0]
     role = [x for x in guild.roles if x.name == 'Live Queue']
+    await channel.send('roles: {}'.format(role))
     if after.activity and after.id == 173747843314483210 and after.activity.type == 1:
+        await channel.send('attempting to add roles')
         await after.add_role(role)
-        # await channel.send('before: {}\nafter: {}'.format(before.activity.name, after.game.name))
 
 
 def check_database(db_name):
