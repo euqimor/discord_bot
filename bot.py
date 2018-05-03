@@ -33,6 +33,13 @@ async def on_ready():
     await bot.change_presence(game=discord.Game(name='with turrets'))
 
 
+@bot.event
+async def on_member_update(before, after):
+    guild = before.guild
+    channel = [x for x in guild.text_channels if x.name == 'secluded_cave'][0]
+    await channel.send('member update test triggered')
+
+
 def check_database(db_name):
     path = os.path.realpath(db_name)
     db_uri = 'file:{}?mode=rw'.format(pathname2url(path))
@@ -625,6 +632,6 @@ if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     if check_database(db_name):
-        bot.run(os.environ['BOT_PROD'])
+        bot.run(os.environ['BOT_TEST'])
     else:
         sys.exit(1)
