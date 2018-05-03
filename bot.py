@@ -38,12 +38,13 @@ async def on_member_update(before, after):
     guild = before.guild
     channel = [x for x in guild.text_channels if x.name == 'secluded_cave'][0]
     role = [x for x in guild.roles if x.name == 'Live Queue'][0]
-    if after.activity and after.id == 173747843314483210 and after.activity.type == 1:
-        await channel.send('attempting to add roles')
-        await after.add_roles(role)
-    if before.activity and after.id == 173747843314483210 and before.activity.type == 1 and after.activity.type != 1:
-        await channel.send('attempting to remove roles')
-        await after.remove_roles(role)
+    if after.activity and after.id == 173747843314483210: #and after.activity.type == 1:
+        await channel.send(after.activity.type)
+        # await channel.send('attempting to add roles')
+        # await after.add_roles(role)
+    # if before.activity and after.id == 173747843314483210 and before.activity.type == 1 and after.activity.type != 1:
+    #     await channel.send('attempting to remove roles')
+    #     await after.remove_roles(role)
 
 
 def check_database(db_name):
