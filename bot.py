@@ -37,7 +37,8 @@ async def on_ready():
 async def on_member_update(before, after):
     guild = before.guild
     channel = [x for x in guild.text_channels if x.name == 'secluded_cave'][0]
-    await channel.send('before: {}\nafter: {}'.format(before.activity, after.activity))
+    if after.activity.type == 'playing':
+        await channel.send('before: {}\nafter: {}'.format(before.activity.name, after.game.name))
 
 
 def check_database(db_name):
