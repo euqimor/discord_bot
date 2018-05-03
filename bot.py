@@ -30,14 +30,14 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    await bot.change_presence(game=discord.Game(name='with turrets'))
+    await bot.change_presence(activity=discord.Game('with turrets'))
 
 
 @bot.event
 async def on_member_update(before, after):
     guild = before.guild
     channel = [x for x in guild.text_channels if x.name == 'secluded_cave'][0]
-    if after.activity.type == 'playing':
+    if after.activity.type == 0:
         await channel.send('before: {}\nafter: {}'.format(before.activity.name, after.game.name))
 
 
@@ -607,7 +607,7 @@ async def set_nick(ctx, *, message: str = ''):
 async def set_status(ctx, *, message: str = ''):  # TODO save permanently?
     status = message.strip()
     if await check_admin_rights(ctx):
-        await bot.change_presence(game=discord.Game(name=status))
+        await bot.change_presence(activity=discord.Game(status))
         await ctx.send('Status set')
     else:
         await ctx.send(random.choice(rejections))
