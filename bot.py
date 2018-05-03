@@ -38,7 +38,7 @@ async def on_member_update(before, after):
     guild = before.guild
     # channel = [x for x in guild.text_channels if x.name == 'secluded_cave'][0]
     role = [x for x in guild.roles if x.name == 'Live Queue']
-    if after.activity and after.author.id == 173747843314483210 and after.activity.type == 1:
+    if after.activity and after.id == 173747843314483210 and after.activity.type == 1:
         await after.add_role(role)
         # await channel.send('before: {}\nafter: {}'.format(before.activity.name, after.game.name))
 
