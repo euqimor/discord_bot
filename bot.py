@@ -105,7 +105,7 @@ async def check_admin_rights(ctx):
 
 
 @bot.group()
-async def tag():
+async def tag(ctx):
     pass
 
 
