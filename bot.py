@@ -104,9 +104,22 @@ async def check_admin_rights(ctx):
     return bool(success_flag)
 
 
-@bot.group()
-async def tag(ctx):
-    pass
+@bot.group(invoke_without_command=True)
+async def tag(ctx, *, tag_name=''):
+    """
+    Retrieves tag by name
+    Usage example: `tag mytag` will fetch `mytag` from saved tags
+    """
+    if tag_name == '':
+        await ctx.send('Tag name required')
+    else:
+        with closing(sqlite3.connect(db_name)) as con:
+            with con:
+                line = con.execute('SELECT tag_content FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()[0]
+        if line:
+            await ctx.send(line)
+        else:
+            await ctx.send('Tag {} not found'.format(tag_name))
 
 
 @tag.command()
