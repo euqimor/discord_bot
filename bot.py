@@ -119,7 +119,7 @@ async def tag(ctx, *, tag_name=''):
         if line:
             await ctx.send(line)
         else:
-            await ctx.send('Tag {} not found'.format(tag_name))
+            await ctx.send('Tag "{}" not found'.format(tag_name))
 
 
 @tag.command()
@@ -130,15 +130,15 @@ async def add(ctx, *, content=''):
     If the name is more than one word long, put it in quotes, otherwise only the first word will be used as a name
     No quotes are needed for the rest of the text
     """
-    if content[0] != '\"':
+    if not content or len(content.split())==1:
+        await ctx.send('Tag content cannot be empty')
+        return
+    elif content[0] != '\"':
         tag_name = content.split()[0]
         tag_content = content[len(tag_name):].strip()
     else:
         tag_name = content.split('" ')[0][1:]
         tag_content = content[len(tag_name)+2:].strip()
-    if tag_content == '':
-        await ctx.send('Tag content cannot be empty')
-        return
     user_id = ctx.author.id
     username = str(ctx.author.name)
     with closing(sqlite3.connect(db_name)) as con:
@@ -147,9 +147,32 @@ async def add(ctx, *, content=''):
         try:
             with con:
                 con.execute('INSERT INTO Tags(user_id, tag_name, tag_content) VALUES(?, ?, ?);',(user_id, tag_name, tag_content))
-            await ctx.send('Successfully added {} to {}\'s tags'.format(tag_name, username))
+            await ctx.send('Successfully added "{}" to {}\'s tags'.format(tag_name, username))
         except sqlite3.IntegrityError:
             await ctx.send('Failed to add tag "{}", name already exists'.format(tag_name))
+
+
+@tag.command()
+async def delete(ctx, *, tag_name=''):
+    """
+    Delete a tag (admin or owner only)
+    Usage example: `tag remove tagname`
+    """
+    if tag_name == '':
+        await ctx.send('Tag name required')
+    else:
+        with closing(sqlite3.connect(db_name)) as con:
+            with con:
+                tag_id = None
+                tag_id, owner_id = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()[0]
+                if tag_id:
+                    if tag_id == ctx.author.id or await check_admin_rights(ctx):
+                        con.execute('DELETE FROM Tags WHERE ROWID=?;', (tag_id,))
+                        await ctx.send('Successfully deleted tag "{}"'.format(tag_name))
+                    else:
+                        await ctx.send('You are not this tag\'s owner or admin, stop ruckusing!'.format(tag_name))
+                else:
+                    await ctx.send('Tag "{}" not found'.format(tag_name))
 
 
 @bot.group(invoke_without_command=True)
