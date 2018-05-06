@@ -9,7 +9,7 @@ from time import sleep
 from collections import defaultdict
 from contextlib import closing
 from urllib.request import pathname2url
-from .db_helpers import *
+from db_helpers import *
 
 
 # TODO Fix the bug where removing the last suggestion deletes it from the DB, but leaves hanging in the channel
