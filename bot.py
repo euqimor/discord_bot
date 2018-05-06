@@ -115,8 +115,9 @@ async def tag(ctx, *, tag_name=''):
     else:
         with closing(sqlite3.connect(db_name)) as con:
             with con:
-                line = con.execute('SELECT tag_content FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()[0]
+                line = con.execute('SELECT tag_content FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
         if line:
+            line = line[0]
             await ctx.send(line)
         else:
             await ctx.send('Tag "{}" not found'.format(tag_name))
@@ -163,14 +164,14 @@ async def delete(ctx, *, tag_name=''):
     else:
         with closing(sqlite3.connect(db_name)) as con:
             with con:
-                tag_id = None
-                tag_id, owner_id = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()[0]
-                if tag_id:
+                result = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
+                if result:
+                    tag_id, owner_id = result[0], result[1]
                     if tag_id == ctx.author.id or await check_admin_rights(ctx):
                         con.execute('DELETE FROM Tags WHERE ROWID=?;', (tag_id,))
                         await ctx.send('Successfully deleted tag "{}"'.format(tag_name))
                     else:
-                        await ctx.send('You are not this tag\'s owner or admin, stop ruckusing!'.format(tag_name))
+                        await ctx.send('You are not this tag\'s owner or admin, {}, stop ruckusing!'.format(ctx.author.name))
                 else:
                     await ctx.send('Tag "{}" not found'.format(tag_name))
 
