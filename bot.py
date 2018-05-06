@@ -71,6 +71,9 @@ def check_database(db_name):
                 'CREATE TABLE Suggestions (id INTEGER PRIMARY KEY, user_id INT, suggestion TEXT, suggestion_type TEXT,\
                  FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE,\
                  UNIQUE (suggestion COLLATE NOCASE, suggestion_type));',
+                'CREATE TABLE Proverbs(proverb TEXT);',
+                'CREATE TABLE Tags (id INTEGER PRIMARY KEY, user_id INT, tag_name TEXT, tag_content TEXT,\
+                 UNIQUE (tag_name COLLATE NOCASE));',
             ]
             for command in commands:
                 con.execute(command)
@@ -99,6 +102,41 @@ async def check_admin_rights(ctx):
     if ctx.author.id == 173747843314483210:
         success_flag = 1
     return bool(success_flag)
+
+
+@bot.group()
+async def tag():
+    pass
+
+
+@tag.command()
+async def add(ctx, *, content=''):
+    """
+    Add a tag
+    Usage example: `tag add tagname your text here` or `tag add \"long tag name\" your text here`
+    If the name is more than one word long, put it in quotes, otherwise only the first word will be used as a name
+    No quotes are needed for the rest of the text
+    """
+    if content[0] != '\"':
+        tag_name = content.split()[0]
+        tag_content = content[len(tag_name):].strip()
+    else:
+        tag_name = content.split('" ')[0][1:]
+        tag_content = content[len(tag_name)+2:].strip()
+    if tag_content == '':
+        await ctx.send('Tag content cannot be empty')
+        return
+    user_id = ctx.author.id
+    username = str(ctx.author.name)
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            add_user_to_db_or_pass(con, username, user_id)
+        try:
+            with con:
+                con.execute('INSERT INTO Tags(user_id, tag_name, tag_content) VALUES(?, ?, ?);',(user_id, tag_name, tag_content))
+            await ctx.send('Successfully added {} to {}\'s tags'.format(tag_name, username))
+        except sqlite3.IntegrityError:
+            await ctx.send('Failed to add tag "{}", name already exists'.format(tag_name))
 
 
 @bot.group(invoke_without_command=True)
