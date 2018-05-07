@@ -126,7 +126,7 @@ async def tag(ctx, *, tag_name=''):
             await ctx.send('Tag "{}" not found'.format(tag_name))
 
 
-@tag.command()
+@tag.command(aliases=['create'])
 async def add(ctx, tag_name, *, tag_content=''):
     """
     Add a tag
@@ -150,7 +150,7 @@ async def add(ctx, tag_name, *, tag_content=''):
             await ctx.send('Failed to add tag "{}", name already exists'.format(tag_name))
 
 
-@tag.command()
+@tag.command(aliases=['remove'])
 async def delete(ctx, *, tag_name=''):
     """
     Delete a tag (admin or owner only)
