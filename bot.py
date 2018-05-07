@@ -159,9 +159,9 @@ async def delete(ctx, *, tag_name=''):
     if tag_name == '':
         await ctx.send('Tag name required')
     else:
-        tag_name = tag_name.strip()
-        if tag_name[0] == '\"':
-            tag_name = tag_name.strip('"')
+        # tag_name = tag_name.strip()
+        # if tag_name[0] == '\"':
+        #     tag_name = tag_name.strip('"')
         with closing(sqlite3.connect(db_name)) as con:
             with con:
                 result = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
