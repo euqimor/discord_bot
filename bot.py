@@ -721,10 +721,15 @@ async def wipe_banners(ctx):
         await ctx.send(random.choice(rejections))
 
 
+@bot.command()
+async def test(ctx, arg1, arg2, *, text):
+    await ctx.send('You passed `{}`, `{}` and `{}`'.format(arg1, arg2, text))
+
+
 if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     if check_database(db_name):
-        bot.run(os.environ['BOT_PROD'])
+        bot.run(os.environ['BOT_TEST'])
     else:
         sys.exit(1)
