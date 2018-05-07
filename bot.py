@@ -173,7 +173,7 @@ async def delete(ctx, *, tag_name=''):
                 result = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
                 if result:
                     tag_id, owner_id = result[0], result[1]
-                    if tag_id == ctx.author.id or await check_admin_rights(ctx):
+                    if owner_id == ctx.author.id or await check_admin_rights(ctx):
                         con.execute('DELETE FROM Tags WHERE ROWID=?;', (tag_id,))
                         await ctx.send('Successfully deleted tag "{}"'.format(tag_name))
                     else:
