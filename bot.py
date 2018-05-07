@@ -127,22 +127,16 @@ async def tag(ctx, *, tag_name=''):
 
 
 @tag.command()
-async def add(ctx, *, content=''):
+async def add(ctx, tag_name, *, tag_content=''):
     """
     Add a tag
     Usage example: `tag add tagname your text here` or `tag add \"long tag name\" your text here`
     If the name is more than one word long, put it in quotes, otherwise only the first word will be used as a name
     No quotes are needed for the rest of the text
     """
-    if not content or len(content.split())==1:
+    if not tag_content:
         await ctx.send('Tag content cannot be empty')
         return
-    elif content[0] != '\"':
-        tag_name = content.split()[0]
-        tag_content = content[len(tag_name):].strip()
-    else:
-        tag_name = content.split('" ')[0][1:]
-        tag_content = content[len(tag_name)+2:].strip()
     user_id = ctx.author.id
     username = str(ctx.author.name)
     with closing(sqlite3.connect(db_name)) as con:
