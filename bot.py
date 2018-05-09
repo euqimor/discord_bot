@@ -115,6 +115,7 @@ async def check_admin_rights(ctx):
 async def tag(ctx, *, tag_name=''):
     """
     Retrieves tag by name
+    Available command alias - $tags
     Usage example:
     $tag mytag
     will fetch `mytag` from saved tags
@@ -139,8 +140,9 @@ async def tag(ctx, *, tag_name=''):
 async def list(ctx, *, filter=''):
     """
     Lists existing tags. By default shows only the tags of the user invoking the command.
-    Allows filters to extend the search. Currently available filters are `all` \
-    or just any string to search for the matching tag.
+    Allows filters to extend the search. Currently available filters are `all`
+    or just any custom string to search for the matching tag name.
+    Available command aliases - $tag search | $tag filter
     Usage examples:
     $tag list
     lists the user's tags
@@ -148,10 +150,10 @@ async def list(ctx, *, filter=''):
     $tag list all
     lists all tags
 
-    $tag list dnd
+    $tag search dnd
     lists all tags with `dnd` in their names
 
-    $tag list nice meme
+    $tag filter nice meme
     lists all tags with `nice meme` in their names
     """
     user_id = ctx.author.id
@@ -179,6 +181,7 @@ async def list(ctx, *, filter=''):
 async def add(ctx, tag_name, *, tag_content=''):
     """
     Add a tag
+    Available command alias - $tag create
     Usage example:
     $tag add tagname your text here
     or
@@ -257,6 +260,7 @@ async def edit(ctx, tag_name, *, new_content):
 async def delete(ctx, *, tag_name=''):
     """
     Delete a tag (admin or owner only)
+    Available command alias - $tag remove
     Usage example:
     $tag delete tagname
     """
