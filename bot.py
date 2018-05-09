@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import dict_query
+from dict_query import *
 import random
 import sqlite3
 import os
@@ -107,6 +107,9 @@ async def check_admin_rights(ctx):
 ########################################################
 # TAGS
 ########################################################
+# To do:
+# tag aliases
+# name suggestions if requested tag  is not found
 
 @bot.group(invoke_without_command=True)
 async def tag(ctx, *, tag_name=''):
@@ -130,6 +133,40 @@ async def tag(ctx, *, tag_name=''):
             await ctx.send(line)
         else:
             await ctx.send('Tag "{}" not found'.format(tag_name))
+
+
+@tag.command()
+async def list(ctx, *, filter=''):
+    """
+    Lists existing tags. By default shows only the tags of the user invoking the command.
+    Allows filters to extend the search. Currently available filters are `all`
+    or just any string to search for the matching tag.
+    Usage examples:
+    $tag list
+    lists the user's tags
+
+    $tag list all
+    lists all tags
+
+    $tag list dnd
+    lists all tags with `dnd` in their names
+
+    $tag list nice meme
+    lists all tags with `nice meme` in their names
+    """
+    if filter == '':
+        user_id = ctx.author.id
+        username = str(ctx.author.name)
+        with closing(sqlite3.connect(db_name)) as con:
+            with con:
+                result = con.execute('SELECT ROWID, user_id, tag_name FROM Tags WHERE user_id=?', (user_id,)).fetchall()
+                if result:
+                    message = f"Tags owned by {username}:\n```\n"
+                    for entry in result:
+                        message += f"{entry[1]}\n"
+                    await ctx.send(message[:-2]+'```')
+                else:
+                    await ctx.send('No tags found')
 
 
 @tag.command(aliases=['create'])
@@ -626,17 +663,17 @@ async def merriam(ctx, *, word: str):
     """Queries Merriam-Webster's Collegiate Dictionary for a word definition. Well, tries to at least..."""
     word = ' '.join(word.split())
     # try:
-    query_result = dict_query.query_merriam(word, os.environ['MERRIAM'])
+    query_result = query_merriam(word, os.environ['MERRIAM'])
     cases = query_result  # the word may have changed if you queried for the past tense for example
     # except:
     #     await ctx.send('Something went wrong during online query')
     # try:
-    phrase = dict_query.parse_merriam(cases)
+    phrase = parse_merriam(cases)
     # except:
     #     await ctx.send('Something went wrong during result parsing')
     if phrase != '' and phrase is not None:
         if len(phrase) >= 2000:
-            message_list = dict_query.split_message(phrase)
+            message_list = split_message(phrase)
             # for message in message_list:
             await ctx.send(message_list[0])
             await ctx.send('\_'*20+'\nRead more: '+'https://www.merriam-webster.com/dictionary/'+'%20'.join(word.split(' ')))
@@ -654,7 +691,7 @@ async def oxford(ctx, *, word: str):
     word = ' '.join(word.split())
     app_id = os.environ['OXFORD_APP_ID']
     app_key = os.environ['OXFORD_APP_KEY']
-    json_data = dict_query.query_oxford(word, app_id, app_key)
+    json_data = query_oxford(word, app_id, app_key)
     code = json_data[1]
     if code == 0:
         message = await ctx.send('Could not find the word or something went wrong with the request')
@@ -662,12 +699,12 @@ async def oxford(ctx, *, word: str):
         await message.delete()
     else:
         if code == 1:  # if API returned the definition
-            parsed_data = dict_query.parse_oxford(json_data[0])
+            parsed_data = parse_oxford(json_data[0])
         elif code == 2:  # if the word couldn't be found and we are being redirected to the closest match
             redirect_data = json_data[0]
             word = ' '.join(redirect_data['results'][0]['word'].split('_'))
-            json_data = dict_query.query_oxford(word, app_id, app_key)
-            parsed_data = dict_query.parse_oxford(json_data[0])
+            json_data = query_oxford(word, app_id, app_key)
+            parsed_data = parse_oxford(json_data[0])
         fields = parsed_data[2]
         title = '{} | Oxford Dictionary'.format(parsed_data[0])
         e = discord.Embed(colour=discord.Colour.blurple(), title=title)
