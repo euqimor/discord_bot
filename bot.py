@@ -111,7 +111,7 @@ async def check_admin_rights(ctx):
 # tag aliases
 # name suggestions if requested tag  is not found
 
-@bot.group(invoke_without_command=True)
+@bot.group(invoke_without_command=True,aliases=['tags'])
 async def tag(ctx, *, tag_name=''):
     """
     Retrieves tag by name
