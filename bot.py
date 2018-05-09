@@ -104,6 +104,10 @@ async def check_admin_rights(ctx):
     return bool(success_flag)
 
 
+########################################################
+# TAGS
+########################################################
+
 @bot.group(invoke_without_command=True)
 async def tag(ctx, *, tag_name=''):
     """
@@ -150,6 +154,32 @@ async def add(ctx, tag_name, *, tag_content=''):
             await ctx.send('Failed to add tag "{}", name already exists'.format(tag_name))
 
 
+@tag.command()
+async def append(ctx, tag_name, *, appended_content):
+    """
+    Append content to an existing tag. Awailable to tag owner or admin.
+    Usage exapmle:
+    `$tag append "my tag name" This is the text I want to append`
+    The content will be added to the tag on a new line.
+    """
+    if appended_content == '':
+        await ctx.send('Specify the text you want to append after the tag\'s name')
+    else:
+        with closing(sqlite3.connect(db_name)) as con:
+            with con:
+                result = con.execute('SELECT ROWID, user_id, tag_content FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
+                if result:
+                    tag_id, owner_id, tag_content = result[0], result[1], result[2]
+                    if owner_id == ctx.author.id or await check_admin_rights(ctx):
+                        con.execute('UPDATE Tags SET tag_content=? WHERE ROWID=?;',
+                                    (f"{tag_content}\n{appended_content}", tag_id,))
+                        await ctx.send('Successfully edited tag "{}"'.format(tag_name))
+                    else:
+                        await ctx.send('You are not this tag\'s owner or admin, {}, stop ruckusing!'.format(ctx.author.name))
+                else:
+                    await ctx.send('Tag "{}" not found'.format(tag_name))
+
+
 @tag.command(aliases=['remove'])
 async def delete(ctx, *, tag_name=''):
     """
@@ -175,6 +205,10 @@ async def delete(ctx, *, tag_name=''):
                 else:
                     await ctx.send('Tag "{}" not found'.format(tag_name))
 
+
+########################################################
+# WISDOM
+########################################################
 
 @bot.group(invoke_without_command=True)
 async def wisdom(ctx, *, word_or_phrase=''):
@@ -238,6 +272,10 @@ async def use(ctx, *, word_or_phrase=''):
         pass
     await ctx.send('{} {}'.format(line, emoji))
 
+
+########################################################
+# SUGGEST
+########################################################
 
 @bot.command()
 async def suggest(ctx, *, data):
@@ -386,6 +424,10 @@ async def adminremove_movie(ctx, data):
         else:
             await ctx.send('"{}" not found in movie suggestions'.format(movie))
 
+
+########################################################
+# OTHER
+########################################################
 
 @bot.command()
 async def wipe_games(ctx):
@@ -719,6 +761,6 @@ if __name__ == '__main__':
     rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
                   'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
     if check_database(db_name):
-        bot.run(os.environ['BOT_PROD'])
+        bot.run(os.environ['BOT_TEST'])
     else:
         sys.exit(1)
