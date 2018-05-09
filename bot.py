@@ -34,24 +34,24 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game('with turrets'))
 
 
-# UNIMPLEMENTED UNTIL THE BUG GETS FIXED
-# @bot.event
-# async def on_member_update(before, after):
-#     guild = before.guild
-#     channel = [x for x in guild.text_channels if x.name == 'secluded_cave'][0]
-#     role = [x for x in guild.roles if x.name == 'Live Queue'][0]
-#     if after.id == 173747843314483210:
-#         if after.activity:
-#             await channel.send(after.activity.type)
-#         else:
-#             await channel.send(str(after.activity))
-#     # if after.activity and after.id == 173747843314483210 and after.activity.type is discord.enums.ActivityType.streaming:
-#     #     await channel.send(after.activity.type)
-#     #     await channel.send('attempting to add roles')
-#     #     await after.add_roles(role)
-#     # if before.activity and after.id == 173747843314483210 and before.activity.type is discord.enums.ActivityType.streaming and after.activity.type != before.activity.type:
-#     #     await channel.send('attempting to remove roles')
-#     #     await after.remove_roles(role)
+#UNIMPLEMENTED UNTIL THE BUG GETS FIXED
+@bot.event
+async def on_member_update(before, after):
+    guild = before.guild
+    channel = [x for x in guild.text_channels if x.name == 'secluded_cave'][0]
+    role = [x for x in guild.roles if x.name == 'Live Queue'][0]
+    if after.id == 173747843314483210:
+        if after.activity:
+            await channel.send(after.activity.type)
+        else:
+            await channel.send(str(after.activity))
+    # if after.activity and after.id == 173747843314483210 and after.activity.type is discord.enums.ActivityType.streaming:
+    #     await channel.send(after.activity.type)
+    #     await channel.send('attempting to add roles')
+    #     await after.add_roles(role)
+    # if before.activity and after.id == 173747843314483210 and before.activity.type is discord.enums.ActivityType.streaming and after.activity.type != before.activity.type:
+    #     await channel.send('attempting to remove roles')
+    #     await after.remove_roles(role)
 
 
 def check_database(db_name):
