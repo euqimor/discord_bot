@@ -208,7 +208,7 @@ async def add(ctx, tag_name, *, tag_content=''):
 @tag.command()
 async def append(ctx, tag_name, *, appended_content):
     """
-    Append content to an existing tag. available to tag owner or admin.
+    Append content to an existing tag. Available to tag owner or admin.
     Usage exapmle:
     $tag append "my tag name" This is the text I want to append
     The content will be added to the tag on a new line.
@@ -234,7 +234,7 @@ async def append(ctx, tag_name, *, appended_content):
 @tag.command()
 async def edit(ctx, tag_name, *, new_content):
     """
-    Fully replace the content of an existing tag. available to tag owner or admin.
+    Fully replace the content of an existing tag. Available to tag owner or admin.
     Usage exapmle:
     $tag edit "my tag name" This is the new tag text
     """
