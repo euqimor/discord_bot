@@ -112,7 +112,9 @@ async def check_admin_rights(ctx):
 async def tag(ctx, *, tag_name=''):
     """
     Retrieves tag by name
-    Usage example: `tag mytag` will fetch `mytag` from saved tags
+    Usage example:
+    $tag mytag
+    will fetch `mytag` from saved tags
     """
     if tag_name == '':
         await ctx.send('Tag name required')
@@ -134,7 +136,10 @@ async def tag(ctx, *, tag_name=''):
 async def add(ctx, tag_name, *, tag_content=''):
     """
     Add a tag
-    Usage example: `tag add tagname your text here` or `tag add \"long tag name\" your text here`
+    Usage example:
+    $tag add tagname your text here
+    or
+    $tag add \"long tag name\" your text here
     If the name is more than one word long, put it in quotes, otherwise only the first word will be used as a name
     No quotes are needed for the rest of the text
     """
@@ -159,7 +164,7 @@ async def append(ctx, tag_name, *, appended_content):
     """
     Append content to an existing tag. Awailable to tag owner or admin.
     Usage exapmle:
-    `$tag append "my tag name" This is the text I want to append`
+    $tag append "my tag name" This is the text I want to append
     The content will be added to the tag on a new line.
     """
     if appended_content == '':
@@ -180,11 +185,37 @@ async def append(ctx, tag_name, *, appended_content):
                     await ctx.send('Tag "{}" not found'.format(tag_name))
 
 
+@tag.command()
+async def edit(ctx, tag_name, *, new_content):
+    """
+    Fully replace the content of an existing tag. Awailable to tag owner or admin.
+    Usage exapmle:
+    $tag edit "my tag name" This is the new tag text
+    """
+    if new_content == '':
+        await ctx.send('Tag content cannot be empty')
+    else:
+        with closing(sqlite3.connect(db_name)) as con:
+            with con:
+                result = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
+                if result:
+                    tag_id, owner_id = result[0], result[1]
+                    if owner_id == ctx.author.id or await check_admin_rights(ctx):
+                        con.execute('UPDATE Tags SET tag_content=? WHERE ROWID=?;',
+                                    (new_content, tag_id,))
+                        await ctx.send('Successfully edited tag "{}"'.format(tag_name))
+                    else:
+                        await ctx.send('You are not this tag\'s owner or admin, {}, stop ruckusing!'.format(ctx.author.name))
+                else:
+                    await ctx.send('Tag "{}" not found'.format(tag_name))
+
+
 @tag.command(aliases=['remove'])
 async def delete(ctx, *, tag_name=''):
     """
     Delete a tag (admin or owner only)
-    Usage example: `tag remove tagname`
+    Usage example:
+    $tag delete tagname
     """
     if tag_name == '':
         await ctx.send('Tag name required')
