@@ -159,32 +159,20 @@ async def list(ctx, *, filter=''):
     with closing(sqlite3.connect(db_name)) as con:
         with con:
             if filter == '':
-                result = con.execute('SELECT user_id, tag_name FROM Tags WHERE user_id=?', (user_id,)).fetchall()
-                if result:
-                    message = f"Tags owned by {username}:\n```\n"
-                    for entry in result:
-                        message += f"{entry[1]}\n"
-                    await ctx.send(message[:-1]+'```')
-                else:
-                    await ctx.send('No tags found')
+                result = con.execute('SELECT tag_name, user_id FROM Tags WHERE user_id=?', (user_id,)).fetchall()
+                message = f"Tags owned by {username}:\n```\n"
             elif filter == 'all':
                 result = con.execute('SELECT tag_name FROM Tags').fetchall()
-                if result:
-                    message = f"All available tags:\n```\n"
-                    for entry in result:
-                        message += f"{entry[0]}\n"
-                    await ctx.send(message[:-1]+'```')
-                else:
-                    await ctx.send('No tags found')
+                message = f"All available tags:\n```\n"
             else:
                 result = con.execute('SELECT tag_name FROM Tags WHERE tag_name LIKE ?', (f"%{filter}%",)).fetchall()
-                if result:
-                    message = f"Tags filtered by `{filter}`:\n```\n"
-                    for entry in result:
-                        message += f"{entry[0]}\n"
-                    await ctx.send(message[:-1]+'```')
-                else:
-                    await ctx.send('No tags found')
+                message = f"Tags filtered by `{filter}`:\n```\n"
+    if result:
+        for entry in result:
+            message += f"{entry[0]}\n"
+        await ctx.send(message[:-1] + '```')
+    else:
+        await ctx.send('No tags found')
 
 
 @tag.command(aliases=['create'])
