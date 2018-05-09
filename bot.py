@@ -139,7 +139,7 @@ async def tag(ctx, *, tag_name=''):
 async def list(ctx, *, filter=''):
     """
     Lists existing tags. By default shows only the tags of the user invoking the command.
-    Allows filters to extend the search. Currently available filters are `all`
+    Allows filters to extend the search. Currently available filters are `all` \
     or just any string to search for the matching tag.
     Usage examples:
     $tag list
