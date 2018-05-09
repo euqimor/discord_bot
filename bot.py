@@ -136,8 +136,8 @@ async def tag(ctx, *, tag_name=''):
             await ctx.send('Tag "{}" not found'.format(tag_name))
 
 
-@tag.command(aliases=['search','filter'])
-async def list(ctx, *, filter=''):
+@tag.command(aliases=['search','filter'],name='list')
+async def _list(ctx, *, filter=''):
     """
     Lists existing tags. By default shows only the tags of the user invoking the command.
     Allows filters to extend the search. Currently available filters are: `all`
