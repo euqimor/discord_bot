@@ -154,16 +154,34 @@ async def list(ctx, *, filter=''):
     $tag list nice meme
     lists all tags with `nice meme` in their names
     """
-    if filter == '':
-        user_id = ctx.author.id
-        username = str(ctx.author.name)
-        with closing(sqlite3.connect(db_name)) as con:
-            with con:
+    user_id = ctx.author.id
+    username = str(ctx.author.name)
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            if filter == '':
                 result = con.execute('SELECT user_id, tag_name FROM Tags WHERE user_id=?', (user_id,)).fetchall()
                 if result:
                     message = f"Tags owned by {username}:\n```\n"
                     for entry in result:
                         message += f"{entry[1]}\n"
+                    await ctx.send(message[:-1]+'```')
+                else:
+                    await ctx.send('No tags found')
+            elif filter == 'all':
+                result = con.execute('SELECT tag_name FROM Tags').fetchall()
+                if result:
+                    message = f"All available tags:\n```\n"
+                    for entry in result:
+                        message += f"{entry[0]}\n"
+                    await ctx.send(message[:-1]+'```')
+                else:
+                    await ctx.send('No tags found')
+            else:
+                result = con.execute('SELECT tag_name FROM Tags WHERE tag_name LIKE ?', (f"%{filter}%",)).fetchall()
+                if result:
+                    message = f"Tags filtered by `{filter}`:\n```\n"
+                    for entry in result:
+                        message += f"{entry[0]}\n"
                     await ctx.send(message[:-1]+'```')
                 else:
                     await ctx.send('No tags found')
