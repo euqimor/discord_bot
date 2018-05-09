@@ -159,12 +159,12 @@ async def list(ctx, *, filter=''):
         username = str(ctx.author.name)
         with closing(sqlite3.connect(db_name)) as con:
             with con:
-                result = con.execute('SELECT ROWID, user_id, tag_name FROM Tags WHERE user_id=?', (user_id,)).fetchall()
+                result = con.execute('SELECT user_id, tag_name FROM Tags WHERE user_id=?', (user_id,)).fetchall()
                 if result:
                     message = f"Tags owned by {username}:\n```\n"
                     for entry in result:
                         message += f"{entry[1]}\n"
-                    await ctx.send(message[:-2]+'```')
+                    await ctx.send(message[:-1]+'```')
                 else:
                     await ctx.send('No tags found')
 
