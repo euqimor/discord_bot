@@ -54,7 +54,7 @@ async def on_ready():
 #     #     await after.remove_roles(role)
 
 @bot.command(hidden=True)
-def status(ctx):
+async def status(ctx):
     user = ctx.message.author
     ctx.message(user.activity.name)
 
