@@ -56,7 +56,7 @@ async def on_ready():
 @bot.command(hidden=True)
 async def status(ctx):
     user = ctx.message.author
-    await ctx.send(user.activity.type.name) if user.activity else ctx.send('No activity')
+    await ctx.send(user.activity.type.name) if user.activity else await ctx.send('No activity')
 
 
 def check_database(db_name):
