@@ -53,6 +53,10 @@ async def on_ready():
 #     #     await channel.send('attempting to remove roles')
 #     #     await after.remove_roles(role)
 
+@bot.command(hidden=True)
+def status(ctx):
+    user = ctx.message.author
+    ctx.message(user.activity.name)
 
 def check_database(db_name):
     path = os.path.realpath(db_name)
