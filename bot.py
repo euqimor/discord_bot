@@ -56,7 +56,8 @@ async def on_ready():
 @bot.command(hidden=True)
 async def status(ctx):
     user = ctx.message.author
-    ctx.message(user.activity.type.name)
+    ctx.message(user.activity.type.name) if user.activity else ctx.message('No activity')
+
 
 def check_database(db_name):
     path = os.path.realpath(db_name)
