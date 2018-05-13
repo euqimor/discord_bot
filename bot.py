@@ -34,7 +34,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game('with turrets'))
 
 
-# UNIMPLEMENTED UNTIL THE BUG GETS FIXED
+# #UNIMPLEMENTED UNTIL THE BUG GETS FIXED
 # @bot.event
 # async def on_member_update(before, after):
 #     guild = before.guild
@@ -52,6 +52,11 @@ async def on_ready():
 #     # if before.activity and after.id == 173747843314483210 and before.activity.type is discord.enums.ActivityType.streaming and after.activity.type != before.activity.type:
 #     #     await channel.send('attempting to remove roles')
 #     #     await after.remove_roles(role)
+
+@bot.command(hidden=True)
+async def status(ctx):
+    user = ctx.message.author
+    await ctx.send(user.activity.type.name) if user.activity else await ctx.send('No activity')
 
 
 def check_database(db_name):
@@ -74,6 +79,9 @@ def check_database(db_name):
                 'CREATE TABLE Proverbs(proverb TEXT);',
                 'CREATE TABLE Tags (id INTEGER PRIMARY KEY, user_id INT, tag_name TEXT, tag_content TEXT,\
                  UNIQUE (tag_name COLLATE NOCASE));',
+                'CREATE TABLE Tag_Aliases (id INTEGER PRIMARY KEY, user_id INT, tag_id INT, alias TEXT,\
+                                 FOREIGN KEY(tag_id) REFERENCES Tags(tag_id) ON DELETE CASCADE,\
+                                 UNIQUE (alias COLLATE NOCASE));',
             ]
             for command in commands:
                 con.execute(command)
@@ -128,10 +136,15 @@ async def tag(ctx, *, tag_name=''):
             tag_name = tag_name.strip('"')
         with closing(sqlite3.connect(db_name)) as con:
             with con:
-                line = con.execute('SELECT tag_content FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
-        if line:
-            line = line[0]
-            await ctx.send(line)
+                result = con.execute('SELECT tag_content FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
+                if not result:
+                    tag_id = con.execute('SELECT tag_id, alias FROM Tag_Aliases WHERE alias=?', (tag_name,)).fetchone()
+                    if tag_id:
+                        tag_id = tag_id[0]
+                        result = con.execute('SELECT tag_content FROM Tags WHERE ROWID=?', (tag_id,)).fetchone()
+        if result:
+            tag_content = result[0]
+            await ctx.send(tag_content)
         else:
             await ctx.send('Tag "{}" not found'.format(tag_name))
 
@@ -203,6 +216,36 @@ async def add(ctx, tag_name, *, tag_content=''):
             await ctx.send('Successfully added "{}" to {}\'s tags'.format(tag_name, username))
         except sqlite3.IntegrityError:
             await ctx.send('Failed to add tag "{}", name already exists'.format(tag_name))
+
+
+@tag.command()
+async def alias(ctx, tag_name, *, tag_alias):
+    """
+    Add an alias for a tag, you don't need to be the tag's owner.
+    Usage example:
+    $tag alias \"long tag name\" \"some alias\"
+    or
+    $tag alias sometag altname
+    If the tag's name or alias is more than one word long, put it in quotes.
+    For single-word names and aliases quotes will work but are not required.
+    """
+    if not tag_alias:
+        await ctx.send('Tag alias cannot be empty')
+        return
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            result = con.execute('SELECT tag_name FROM Tags WHERE tag_name = ?;',(tag_alias,)).fetchone()
+            if result:
+                await ctx.send(f"Failed to add alias \"{tag_alias}\", a tag with that name already exists")
+            else:
+                result = con.execute('SELECT tag_name, ROWID FROM Tags WHERE tag_name = ?', (tag_name,)).fetchone()
+                tag_id = result[1] if result else await ctx.send(f"Failed to add alias, tag \"{tag_name}\" not found")
+                try:
+                    con.execute('INSERT INTO Tag_Aliases(user_id, tag_id, alias) VALUES(?, ?, ?);',
+                                (ctx.author.id, tag_id, tag_alias))
+                    await ctx.send(f"Successfully added alias \"{tag_alias}\" for tag \"{tag_name}\"")
+                except sqlite3.IntegrityError:
+                    await ctx.send(f"Failed to add alias \"{tag_alias}\", name already exists")
 
 
 @tag.command()
