@@ -238,7 +238,7 @@ async def alias(ctx, tag_name, *, tag_alias):
             if result:
                 await ctx.send(f"Failed to add alias \"{tag_alias}\", a tag with that name already exists")
             else:
-                result = con.execute('SELECT tag_name, tag_id FROM Tags WHERE tag_name = ?', (tag_name,)).fetchone()
+                result = con.execute('SELECT tag_name, ROWID FROM Tags WHERE tag_name = ?', (tag_name,)).fetchone()
                 tag_id = result[1] if result else await ctx.send(f"Failed to add alias, tag \"{tag_name}\" not found")
                 try:
                     con.execute('INSERT INTO Tag_Aliases(user_id, tag_id, alias) VALUES(?, ?, ?);',
