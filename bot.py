@@ -234,7 +234,7 @@ async def alias(ctx, tag_name, *, tag_alias):
             else:
                 result = con.execute('SELECT tag_name, tag_alias FROM Tags WHERE tag_name = ?', (tag_name,)).fetchone()
                 if result:
-                    aliases = result[1]+f"[{tag_alias}]"
+                    aliases = result[1]+f"[{tag_alias}]" if result[1] else f"[{tag_alias}]"
                     con.execute('UPDATE Tags SET tag_alias = ? WHERE tag_name = ? ;',
                                 (aliases, tag_name))
                     await ctx.send(f"Successfully added alias \"{tag_alias}\" for tag \"{tag_name}\"")
