@@ -138,8 +138,9 @@ async def tag(ctx, *, tag_name=''):
             with con:
                 result = con.execute('SELECT tag_content FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
                 if not result:
-                    tag_id = con.execute('SELECT tag_id, alias FROM Tag_Aliases WHERE alias=?', (tag_name,)).fetchone()[0]
+                    tag_id = con.execute('SELECT tag_id, alias FROM Tag_Aliases WHERE alias=?', (tag_name,)).fetchone()
                     if tag_id:
+                        tag_id = tag_id[0]
                         result = con.execute('SELECT tag_content FROM Tags WHERE tag_id=?', (tag_id,)).fetchone()
         if result:
             tag_content = result[0]
