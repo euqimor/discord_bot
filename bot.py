@@ -136,7 +136,7 @@ async def tag(ctx, *, tag_name=''):
             with con:
                 line = con.execute('SELECT tag_content FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
                 if not line:
-                    line = con.execute('SELECT tag_content FROM Tags WHERE tag_alias LIKE ?', (f"[{tag_name}]",)).fetchone()
+                    line = con.execute('SELECT tag_content FROM Tags WHERE tag_alias LIKE ?', (f"%[{tag_name}]%",)).fetchone()
         if line:
             line = line[0]
             await ctx.send(line)
