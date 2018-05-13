@@ -77,7 +77,8 @@ def check_database(db_name):
                  FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE,\
                  UNIQUE (suggestion COLLATE NOCASE, suggestion_type));',
                 'CREATE TABLE Proverbs(proverb TEXT);',
-                'CREATE TABLE Tags (id INTEGER PRIMARY KEY, user_id INT, tag_name TEXT, tag_content TEXT,\
+                'CREATE TABLE Tags (id INTEGER PRIMARY KEY, user_id INT,\
+                 tag_name TEXT, tag_content TEXT, tag_alias TEXT,\
                  UNIQUE (tag_name COLLATE NOCASE));',
             ]
             for command in commands:
@@ -208,6 +209,37 @@ async def add(ctx, tag_name, *, tag_content=''):
             await ctx.send('Successfully added "{}" to {}\'s tags'.format(tag_name, username))
         except sqlite3.IntegrityError:
             await ctx.send('Failed to add tag "{}", name already exists'.format(tag_name))
+
+
+@tag.command()
+async def alias(ctx, tag_name, *, tag_alias):
+    """
+    Add an alias for a tag
+    Usage example:
+    $tag alias \"long tag name\" \"some alias\"
+    or
+    $tag alias sometag altname
+    If the tag's name or alias is more than one word long, put it in quotes.
+    For single-word names and aliases quotes will work but are not required.
+    """
+    if not tag_alias:
+        await ctx.send('Tag alias cannot be empty')
+        return
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            result = con.execute('SELECT tag_name, tag_alias FROM Tags '
+                                 'WHERE tag_name = ? OR tag_alias LIKE ?;',(tag_alias,f"[{tag_alias}]")).fetchone()
+            if result:
+                await ctx.send(f"Failed to add alias, a tag with that name or alias already exists")
+            else:
+                result = con.execute('SELECT tag_name, tag_alias FROM Tags WHERE tag_name = ?', (tag_name,)).fetchone()
+                if result:
+                    aliases = result[1]+f"[{tag_alias}]"
+                    con.execute('UPDATE Tags SET tag_alias = ? WHERE tag_name = ? ;',
+                                (aliases, tag_name))
+                    await ctx.send(f"Successfully added alias \"{tag_alias}\" for tag \"{tag_name}\"")
+                else:
+                    await ctx.send(f"Failed to add alias, tag \"{tag_name}\" not found")
 
 
 @tag.command()
