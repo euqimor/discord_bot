@@ -61,6 +61,7 @@ async def status(ctx, user):
         user = ctx.message.mentions[0]
     except IndexError:
         await ctx.send('Mention a user to invoke this command')
+        return
     if user.activity:
         await ctx.send(f'{user.name} is {user.activity.type.name}')
     else:
