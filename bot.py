@@ -54,7 +54,8 @@ async def on_ready():
 #     #     await after.remove_roles(role)
 
 @bot.command(hidden=True)
-async def status(ctx, user: discord.Member):
+async def status(ctx):
+    user = ctx.message.mentions[0]
     if user.activity:
         await ctx.send(f'{user.name} is {user.activity.type.name}')
     else:
