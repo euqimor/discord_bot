@@ -39,11 +39,11 @@ async def on_member_update(before, after):
     guild = before.guild
     channel = discord.utils.get(guild.channels, name='secluded_cave')
     role = discord.utils.get(guild.roles, name='Live Queue')
-    if after.activity and after.id == 363993907996000258 and after.activity.type.name == 'Streaming':
+    if after.activity and after.id == 363993907996000258 and after.activity.type.name == 'streaming':
         await channel.send(f'{after.name} is {after.activity.type.name}')
         await channel.send('attempting to add roles')
         await after.add_roles(role)
-    if before.activity and after.id == 363993907996000258 and before.activity.type.name == 'Streaming' and after.activity.type != before.activity.type:
+    if before.activity and after.id == 363993907996000258 and before.activity.type.name == 'streaming' and after.activity.type != before.activity.type:
         await channel.send('attempting to remove roles')
         await after.remove_roles(role)
 
