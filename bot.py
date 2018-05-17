@@ -54,13 +54,18 @@ async def on_ready():
 #     #     await after.remove_roles(role)
 
 @bot.command(hidden=True)
-async def status(ctx):
+async def status(ctx, user):
     # user = ctx.message.author
     # await ctx.send(user.activity.type.name) if user.activity else await ctx.send('No activity')
-    if bot.activity:
-        await ctx.send(bot.activity.type.name)
+    try:
+        user = ctx.message.mentions[0]
+    except IndexError:
+        await ctx.send('Mention a user to invoke this command')
+    if user.activity:
+        await ctx.send(f'{user.name} is {user.activity.type.name)}')
     else:
-        await ctx.send('No activity')
+        await ctx.send(f'{user.name}: no activity')
+
 
 @bot.command(hidden=True)
 async def stream(ctx):
