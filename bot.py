@@ -69,6 +69,12 @@ async def status(ctx, user):
 
 
 @bot.command(hidden=True)
+async def mystatus(ctx):
+    user = ctx.message.author
+    await ctx.send(user.activity.type.name) if user.activity else await ctx.send('No activity')
+
+
+@bot.command(hidden=True)
 async def stream(ctx):
     await bot.change_presence(activity=discord.Streaming(name="test", url="https://www.twitch.tv/123"))
 
