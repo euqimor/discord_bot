@@ -55,8 +55,13 @@ async def on_ready():
 
 @bot.command(hidden=True)
 async def status(ctx):
-    user = ctx.message.author
-    await ctx.send(user.activity.type.name) if user.activity else await ctx.send('No activity')
+    # user = ctx.message.author
+    # await ctx.send(user.activity.type.name) if user.activity else await ctx.send('No activity')
+    await ctx.send(bot.activity.type.name) if bot.activity else await ctx.send('No activity')
+
+@bot.command(hidden=True)
+async def stream(ctx):
+    await bot.change_presence(activity=discord.Streaming(name="My Stream", url="https://www.twitch.tv/thisisgamervention"))
 
 
 def check_database(db_name):
@@ -116,7 +121,6 @@ async def check_admin_rights(ctx):
 # TAGS
 ########################################################
 # To do:
-# tag aliases
 # name suggestions if requested tag  is not found
 
 @bot.group(invoke_without_command=True,aliases=['tags'])
