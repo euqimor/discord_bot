@@ -37,16 +37,19 @@ async def on_ready():
 @bot.event
 async def on_member_update(before, after):
     guild = before.guild
-    channel = discord.utils.get(guild.text_channels, name='secluded_cave')
+    channel = discord.utils.get(guild.text_channels, name='troubleshoot')
     role = discord.utils.get(guild.roles, name='Live Queue')
-    await channel.send(f'{after.name} activity: {after.activity}')
-    if after.activity and after.id == 363993907996000258 and after.activity.type.name == 'streaming':
-        await channel.send(f'{after.name} is {after.activity.type.name}')
-        await channel.send('attempting to add roles')
-        await after.add_roles(role)
-    if before.activity and after.id == 363993907996000258 and before.activity.type.name == 'streaming' and after.activity.type != before.activity.type:
-        await channel.send('attempting to remove roles')
-        await after.remove_roles(role)
+    if after.activity and after.activity.type.name == 'streaming':
+        if not before.activity or before.activity.type.name != 'streaming':
+            await channel.send(f'{after.name} is {after.activity.type.name}')
+            await channel.send('attempting to add role')
+            await after.add_roles(role)
+        else:
+            return
+    if before.activity and before.activity.type.name == 'streaming':
+        if not after.activity or after.activity.type.name != 'streaming':
+            await channel.send('attempting to remove roles')
+            await after.remove_roles(role)
 
 
 @bot.command(hidden=True)
