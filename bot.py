@@ -75,6 +75,6 @@ if __name__ == '__main__':
         except Exception as e:
             print(f'Failed to load extension {extension}.')
     if check_database(bot.db_name):
-        bot.run(os.environ['BOT_TEST'])
+        bot.run(os.environ['BOT_PROD'])
     else:
         sys.exit(1)
