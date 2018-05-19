@@ -20,7 +20,7 @@ async def add_role_to_streamers(guild):
     role = get(guild.roles, name='Live Queue')
     channel = get(guild.text_channels, name='troubleshoot') \
               or get(guild.text_channels, name='secluded_cave')
-    streaming_members = [x for x in guild.members if x.activity.type.name == 'streaming']
+    streaming_members = [x for x in guild.members if x.activity and x.activity.type.name == 'streaming']
     for member in streaming_members:
         await channel.send(f'{member.name} is {member.activity.type.name}. Attempting to add role.')
         await member.add_roles(role)
