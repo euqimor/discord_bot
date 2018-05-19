@@ -1,7 +1,9 @@
 import discord
 from discord.ext import commands
-import sys
-from cogs.utils.db import *
+from sys import exit
+from os import environ
+from cogs.utils.db import check_database
+from cogs.utils.misc import add_role_to_streamers
 
 
 # TODO Fix the bug where removing the last suggestion deletes it from the DB, but leaves hanging in the channel
@@ -27,7 +29,7 @@ def get_prefix(_bot, message):
     prefixes = ['$']
 
     if not message.guild:
-        return ['$','!','?']
+        return ['$', '!', '?']
 
     return commands.when_mentioned_or(*prefixes)(_bot, message)
 
@@ -48,24 +50,26 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     await bot.change_presence(activity=discord.Game('with turrets'))
+    for guild in bot.guilds:
+        await add_role_to_streamers(guild)
 
 
-# @bot.event
-# async def on_member_update(before, after):
-#     guild = before.guild
-#     channel = discord.utils.get(guild.text_channels, name='troubleshoot')
-#     role = discord.utils.get(guild.roles, name='Live Queue')
-#     if after.activity and after.activity.type.name == 'streaming':
-#         if not before.activity or before.activity.type.name != 'streaming':
-#             await channel.send(f'{after.name} is {after.activity.type.name}')
-#             await channel.send('attempting to add role')
-#             await after.add_roles(role)
-#         else:
-#             return
-#     if before.activity and before.activity.type.name == 'streaming':
-#         if not after.activity or after.activity.type.name != 'streaming':
-#             await channel.send('attempting to remove roles')
-#             await after.remove_roles(role)
+@bot.event
+async def on_member_update(before, after):
+    guild = before.guild
+    channel = discord.utils.get(guild.text_channels, name='troubleshoot') \
+        or discord.utils.get(guild.text_channels, name='secluded_cave')
+    role = discord.utils.get(guild.roles, name='Live Queue')
+    if after.activity and after.activity.type.name == 'streaming':
+        if not before.activity or before.activity.type.name != 'streaming':
+            await channel.send(f'{after.name} is {after.activity.type.name}. Attempting to add role.')
+            await after.add_roles(role)
+        else:
+            return
+    if before.activity and before.activity.type.name == 'streaming':
+        if not after.activity or after.activity.type.name != 'streaming':
+            await channel.send(f'{after.name} stopped {before.activity.type.name}. Attempting to remove role.')
+            await after.remove_roles(role)
 
 
 if __name__ == '__main__':
@@ -75,6 +79,6 @@ if __name__ == '__main__':
         except Exception as e:
             print(f'Failed to load extension {extension}.')
     if check_database(bot.db_name):
-        bot.run(os.environ['BOT_TEST'])
+        bot.run(environ['BOT_TEST'])
     else:
-        sys.exit(1)
+        exit(1)
