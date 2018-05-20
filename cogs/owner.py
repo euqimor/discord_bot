@@ -3,7 +3,7 @@ import sqlite3
 from contextlib import closing
 from discord.ext import commands
 from cogs.utils.misc import check_admin_rights
-from cogs.utils.messages import update_banner, rejections, message_games_by_author, embed_suggestions_in_category
+from cogs.utils.messages import update_banner, rejections
 from random import choice as random_choice
 
 
@@ -34,6 +34,8 @@ class OwnerCog:
         await self.bot.change_presence(activity=discord.Streaming(name="test", url="https://www.twitch.tv/123"))
 
     @commands.command()
+    @commands.guild_only()
+    @commands.is_owner()
     async def wipe_user(self, ctx, user_id: str):
         """Purges the user and all related content from the database, command available only to Admin role"""
         if await check_admin_rights(ctx):
@@ -59,22 +61,8 @@ class OwnerCog:
         else:
             await ctx.send(random_choice(rejections))
 
-    @commands.command(hidden=True)
-    async def games_full(self, ctx):
-        """Prints games suggested so far grouped by suggestion author's name"""
-        message = message_games_by_author(ctx)
-        await ctx.send(message)
-
-    @commands.command(hidden=True)
-    async def games_list(self, ctx):
-        """Prints games suggested so far in one list"""
-        e = embed_suggestions_in_category(ctx, 'game')
-        author_pic_url = 'https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
-        e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
-        e.set_author(name='AellaQ', url='https://www.twitch.tv/aellaq', icon_url=author_pic_url)
-        await ctx.send(embed=e)
-
     @commands.command()
+    @commands.is_owner()
     async def set_prefix(self, ctx, message: str):  # TODO save permanently
         prefix = message.strip()
         if await check_admin_rights(ctx):
@@ -84,6 +72,7 @@ class OwnerCog:
             await ctx.send(random_choice(rejections))
 
     @commands.command(aliases=['set_nickname'])
+    @commands.is_owner()
     async def set_nick(self, ctx, *, message: str = ''):
         nickname = message.strip()
         if await check_admin_rights(ctx):
@@ -94,6 +83,7 @@ class OwnerCog:
             await ctx.send(random_choice(rejections))
 
     @commands.command(aliases=['set_playing'])
+    @commands.is_owner()
     async def set_status(self, ctx, *, message: str = ''):  # TODO save permanently?
         status = message.strip()
         if await check_admin_rights(ctx):
