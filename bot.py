@@ -57,18 +57,14 @@ async def on_ready():
 @bot.event
 async def on_member_update(before, after):
     guild = before.guild
-    channel = discord.utils.get(guild.text_channels, name='troubleshoot') \
-        or discord.utils.get(guild.text_channels, name='secluded_cave')
     role = discord.utils.get(guild.roles, name='Live Queue')
     if after.activity and after.activity.type.name == 'streaming':
         if not before.activity or before.activity.type.name != 'streaming':
-            await channel.send(f'{after.name} is {after.activity.type.name}. Attempting to add role.')
             await after.add_roles(role)
         else:
             return
     if before.activity and before.activity.type.name == 'streaming':
         if not after.activity or after.activity.type.name != 'streaming':
-            await channel.send(f'{after.name} stopped {before.activity.type.name}. Attempting to remove role.')
             await after.remove_roles(role)
 
 

@@ -3,7 +3,7 @@ import sqlite3
 from contextlib import closing
 from collections import defaultdict
 from discord.utils import get
-from cogs.utils.misc import suggestions_exist_in_category
+
 
 rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
               'Stop trying that, or I\'ll report you to Nightmom!', 'Yeah, right.']
