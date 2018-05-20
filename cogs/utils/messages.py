@@ -14,14 +14,14 @@ async def update_banner(ctx, banner_type):
     channel = get(guild.text_channels, name='game_suggestions_bot')
     message_list = await channel.history(limit=3).flatten()
     if message_list:
-        if banner_type == 'games' and suggestions_exist_in_category('game', ctx.bot.db):
+        if banner_type == 'games' and suggestions_exist_in_category('game', ctx.bot.db_name):
             e = embed_suggestions_in_category(ctx, 'game')
             author_pic_url = 'https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
             e.set_thumbnail(url='https://cdn0.iconfinder.com/data/icons/social-network-7/50/16-128.png')
             e.set_author(name='AellaQ', url='https://www.twitch.tv/aellaq', icon_url=author_pic_url)
             await message_list[2].edit(embed=e)
             await message_list[1].edit(embed=embed_games_by_author(ctx))
-        elif banner_type == 'movies' and suggestions_exist_in_category('movie', ctx.bot.db):
+        elif banner_type == 'movies' and suggestions_exist_in_category('movie', ctx.bot.db_name):
             e = embed_suggestions_in_category(ctx, 'movie')
             e.colour = discord.Colour.orange()
             e.set_thumbnail(url='https://lh3.googleusercontent.com/TAzWe4fpDp8T7od9EoLTj4zJLV6EJQwBZjJ4mVjyzmKNzd5mVMdLU3k8J7XvErqsg59X2i71SQ=w50-h50-e365')
@@ -34,7 +34,7 @@ async def update_banner(ctx, banner_type):
 
 
 async def create_banners(ctx):
-    if suggestions_exist_in_category('game', ctx.bot.db) or suggestions_exist_in_category('movie', ctx.bot.db):
+    if suggestions_exist_in_category('game', ctx.bot.db_name) or suggestions_exist_in_category('movie', ctx.bot.db_name):
         channel = get(ctx.guild.text_channels, name='game_suggestions_bot')
         e = embed_suggestions_in_category(ctx, 'game')
         author_pic_url = 'https://static-cdn.jtvnw.net/jtv_user_pictures/f01a051288087531-profile_image-70x70.png'
