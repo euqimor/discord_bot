@@ -80,7 +80,7 @@ class OwnerCog:
         channel = discord.utils.get(guild.text_channels, name='game_suggestions_bot')
         message_list = await channel.history(limit=3).flatten()
         name = find_suggestion_name_by_index(message_list[message_index], suggestion_index)
-        ctx.send(f'Found: `{name}`')
+        ctx.send(f'{name}')
 
 
 def setup(bot):

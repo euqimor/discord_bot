@@ -86,6 +86,8 @@ def find_suggestion_name_by_index(message, index):
     match = search(r'{}\. (.*)'.format(index), items)
     if match:
         return match.group(1)
+    else:
+        return items
 
 
 def split_message(message):
