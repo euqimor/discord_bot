@@ -75,7 +75,7 @@ class OwnerCog:
         await ctx.send('Status set')
 
     @commands.command(hidden=True)
-    async def find(self, ctx, message_index, suggestion_index):
+    async def find(self, ctx, message_index: int, suggestion_index: int):
         guild = ctx.guild
         channel = discord.utils.get(guild.text_channels, name='game_suggestions_bot')
         message_list = await channel.history(limit=3).flatten()
