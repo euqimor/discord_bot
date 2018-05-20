@@ -72,7 +72,7 @@ def embed_suggestions_in_category(ctx, suggestion_type: str):
         with con:
             suggestions = con.execute('SELECT suggestion FROM Suggestions WHERE suggestion_type=?;',(suggestion_type,)).fetchall()
         if suggestions:
-            text = '\n'.join([item[0] for item in suggestions])
+            text = '\n'.join([f'{index}. {item[0]}' for index, item in enumerate(suggestions, start=1)])
         else:
             text = 'Nothing has been suggested yet'
         e.add_field(name=title, value=text, inline=False)
