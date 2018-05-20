@@ -3,6 +3,7 @@ import sqlite3
 from contextlib import closing
 from collections import defaultdict
 from discord.utils import get
+from re import search
 
 
 rejections = ['Nope', 'Nu-uh', 'You are not my supervisor!', 'Sorry, you are not important enough to do that -_-',
@@ -77,6 +78,14 @@ def embed_suggestions_in_category(ctx, suggestion_type: str):
             text = 'Nothing has been suggested yet'
         e.add_field(name=title, value=text, inline=False)
         return e
+
+
+def find_suggestion_name_by_index(message, index):
+    e = message.embeds[0]
+    items = e.fields[0].value
+    match = search(r'{}\. (.*)'.format(index), items)
+    if match:
+        return match.group(1)
 
 
 def split_message(message):

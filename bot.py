@@ -39,6 +39,12 @@ class CompanionCube(commands.Bot):
         super().__init__(command_prefix=get_prefix, description=description)
         self.db_name = 'cube.db'
 
+        for extension in initial_extensions:
+            try:
+                self.load_extension(extension)
+            except Exception as e:
+                print(f'Failed to load extension {extension}.')
+
 
 bot = CompanionCube()
 
@@ -69,11 +75,6 @@ async def on_member_update(before, after):
 
 
 if __name__ == '__main__':
-    for extension in initial_extensions:
-        try:
-            bot.load_extension(extension)
-        except Exception as e:
-            print(f'Failed to load extension {extension}.')
     if check_database(bot.db_name):
         bot.run(environ['BOT_TEST'])
     else:
