@@ -2,9 +2,10 @@ from discord.ext import commands
 from random import randint
 from contextlib import closing
 import sqlite3
+import aiohttp
 
 
-class WisdomCog:
+class SillyCog:
     def __init__(self, bot):
         self.bot = bot
 
@@ -70,6 +71,16 @@ class WisdomCog:
             pass
         await ctx.send('{} {}'.format(line, emoji))
 
+    @commands.command()
+    async def cat(self, ctx):
+        """
+        Cat.
+        Posts a random cat pic.
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://api.github.com/events') as resp:
+                await ctx.send(resp.json())
+
 
 def setup(bot):
-    bot.add_cog(WisdomCog(bot))
+    bot.add_cog(SillyCog(bot))
