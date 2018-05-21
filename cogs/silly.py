@@ -78,8 +78,8 @@ class SillyCog:
         Posts a random cat pic.
         """
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://api.github.com/events') as resp:
-                await ctx.send(resp.json()['file'])
+            async with session.get('http://aws.random.cat/meow') as resp:
+                await ctx.send(resp.json())
 
 
 def setup(bot):
