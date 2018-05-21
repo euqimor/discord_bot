@@ -83,7 +83,6 @@ class SuggestionsCog:
             else:
                 await ctx.send(f'Couldn\'t find anything matching "{data}" in {username}\'s suggestions')
 
-
     @commands.command(aliases=['movie_remove'])
     async def remove_movie(self, ctx, *, data):
         """Removes the movie suggestion if the movie was suggested by the user issuing the command"""

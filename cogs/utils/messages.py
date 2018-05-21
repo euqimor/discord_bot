@@ -85,7 +85,7 @@ async def get_suggestion_name(ctx, suggestion_category, data):
     index = regex.group(1)
     name = regex.group(2)
     if name:
-        return ' '.join(name).split()
+        return ' '.join(name.split())
     elif index:
         guild = ctx.guild
         channel = get(guild.text_channels, name='game_suggestions_bot')
