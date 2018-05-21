@@ -79,7 +79,8 @@ class SillyCog:
         """
         async with aiohttp.ClientSession() as session:
             async with session.get('http://aws.random.cat/meow') as resp:
-                await ctx.send(await resp.json()['file'])
+                cat = await resp.json()
+        await ctx.send(cat['file'])
 
 
 def setup(bot):
