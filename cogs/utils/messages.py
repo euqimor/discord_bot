@@ -80,14 +80,34 @@ def embed_suggestions_in_category(ctx, suggestion_type: str):
         return e
 
 
+async def get_suggestion_name(ctx, suggestion_category, data):
+    regex = search(r'^(\d+)?\.? ?(.*)', data)
+    index = regex.group(1)
+    name = regex.group(2)
+    if name:
+        return ' '.join(name).split()
+    elif index:
+        guild = ctx.guild
+        channel = get(guild.text_channels, name='game_suggestions_bot')
+        message_list = await channel.history(limit=3).flatten()
+        if suggestion_category == 'game':
+            message = message_list[2]
+        elif suggestion_category == 'movie':
+            message = message_list[0]
+        else:
+            return
+        name = find_suggestion_name_by_index(message, index)
+        return name
+
+
 def find_suggestion_name_by_index(message, index):
+    # looks for a suggestion string in a single field embed inside a message
+    # i.e. index = 15, finds "15. Nier: Automata", returns "Nier: Automata"
     e = message.embeds[0]
     items = e.fields[0].value
     match = search(r'{}\. (.*)'.format(index), items)
     if match:
         return match.group(1)
-    else:
-        return items
 
 
 def split_message(message):

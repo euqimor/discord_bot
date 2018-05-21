@@ -5,10 +5,6 @@ from os import environ
 from cogs.utils.db import check_database
 from cogs.utils.misc import add_role_to_streamers
 
-
-# TODO Fix the bug where removing the last suggestion deletes it from the DB, but leaves hanging in the channel
-# TODO Sort output list by id
-
 # TODO MAKE EXISTS CHECK A SEPARATE FUNCTION!!!
 # TODO PROVIDE HELP INSTRUCTIONS, separate commands into groups, add multi-server support(?)
 # TODO 2000 symbols limit for suggestions list
