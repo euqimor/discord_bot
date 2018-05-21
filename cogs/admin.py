@@ -1,5 +1,5 @@
 import sqlite3
-from discord import TextChannel
+from discord import TextChannel, Forbidden
 from discord.ext import commands
 from random import choice as random_choice
 from cogs.utils.messages import update_banner, rejections
@@ -19,7 +19,7 @@ class AdminCog:
             if isinstance(ctx.channel, TextChannel):
                 try:
                     await ctx.message.delete()
-                except commands.MissingPermissions:
+                except Forbidden:
                     pass
             if '#' not in channel_id:
                 dest_channel = ctx.bot.get_channel(int(channel_id))

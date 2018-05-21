@@ -2,7 +2,7 @@ import discord
 import sqlite3
 from contextlib import closing
 from discord.ext import commands
-from cogs.utils.messages import update_banner, find_suggestion_name_by_index
+from cogs.utils.messages import update_banner
 
 
 class OwnerCog:
