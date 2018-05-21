@@ -79,7 +79,7 @@ class SillyCog:
         """
         async with aiohttp.ClientSession() as session:
             async with session.get('https://api.github.com/events') as resp:
-                await ctx.send(resp.json())
+                await ctx.send(resp.json()['file'])
 
 
 def setup(bot):
