@@ -1,6 +1,7 @@
 import sqlite3
 import os
 from urllib.request import pathname2url
+from contextlib import closing
 
 
 def check_database(db_name):
@@ -43,3 +44,17 @@ def check_database(db_name):
 def add_user_to_db_or_pass(con, username, user_id):
     con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;', (username, user_id))
     con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);', (username, user_id))
+
+
+def suggestion_exists_check(db_name, suggestion, suggestion_type, user_id=''):
+    with closing(sqlite3.connect(db_name)) as con:
+        with con:
+            if not user_id:
+                exists = con.execute('SELECT * FROM Suggestions \
+                                              WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                     (suggestion, suggestion_type)).fetchall()
+            else:
+                exists = con.execute('SELECT * FROM Suggestions \
+                                                                  WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
+                                     (user_id, suggestion, suggestion_type)).fetchall()
+    return bool(exists)

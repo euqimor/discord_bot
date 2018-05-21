@@ -19,7 +19,7 @@ class AdminCog:
             if isinstance(ctx.channel, TextChannel):
                 try:
                     await ctx.message.delete()
-                except:  # TODO find the proper name for the permissions exception
+                except commands.MissingPermissions:
                     pass
             if '#' not in channel_id:
                 dest_channel = ctx.bot.get_channel(int(channel_id))

@@ -56,7 +56,7 @@ class OwnerCog:
                 await ctx.send('User not found in the database')
 
     @commands.command()
-    async def set_prefix(self, ctx, message: str):  # TODO save permanently
+    async def set_prefix(self, ctx, message: str):
         prefix = message.strip()
         ctx.bot.command_prefix = prefix
         await ctx.send('The prefix is set to ' + str(ctx.bot.command_prefix))
@@ -69,18 +69,10 @@ class OwnerCog:
         await ctx.send('Nickname set')
 
     @commands.command(aliases=['set_playing'])
-    async def set_status(self, ctx, *, message: str = ''):  # TODO save permanently?
+    async def set_status(self, ctx, *, message: str = ''):
         status = message.strip()
         await ctx.bot.change_presence(activity=discord.Game(status))
         await ctx.send('Status set')
-
-    @commands.command(hidden=True)
-    async def find(self, ctx, message_index: int, suggestion_index: int):
-        guild = ctx.guild
-        channel = discord.utils.get(guild.text_channels, name='game_suggestions_bot')
-        message_list = await channel.history(limit=3).flatten()
-        name = find_suggestion_name_by_index(message_list[message_index], suggestion_index)
-        await ctx.send(f'{name}')
 
 
 def setup(bot):

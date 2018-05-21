@@ -5,9 +5,6 @@ from os import environ
 from cogs.utils.db import check_database
 from cogs.utils.misc import add_role_to_streamers
 
-# TODO MAKE EXISTS CHECK A SEPARATE FUNCTION!!!
-# TODO PROVIDE HELP INSTRUCTIONS, separate commands into groups, add multi-server support(?)
-# TODO 2000 symbols limit for suggestions list
 
 description = '''An awkward attempt at making a discord bot'''
 
@@ -60,14 +57,17 @@ async def on_ready():
 async def on_member_update(before, after):
     guild = before.guild
     role = discord.utils.get(guild.roles, name='Live Queue')
+    bot_role = guild.me.top_role
     if after.activity and after.activity.type.name == 'streaming':
         if not before.activity or before.activity.type.name != 'streaming':
-            await after.add_roles(role)
+            if after.top_role < bot_role:
+                await after.add_roles(role)
         else:
             return
     if before.activity and before.activity.type.name == 'streaming':
         if not after.activity or after.activity.type.name != 'streaming':
-            await after.remove_roles(role)
+            if after.top_role < bot_role:
+                await after.remove_roles(role)
 
 
 if __name__ == '__main__':

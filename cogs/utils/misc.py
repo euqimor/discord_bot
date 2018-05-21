@@ -21,4 +21,5 @@ async def add_role_to_streamers(guild):
     role = get(guild.roles, name='Live Queue')
     streaming_members = [x for x in guild.members if x.activity and x.activity.type.name == 'streaming']
     for member in streaming_members:
-        await member.add_roles(role)
+        if member.top_role < guild.me.top_role:
+            await member.add_roles(role)
