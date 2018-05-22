@@ -83,7 +83,7 @@ class SillyCog:
             async with session.get('https://cataas.com/cat') as resp:
                 imgtype = resp.headers['content-type']
                 cat_bytes = BytesIO(await resp.read())
-        cat_file = File(cat_bytes, f'cat.{imgtype}')
+        cat_file = File(cat_bytes, f'cat.{imgtype[6:]}')
         # e = Embed()
         # e.set_image(url="attachment://cat.png")
         # await ctx.send(embed=e)
