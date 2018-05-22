@@ -82,8 +82,8 @@ class SillyCog:
         async with aiohttp.ClientSession() as session:
             async with session.get('https://cataas.com/cat') as resp:
                 cat_bytes = BytesIO(await resp.read())
-        cat_file = File(cat_bytes)
-        await ctx.send(file=cat_file, filename='cat.png')
+        cat_file = File(cat_bytes, 'cat.png')
+        await ctx.send(file=cat_file)
 
 
 def setup(bot):
