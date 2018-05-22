@@ -81,13 +81,13 @@ class SillyCog:
         """
         async with aiohttp.ClientSession() as session:
             async with session.get('https://cataas.com/cat') as resp:
-                imgtype = resp.headers['content-type']
+                img_type = resp.headers['content-type'][6:]
                 cat_bytes = BytesIO(await resp.read())
-        cat_file = File(cat_bytes, f'cat.{imgtype[6:]}')
-        # e = Embed()
-        # e.set_image(url="attachment://cat.png")
-        # await ctx.send(embed=e)
-        await ctx.send(file=cat_file)
+                filename = f'cat.{img_type}'
+        cat_file = File(cat_bytes, filename)
+        e = Embed()
+        e.set_image(url=f"attachment://{filename}")
+        await ctx.send(file=cat_file, embed=e)
 
 def setup(bot):
     bot.add_cog(SillyCog(bot))
