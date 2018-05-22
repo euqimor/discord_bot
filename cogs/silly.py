@@ -3,6 +3,8 @@ from random import randint
 from contextlib import closing
 import sqlite3
 import aiohttp
+from io import BytesIO
+from discord import File
 
 
 class SillyCog:
@@ -78,9 +80,10 @@ class SillyCog:
         Posts a random cat pic.
         """
         async with aiohttp.ClientSession() as session:
-            async with session.get('http://aws.random.cat/meow') as resp:
-                cat = await resp.json()
-                await ctx.send(cat['file'])
+            async with session.get('https://cataas.com/cat') as resp:
+                cat_bytes = BytesIO(await resp.read())
+        cat_file = File(cat_bytes)
+        await ctx.send(file=cat_file)
 
 
 def setup(bot):
