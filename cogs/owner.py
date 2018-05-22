@@ -4,6 +4,7 @@ from contextlib import closing
 from discord.ext import commands
 from cogs.utils.messages import update_banner
 from discord.utils import get
+from time import sleep
 
 
 class OwnerCog:
@@ -95,6 +96,7 @@ class OwnerCog:
         await channel.send('I\'m sowwy :(')
         await channel.send('Here.')
         cat = self.bot.get_command('cat')
+        sleep(1)
         await channel.send('Forgief plz :(')
         await cat.invoke(ctx)
 
