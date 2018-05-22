@@ -4,7 +4,7 @@ from contextlib import closing
 import sqlite3
 import aiohttp
 from io import BytesIO
-from discord import File
+from discord import File, Embed
 
 
 class SillyCog:
@@ -83,7 +83,9 @@ class SillyCog:
             async with session.get('https://cataas.com/cat') as resp:
                 cat_bytes = BytesIO(await resp.read())
         cat_file = File(cat_bytes, 'cat.png')
-        await ctx.send(file=cat_file)
+        e = Embed()
+        e.set_image(url="attachment://cat.png")
+        await ctx.send(embed=e)
 
 
 def setup(bot):
