@@ -28,7 +28,7 @@ async def add_role_to_streamers(guild):
 async def remove_role_from_non_streamers(guild):
     role = get(guild.roles, name='Live Queue')
     members_with_role = [x for x in guild.members if role in x.roles]
-    print(f'members found: {members_with_role}')
     for member in members_with_role:
-        if member.activity and member.activity.type.name != 'streaming':
-            await member.remove_roles(role)
+        if not member.activity or (member.activity and member.activity.type.name != 'streaming'):
+            if member.top_role < guild.me.top_role:
+              await member.remove_roles(role)
