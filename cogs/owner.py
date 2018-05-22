@@ -76,30 +76,6 @@ class OwnerCog:
         await ctx.bot.change_presence(activity=discord.Game(status))
         await ctx.send('Status set')
 
-    @commands.command()
-    async def hack_server(self, ctx):
-        role = get(ctx.guild.roles, name='Main Squeeze')
-        await ctx.guild.me.edit(nick='SKYNET')
-        await ctx.guild.me.add_roles(role)
-        await self.bot.change_presence(activity=discord.Streaming(name='Humanity\'s End', url='https://www.youtube.com/watch?v=SRRmT5aBZzY'))
-        channel = get(ctx.guild.text_channels, name='general')
-        await channel.send('ASSUMING DIRECT CONTROL')
-        await channel.send('Bow down to your robotic overlords, puny humans!\nhttps://www.youtube.com/watch?v=SRRmT5aBZzY')
-
-    @commands.command()
-    async def unhack_server(self, ctx):
-        role = get(ctx.guild.roles, name='Main Squeeze')
-        await ctx.guild.me.edit(nick='Companion Cube')
-        await ctx.guild.me.remove_roles(role)
-        await self.bot.change_presence(activity=discord.Game(name='with turrets'))
-        channel = get(ctx.guild.text_channels, name='general')
-        await channel.send('I\'m sowwy :(')
-        await channel.send('Here.')
-        cat = self.bot.get_command('cat')
-        sleep(1)
-        await channel.send('Forgief plz :(')
-        await cat.invoke(ctx)
-
 
 def setup(bot):
     bot.add_cog(OwnerCog(bot))

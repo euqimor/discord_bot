@@ -3,7 +3,7 @@ from discord.ext import commands
 from sys import exit
 from os import environ
 from cogs.utils.db import check_database
-from cogs.utils.misc import add_role_to_streamers
+from cogs.utils.misc import add_role_to_streamers, remove_role_from_non_streamers
 
 
 description = '''An awkward attempt at making a discord bot'''
@@ -51,6 +51,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game('with turrets'))
     for guild in bot.guilds:
         await add_role_to_streamers(guild)
+        await remove_role_from_non_streamers(guild)
 
 
 @bot.event
