@@ -72,6 +72,6 @@ async def on_member_update(before, after):
 
 if __name__ == '__main__':
     if check_database(bot.db_name):
-        bot.run(environ['BOT_PROD'])
+        bot.run(environ['BOT_TEST'])
     else:
         exit(1)

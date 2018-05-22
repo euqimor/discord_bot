@@ -3,6 +3,7 @@ import sqlite3
 from contextlib import closing
 from discord.ext import commands
 from cogs.utils.messages import update_banner
+from discord.utils import get
 
 
 class OwnerCog:
@@ -73,6 +74,16 @@ class OwnerCog:
         status = message.strip()
         await ctx.bot.change_presence(activity=discord.Game(status))
         await ctx.send('Status set')
+
+    @commands.command()
+    async def hack_server(self, ctx):
+        role = get(ctx.guild.roles, name='Main Squeeze')
+        await self.bot.edit(nick='SKYNET')
+        await self.bot.add_role(role)
+        await self.bot.change_presence(activity=discord.Streaming(name='Humanity\'s End', url='https://www.youtube.com/watch?v=SRRmT5aBZzY'))
+        channel = get(ctx.guild.text_channels, name='general')
+        await channel.send('ASSUMING DIRECT CONTROL')
+        await channel.send('Bow down to your robotic overlords, puny humans!')
 
 
 def setup(bot):
