@@ -78,12 +78,23 @@ class OwnerCog:
     @commands.command()
     async def hack_server(self, ctx):
         role = get(ctx.guild.roles, name='Main Squeeze')
-        await self.bot.edit(nick='SKYNET')
-        await self.bot.add_role(role)
+        await ctx.guild.me.edit(nick='SKYNET')
+        await ctx.guild.me.add_roles(role)
         await self.bot.change_presence(activity=discord.Streaming(name='Humanity\'s End', url='https://www.youtube.com/watch?v=SRRmT5aBZzY'))
         channel = get(ctx.guild.text_channels, name='general')
         await channel.send('ASSUMING DIRECT CONTROL')
         await channel.send('Bow down to your robotic overlords, puny humans!')
+
+    @commands.command()
+    async def unhack_server(self, ctx):
+        role = get(ctx.guild.roles, name='Main Squeeze')
+        await ctx.guild.me.edit(nick='Companion Cube')
+        await ctx.guild.me.remove_roles(role)
+        await self.bot.change_presence(activity=discord.Game(name='with turrets'))
+        channel = get(ctx.guild.text_channels, name='general')
+        await channel.send('I\'m sowwy :(')
+        cat = self.bot.get_command('cat')
+        await cat.invoke(ctx)
 
 
 def setup(bot):
