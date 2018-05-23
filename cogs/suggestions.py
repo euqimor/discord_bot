@@ -152,8 +152,9 @@ class SuggestionsCog:
 
     @commands.command()
     async def test(self, ctx):
+        # num_emoju = {1:''}
         message = await ctx.send(':one: afdasf\n\n:two: aggag\n\n:three: asfasfa\n\n:four: afasfa')
-        await message.add_reaction(u'0\u20e3')
+        await message.add_reaction('0\u20e3')
 
 
 def setup(bot):
