@@ -150,7 +150,7 @@ class SuggestionsCog:
         else:
             await ctx.send(f'Couldn\'t find anything matching "{data}" in movie suggestions')
 
-
+    @commands.command()
     async def test(self, ctx):
         message = await ctx.send(':one:\n:two:\n:three:\n:four:')
         for i in range(10):
