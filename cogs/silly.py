@@ -5,7 +5,7 @@ import sqlite3
 import aiohttp
 from io import BytesIO
 from discord import File, Embed, Colour
-from random import random
+from random import choice
 
 
 class SillyCog:
@@ -98,7 +98,7 @@ class SillyCog:
         Chooses one of the options for you.
         Use quotes for options consisting of multiple words.
         """
-        answer = random(options)
+        answer = choice(options)
         await ctx.send(answer)
 
 
