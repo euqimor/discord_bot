@@ -151,5 +151,11 @@ class SuggestionsCog:
             await ctx.send(f'Couldn\'t find anything matching "{data}" in movie suggestions')
 
 
+    async def test(self, ctx):
+        message = await ctx.send(':one:\n:two:\n:three:\n:four:')
+        for i in range(10):
+            message.add_reaction(u'{}'.format(i))
+
+
 def setup(bot):
     bot.add_cog(SuggestionsCog(bot))
