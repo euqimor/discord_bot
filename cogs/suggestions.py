@@ -152,9 +152,8 @@ class SuggestionsCog:
 
     @commands.command()
     async def test(self, ctx):
-        message = await ctx.send(':one:\n:two:\n:three:\n:four:')
-        for i in range(10):
-            message.add_reaction(u'{}'.format(i))
+        message = await ctx.send(':one: afdasf\n:two: aggag\n:three: asfasfa\n:four: afasfa')
+        message.add_reaction(u'1')
 
 
 def setup(bot):
