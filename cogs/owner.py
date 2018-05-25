@@ -85,7 +85,7 @@ class OwnerCog:
          ```
         """
         code = code[6:-3]
-        success_flag = '✔'
+        success_flag = '✅'
         failure_flag = '❌'
         base_out = sys.stdout
         temp_out = StringIO()
