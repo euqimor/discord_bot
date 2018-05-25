@@ -85,21 +85,24 @@ class OwnerCog:
          ```
         """
         code = code[6:-3]
-        success_flag = '✅'
-        failure_flag = '❌'
-        base_out = sys.stdout
-        temp_out = StringIO()
-        try:
-            sys.stdout = temp_out
-            exec(code, globals(), locals())
-            await ctx.message.add_reaction(success_flag)
-            await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
-        except:
-            await ctx.message.add_reaction(failure_flag)
-            traceback.print_exc(file=temp_out, chain=False)
-            await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
-        finally:
-            sys.stdout = base_out
+        if code != '':
+            success_flag = '✅'
+            failure_flag = '❌'
+            base_out = sys.stdout
+            temp_out = StringIO()
+            try:
+                sys.stdout = temp_out
+                exec(code, globals(), locals())
+                await ctx.message.add_reaction(success_flag)
+                await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
+            except:
+                await ctx.message.add_reaction(failure_flag)
+                traceback.print_exc(file=temp_out, chain=False)
+                await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
+            finally:
+                sys.stdout = base_out
+        else:
+            await ctx.send("The command must be in a code block")
 
 
 def setup(bot):
