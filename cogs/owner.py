@@ -85,17 +85,17 @@ class OwnerCog:
          ```
         """
         code = code[6:-3]
-        success_flag = '1\u20e3'
-        failure_flag = '2\u20e3'
+        success_flag = '✔'
+        failure_flag = '❌'
         base_out = sys.stdout
         temp_out = StringIO()
         try:
             sys.stdout = temp_out
             exec(code, globals(), locals())
-            ctx.message.add_reaction(success_flag)
+            await ctx.message.add_reaction(success_flag)
             await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
         except:
-            ctx.message.add_reaction(failure_flag)
+            await ctx.message.add_reaction(failure_flag)
             traceback.print_exc(file=temp_out, chain=False)
             await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
         finally:
