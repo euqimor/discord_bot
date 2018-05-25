@@ -92,8 +92,10 @@ class OwnerCog:
         sys.stdout = sys.stderr = temp_out
         try:
             exec(code)
-        finally:
             await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
+        except:
+            await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
+        finally:
             sys.stdout = base_out
             sys.stderr = base_err
 
