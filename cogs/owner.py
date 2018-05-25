@@ -84,8 +84,8 @@ class OwnerCog:
          ```
         """
         code = code[6:-3]
-        success_flag = '✔'
-        failure_flag = '❌'
+        success_flag = u'✔'
+        failure_flag = u'❌'
         base_out = sys.stdout
         temp_out = StringIO()
         try:
@@ -93,9 +93,9 @@ class OwnerCog:
             exec(code)
             ctx.message.add_reaction(success_flag)
             await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
-        except Exception as e:
+        except:
             ctx.message.add_reaction(failure_flag)
-            await ctx.send(f"```py\n{e}\n```")
+            await ctx.send(f"```py\n{sys.exc_info()[0]}\n```")
         finally:
             sys.stdout = base_out
 
