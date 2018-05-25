@@ -90,7 +90,7 @@ class SillyCog:
         # e.colour = Colour.from_rgb(206, 24, 188)
         # e.title = 'Das a cat.'
         # e.set_image(url=f"attachment://{filename}")
-        await ctx.send(content='Das a cat.', file=cat_file)
+        await ctx.send(file=cat_file)
 
     @commands.command()
     async def choose(self, ctx, *options: commands.clean_content):
