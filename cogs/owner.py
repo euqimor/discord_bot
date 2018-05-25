@@ -1,7 +1,8 @@
 import discord
 import sqlite3
-from io import StringIO
 import sys
+import traceback
+from io import StringIO
 from contextlib import closing
 from discord.ext import commands
 from cogs.utils.messages import update_banner
@@ -95,7 +96,8 @@ class OwnerCog:
             await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
         except:
             ctx.message.add_reaction(failure_flag)
-            await ctx.send(f"```py\n{sys.exc_info()[0]}\n```")
+            traceback.print_exc(file=temp_out, chain=False)
+            await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
         finally:
             sys.stdout = base_out
 
