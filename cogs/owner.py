@@ -85,15 +85,15 @@ class OwnerCog:
          ```py
          ```
         """
+        code = code[6:-3]
         base_out = sys.stdout
         base_err = sys.stderr
         temp_out = StringIO()
-        code = code[6:-3]
+        sys.stdout = sys.stderr = temp_out
         try:
-            sys.stdout = sys.stderr = temp_out
             exec(code)
-            await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
         finally:
+            await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
             sys.stdout = base_out
             sys.stderr = base_err
 
