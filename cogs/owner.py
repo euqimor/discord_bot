@@ -1,6 +1,7 @@
 import discord
 import sqlite3
-import subprocess
+from io import StringIO
+import sys
 from contextlib import closing
 from discord.ext import commands
 from cogs.utils.messages import update_banner
@@ -84,13 +85,17 @@ class OwnerCog:
          ```py
          ```
         """
+        base_out = sys.stdout
+        base_err = sys.stderr
+        temp_out = StringIO()
         code = code[6:-3]
-        exec_command = subprocess.run(code, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        await ctx.send(f"```py\n{exec_command.stdout.read()}\n```")
-        # try:
-        #     await ctx.send(f"```py\n{exec(code)}\n```")
-        # except Exception as e:
-        #     await ctx.send(f"```py\n{e}\n```")
+        try:
+            sys.stdout = sys.stderr = temp_out
+            exec(code)
+            await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
+        finally:
+            sys.stdout = base_out
+            sys.stderr = base_err
 
 
 def setup(bot):
