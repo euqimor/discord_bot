@@ -87,17 +87,15 @@ class OwnerCog:
         """
         code = code[6:-3]
         base_out = sys.stdout
-        base_err = sys.stderr
         temp_out = StringIO()
-        sys.stdout = sys.stderr = temp_out
         try:
+            sys.stdout = temp_out
             exec(code)
             await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
-        except:
-            await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
+        except Exception as e:
+            await ctx.send(f"```py\n{e}\n```")
         finally:
             sys.stdout = base_out
-            sys.stderr = base_err
 
 
 def setup(bot):
