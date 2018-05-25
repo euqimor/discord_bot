@@ -5,8 +5,6 @@ import sys
 from contextlib import closing
 from discord.ext import commands
 from cogs.utils.messages import update_banner
-from discord.utils import get
-from time import sleep
 
 
 class OwnerCog:
@@ -86,13 +84,17 @@ class OwnerCog:
          ```
         """
         code = code[6:-3]
+        success_flag = '✔'
+        failure_flag = '❌'
         base_out = sys.stdout
         temp_out = StringIO()
         try:
             sys.stdout = temp_out
             exec(code)
+            ctx.message.add_reaction(success_flag)
             await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
         except Exception as e:
+            ctx.message.add_reaction(failure_flag)
             await ctx.send(f"```py\n{e}\n```")
         finally:
             sys.stdout = base_out
