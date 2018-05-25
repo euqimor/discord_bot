@@ -85,8 +85,8 @@ class OwnerCog:
          ```
         """
         code = code[6:-3]
-        success_flag = 'U2714'
-        failure_flag = 'U274C'
+        success_flag = '1\u20e3'
+        failure_flag = '2\u20e3'
         base_out = sys.stdout
         temp_out = StringIO()
         try:
