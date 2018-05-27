@@ -92,7 +92,7 @@ class OwnerCog:
             temp_out = StringIO()
             try:
                 sys.stdout = temp_out
-                await exec(code, globals(), locals())
+                exec(code, globals(), locals())
                 await ctx.message.add_reaction(success_flag)
                 await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
             except:
