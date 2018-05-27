@@ -3,6 +3,7 @@ import sqlite3
 import sys
 import traceback
 from io import StringIO
+from textwrap import indent
 from contextlib import closing
 from discord.ext import commands
 from cogs.utils.messages import update_banner
@@ -90,6 +91,17 @@ class OwnerCog:
             failure_flag = '❌'
             base_out = sys.stdout
             temp_out = StringIO()
+
+            env = {
+                'ctx': ctx,
+                'bot': self.bot
+            }
+            to_compile = f"def func():\n{indent(code, '  ')}"
+            try:
+                exec(to_compile, env)
+            except Exception as e:
+                ret =
+
             try:
                 sys.stdout = temp_out
                 exec(code, globals(), locals())
