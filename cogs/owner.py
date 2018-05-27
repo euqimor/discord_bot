@@ -77,7 +77,7 @@ class OwnerCog:
         await ctx.bot.change_presence(activity=discord.Game(status))
         await ctx.send('Status set')
 
-    @commands.command(hidden=True, name=exec)
+    @commands.command(hidden=True, name='exec')
     async def _exec(self, ctx, *, code):
         """
          Executes code presented in a code block of the following format:
