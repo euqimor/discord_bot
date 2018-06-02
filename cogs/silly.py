@@ -5,6 +5,7 @@ import sqlite3
 import aiohttp
 from io import BytesIO
 from discord import File, Embed, Colour
+from random import choice
 
 
 class SillyCog:
@@ -89,7 +90,17 @@ class SillyCog:
         # e.colour = Colour.from_rgb(206, 24, 188)
         # e.title = 'Das a cat.'
         # e.set_image(url=f"attachment://{filename}")
-        await ctx.send(content='Das a cat.', file=cat_file)
+        await ctx.send(file=cat_file)
+
+    @commands.command()
+    async def choose(self, ctx, *options: commands.clean_content):
+        """
+        Chooses one of the options for you.
+        Use quotes for options consisting of multiple words.
+        """
+        answer = choice(options)
+        await ctx.send(answer)
+
 
 def setup(bot):
     bot.add_cog(SillyCog(bot))

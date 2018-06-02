@@ -1,10 +1,12 @@
 import discord
 import sqlite3
-from contextlib import closing
+import sys
+import traceback
+from io import StringIO
+from textwrap import indent
+from contextlib import closing, redirect_stdout
 from discord.ext import commands
 from cogs.utils.messages import update_banner
-from discord.utils import get
-from time import sleep
 
 
 class OwnerCog:
@@ -75,6 +77,48 @@ class OwnerCog:
         status = message.strip()
         await ctx.bot.change_presence(activity=discord.Game(status))
         await ctx.send('Status set')
+
+    @commands.command(hidden=True, name='exec')
+    async def _exec(self, ctx, *, code):
+        """
+         Executes code presented in a code block of the following format:
+         ```py
+         ```
+        """
+        code = code[6:-3]
+        if code != '':
+            success_flag = '✅'
+            failure_flag = '❌'
+            temp_out = StringIO()
+
+            env = {
+                'ctx': ctx,
+                'bot': self.bot
+            }
+            env.update(globals())
+            to_compile = f"async def func():\n{indent(code, '  ')}"
+            try:
+                exec(to_compile, env)
+            except Exception as e:
+                await ctx.message.add_reaction(failure_flag)
+                return await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
+
+            func = env['func']
+            try:
+                with redirect_stdout(temp_out):
+                    ret = await func()
+            except Exception as e:
+                await ctx.message.add_reaction(failure_flag)
+                await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
+            else:
+                value = temp_out.getvalue()
+                await ctx.message.add_reaction(success_flag)
+                if ret is None:
+                    await ctx.send(f"```py\n{value}\n```")
+                else:
+                    await ctx.send(f'```py\n{value}{ret}\n```')
+        else:
+            await ctx.send("The command must be in a code block")
 
 
 def setup(bot):

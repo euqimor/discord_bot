@@ -57,18 +57,20 @@ async def on_ready():
 @bot.event
 async def on_member_update(before, after):
     guild = before.guild
-    role = discord.utils.get(guild.roles, name='Live Queue')
     bot_role = guild.me.top_role
-    if after.activity and after.activity.type.name == 'streaming':
-        if not before.activity or before.activity.type.name != 'streaming':
-            if after.top_role < bot_role:
-                await after.add_roles(role)
-        else:
-            return
-    if before.activity and before.activity.type.name == 'streaming':
-        if not after.activity or after.activity.type.name != 'streaming':
-            if after.top_role < bot_role:
-                await after.remove_roles(role)
+
+    # only add to members that are below us
+    if after.top_role > bot_role:
+        return
+
+    # add or remove streaming role as necessary
+    role = discord.utils.get(guild.roles, name='Live Queue')
+    if after.activity is None or after.activity.type.name != 'streaming':
+        if role in after.roles:
+            await after.remove_roles(role)
+    else:
+        if not role in after.roles:
+            await after.add_roles(role)
 
 
 if __name__ == '__main__':
