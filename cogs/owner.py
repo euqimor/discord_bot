@@ -108,7 +108,8 @@ class OwnerCog:
                     ret = await func()
             except Exception as e:
                 await ctx.message.add_reaction(failure_flag)
-                await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
+                await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
+                # await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
             else:
                 value = temp_out.getvalue()
                 await ctx.message.add_reaction(success_flag)
