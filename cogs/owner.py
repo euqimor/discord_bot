@@ -113,9 +113,9 @@ class OwnerCog:
             else:
                 value = temp_out.getvalue()
                 await ctx.message.add_reaction(success_flag)
-                if ret is None:
+                if ret is None and value:
                     await ctx.send(f"```py\n{value}\n```")
-                else:
+                elif ret:
                     await ctx.send(f'```py\n{value}{ret}\n```')
         else:
             await ctx.send("The command must be in a code block")
