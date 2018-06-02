@@ -106,6 +106,7 @@ class OwnerCog:
             try:
                 with redirect_stdout(temp_out):
                     ret = await func()
+                    await func()
             except Exception as e:
                 await ctx.message.add_reaction(failure_flag)
                 await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
