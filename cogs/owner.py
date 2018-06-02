@@ -4,7 +4,7 @@ import sys
 import traceback
 from io import StringIO
 from textwrap import indent
-from contextlib import closing
+from contextlib import closing, redirect_stdout
 from discord.ext import commands
 from cogs.utils.messages import update_banner
 
@@ -89,7 +89,6 @@ class OwnerCog:
         if code != '':
             success_flag = '✅'
             failure_flag = '❌'
-            base_out = sys.stdout
             temp_out = StringIO()
 
             env = {
@@ -100,19 +99,25 @@ class OwnerCog:
             try:
                 exec(to_compile, env)
             except Exception as e:
-                ret =
-
-            try:
-                sys.stdout = temp_out
-                exec(code, globals(), locals())
-                await ctx.message.add_reaction(success_flag)
-                await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
-            except:
                 await ctx.message.add_reaction(failure_flag)
-                traceback.print_exc(file=temp_out, chain=False)
-                await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
-            finally:
-                sys.stdout = base_out
+                with redirect_stdout(temp_out):
+                    print(f"```py\n{e.__class__.__name__}: {e}\n```")
+
+            func = env['func']
+            try:
+                with redirect_stdout(temp_out):
+                    ret = await func()
+            except Exception as e:
+                await ctx.message.add_reaction(failure_flag)
+                with redirect_stdout(temp_out):
+                    print(f"```py\n{e.__class__.__name__}: {e}\n```")
+            else:
+                value = temp_out.getvalue()
+                await ctx.message.add_reaction(success_flag)
+                if ret is None:
+                    await ctx.send(f"```py\n{value}\n```")
+                else:
+                    await ctx.send(f'```py\n{value}{ret}\n```')
         else:
             await ctx.send("The command must be in a code block")
 
