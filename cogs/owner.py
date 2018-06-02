@@ -107,7 +107,7 @@ class OwnerCog:
             try:
                 with redirect_stdout(temp_out):
                     await ctx.send(f"{func}")
-                    func()
+                    await ctx.send(f"{type(func)}")
                     ret = await func()
             except Exception as e:
                 await ctx.message.add_reaction(failure_flag)
