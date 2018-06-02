@@ -95,6 +95,7 @@ class OwnerCog:
                 'ctx': ctx,
                 'bot': self.bot
             }
+            env.update(globals())
             to_compile = f"async def func():\n{indent(code, '  ')}"
             try:
                 exec(to_compile, env)
@@ -106,7 +107,6 @@ class OwnerCog:
             try:
                 with redirect_stdout(temp_out):
                     ret = await func()
-                    await func()
             except Exception as e:
                 await ctx.message.add_reaction(failure_flag)
                 await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
