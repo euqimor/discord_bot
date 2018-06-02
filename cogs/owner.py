@@ -100,8 +100,7 @@ class OwnerCog:
                 exec(to_compile, env)
             except Exception as e:
                 await ctx.message.add_reaction(failure_flag)
-                with redirect_stdout(temp_out):
-                    print(f"```py\n{e.__class__.__name__}: {e}\n```")
+                await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
 
             func = env['func']
             try:
@@ -109,8 +108,7 @@ class OwnerCog:
                     ret = await func()
             except Exception as e:
                 await ctx.message.add_reaction(failure_flag)
-                with redirect_stdout(temp_out):
-                    print(f"```py\n{e.__class__.__name__}: {e}\n```")
+                await ctx.send(f"```py{temp_out.getvalue()}\n```")
             else:
                 value = temp_out.getvalue()
                 await ctx.message.add_reaction(success_flag)
