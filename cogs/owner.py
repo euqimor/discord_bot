@@ -101,7 +101,7 @@ class OwnerCog:
             except Exception as e:
                 await ctx.message.add_reaction(failure_flag)
                 return await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
-            await ctx.send(f"{env}")
+            await ctx.send(f"{env[:2000]}")
             func = env['func']
             await ctx.send(f"{func}")
             try:
