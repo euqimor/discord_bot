@@ -95,24 +95,20 @@ class OwnerCog:
                 'ctx': ctx,
                 'bot': self.bot
             }
-            to_compile = f"def func():\n{indent(code, '  ')}"
+            to_compile = f"async def func():\n{indent(code, '  ')}"
             try:
                 exec(to_compile, env)
             except Exception as e:
                 await ctx.message.add_reaction(failure_flag)
                 return await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
-            await ctx.send(f"{str(env)[:2000]}")
+
             func = env['func']
-            await ctx.send(f"{func}")
             try:
                 with redirect_stdout(temp_out):
-                    await ctx.send(f"{func}")
-                    await ctx.send(f"{type(func)}")
                     ret = await func()
             except Exception as e:
                 await ctx.message.add_reaction(failure_flag)
                 await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
-                # await ctx.send(f"```py\n{temp_out.getvalue()}\n```")
             else:
                 value = temp_out.getvalue()
                 await ctx.message.add_reaction(success_flag)
