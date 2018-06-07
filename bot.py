@@ -4,7 +4,8 @@ from sys import exit
 from os import environ
 from cogs.utils.db import check_database
 from cogs.utils.misc import add_role_to_streamers, remove_role_from_non_streamers
-
+import random
+import time
 
 description = '''An awkward attempt at making a discord bot'''
 
@@ -31,6 +32,12 @@ class CompanionCube(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=get_prefix, description=description)
         self.db_name = 'cube.db'
+        self.spice = [
+            'Spice? Do you spice?',
+            'Spice? What do you think? Little spice?',
+            'Spice? Spice it? Little spice?'
+        ]
+        self.spice_cooldown_start = 0.0
 
         for extension in initial_extensions:
             try:
@@ -52,6 +59,13 @@ async def on_ready():
     for guild in bot.guilds:
         await add_role_to_streamers(guild)
         await remove_role_from_non_streamers(guild)
+
+
+@bot.event
+async def on_message(message):
+    if 'spice' in message.clean_content.strip('?!,.').split() and (time.time() - bot.spice_cooldown_start) > 60:
+        await message.channel.send(random.choice(bot.spice))
+        bot.spice_cooldown_start = time.time()
 
 
 @bot.event
