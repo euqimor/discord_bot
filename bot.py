@@ -61,11 +61,12 @@ async def on_ready():
         await remove_role_from_non_streamers(guild)
 
 
-# @bot.event
-# async def on_message(message):
-#     if 'spice' in message.clean_content.strip('?!,.').split() and (time.time() - bot.spice_cooldown_start) > 21600:
-#         await message.channel.send(random.choice(bot.spice))
-#         bot.spice_cooldown_start = time.time()
+@bot.event
+async def on_message(message):
+    if 'spice' in message.clean_content.strip('?!,.').split() and (time.time() - bot.spice_cooldown_start) > 21600:
+        await message.channel.send(random.choice(bot.spice))
+        bot.spice_cooldown_start = time.time()
+    await bot.process_commands(message)
 
 
 @bot.event
