@@ -131,7 +131,7 @@ class OwnerCog:
         url = attachment.url
         if filename is None:
             filename = [attachment.filename]
-        if '/' or '\\' in filename:
+        elif '/' or '\\' in filename:
             filename = re.split(r'/|\\', filename)
         dest_full_path = os.path.join(base_path, *filename)
         reaction_msg = await ctx.send(f'Uploading {dest_full_path}\n✅ - OK | ❌ - Cancel')
