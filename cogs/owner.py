@@ -1,6 +1,7 @@
 import discord
 import sqlite3
 import sys
+import os
 import traceback
 from io import StringIO
 from textwrap import indent
@@ -119,6 +120,25 @@ class OwnerCog:
                     await ctx.send(f'```py\n{value}{ret}\n```')
         else:
             await ctx.send("The command must be in a code block")
+
+    @commands.command(hidden=True, name='reload')
+    async def _reload(self, ctx, *, module):
+        """Reloads a module"""
+        try:
+            self.bot.unload_extension(module)
+            self.bot.load_extension(module)
+        except Exception as e:
+            await ctx.send(f'```py\n{traceback.format_exc()}\n```')
+        else:
+            await ctx.message.add_reaction('✅')
+
+    # @commands.command(hidden=True)
+    # async def upload(self, ctx):
+    #     base_path = os.path.abspath(os.path.dirname(__file__))
+    #     attachment = ctx.message.attachments[0]
+    #     url = attachment.url
+    #     filename = attachment.filename
+
 
 
 def setup(bot):
