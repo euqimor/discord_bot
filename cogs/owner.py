@@ -17,25 +17,6 @@ class OwnerCog:
     async def __local_check(self, ctx):
         return await self.bot.is_owner(ctx.author)
 
-    @commands.command(hidden=True)
-    @commands.guild_only()
-    async def status(self, ctx, user: discord.Member):
-        if user.activity:
-            await ctx.send(f'{user.name} is {user.activity.type.name}')
-        else:
-            await ctx.send(f'{user.name}: no activity')
-
-    @commands.command(hidden=True)
-    @commands.guild_only()
-    async def mystatus(self, ctx):
-        user = ctx.message.author
-        await ctx.send(user.activity.type.name) if user.activity else await ctx.send('No activity')
-
-    @commands.command(hidden=True)
-    @commands.guild_only()
-    async def stream(self, ctx):
-        await self.bot.change_presence(activity=discord.Streaming(name="test", url="https://www.twitch.tv/123"))
-
     @commands.command()
     @commands.guild_only()
     async def wipe_user(self, ctx, user_id: str):
@@ -138,7 +119,6 @@ class OwnerCog:
     #     attachment = ctx.message.attachments[0]
     #     url = attachment.url
     #     filename = attachment.filename
-
 
 
 def setup(bot):
