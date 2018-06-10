@@ -132,7 +132,7 @@ class OwnerCog:
         if filename is None:
             filename = [attachment.filename]
         elif '/' or '\\' in filename:
-            filename = re.split(r'/|\\', filename)
+            filename = re.split(r'[/\\]', filename)
         dest_full_path = os.path.join(base_path, *filename)
         reaction_msg = await ctx.send(f'Uploading {dest_full_path}\n✅ - OK | ❌ - Cancel')
         for reaction in ['✅', '❌']:
@@ -141,6 +141,8 @@ class OwnerCog:
             reaction, user = await ctx.bot.wait_for('reaction_add', timeout=60.0, check=check)
         except TimeoutError:
             await ctx.send(f'Timeout, aborting.', delete_after=10)
+            await reaction_msg.delete()
+            await ctx.message.delete()
             return
         try:
             await reaction_msg.clear_reactions()
@@ -158,6 +160,9 @@ class OwnerCog:
             await ctx.send(f'✅ Uploaded {filename[-1]}')
         except Exception as e:
             await ctx.send(f'```py\n{traceback.format_exc()}\n```')
+        finally:
+            await reaction_msg.delete()
+            await ctx.message.delete()
 
 
 def setup(bot):
