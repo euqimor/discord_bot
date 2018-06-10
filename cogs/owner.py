@@ -2,7 +2,10 @@ import discord
 import sqlite3
 import sys
 import os
+import re
 import traceback
+import aiohttp
+from asyncio import TimeoutError
 from io import StringIO
 from textwrap import indent
 from contextlib import closing, redirect_stdout
@@ -113,12 +116,48 @@ class OwnerCog:
         else:
             await ctx.message.add_reaction('✅')
 
-    # @commands.command(hidden=True)
-    # async def upload(self, ctx):
-    #     base_path = os.path.abspath(os.path.dirname(__file__))
-    #     attachment = ctx.message.attachments[0]
-    #     url = attachment.url
-    #     filename = attachment.filename
+    @commands.command(hidden=True)
+    async def upload(self, ctx, filename: str = None):
+        """Uploads a file"""
+        def check(reaction, user):
+            if user.id == ctx.message.author.id and str(reaction.emoji) in ['✅', '❌']:
+                return True
+        try:
+            attachment = ctx.message.attachments[0]
+        except IndexError:
+            await ctx.send('No attachment found', delete_after=15)
+            return
+        base_path = os.path.dirname(os.path.realpath(__file__))
+        url = attachment.url
+        if filename is None:
+            filename = [attachment.filename]
+        if '/' or '\\' in filename:
+            filename = re.split(r'/|\\', filename)
+        dest_full_path = os.path.join(base_path, *filename)
+        reaction_msg = await ctx.send(f'Uploading {dest_full_path}\n✅ - OK | ❌ - Cancel')
+        for reaction in ['✅', '❌']:
+            await reaction_msg.add_reaction(reaction)
+        try:
+            reaction, user = await ctx.bot.wait_for('reaction_add', timeout=60.0, check=check)
+        except TimeoutError:
+            await ctx.send(f'Timeout, aborting.', delete_after=10)
+            return
+        try:
+            await reaction_msg.clear_reactions()
+        except discord.Forbidden:
+            pass
+        try:
+            dest_dir = os.path.dirname(dest_full_path)
+            if not os.path.exists(dest_dir):
+                os.makedirs(dest_dir)
+            with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    content = await resp.read()
+            with open(dest_full_path, 'wb') as f:
+                f.write(content)
+            await ctx.send(f'✅ Uploaded {filename[-1]}')
+        except Exception as e:
+            await ctx.send(f'```py\n{traceback.format_exc()}\n```')
 
 
 def setup(bot):
