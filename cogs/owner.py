@@ -1,7 +1,11 @@
 import discord
 import sqlite3
 import sys
+import os
+import re
 import traceback
+import aiohttp
+from asyncio import TimeoutError
 from io import StringIO
 from textwrap import indent
 from contextlib import closing, redirect_stdout
@@ -15,25 +19,6 @@ class OwnerCog:
 
     async def __local_check(self, ctx):
         return await self.bot.is_owner(ctx.author)
-
-    @commands.command(hidden=True)
-    @commands.guild_only()
-    async def status(self, ctx, user: discord.Member):
-        if user.activity:
-            await ctx.send(f'{user.name} is {user.activity.type.name}')
-        else:
-            await ctx.send(f'{user.name}: no activity')
-
-    @commands.command(hidden=True)
-    @commands.guild_only()
-    async def mystatus(self, ctx):
-        user = ctx.message.author
-        await ctx.send(user.activity.type.name) if user.activity else await ctx.send('No activity')
-
-    @commands.command(hidden=True)
-    @commands.guild_only()
-    async def stream(self, ctx):
-        await self.bot.change_presence(activity=discord.Streaming(name="test", url="https://www.twitch.tv/123"))
 
     @commands.command()
     @commands.guild_only()
@@ -119,6 +104,65 @@ class OwnerCog:
                     await ctx.send(f'```py\n{value}{ret}\n```')
         else:
             await ctx.send("The command must be in a code block")
+
+    @commands.command(hidden=True, name='reload')
+    async def _reload(self, ctx, *, module):
+        """Reloads a module"""
+        try:
+            self.bot.unload_extension(module)
+            self.bot.load_extension(module)
+        except Exception as e:
+            await ctx.send(f'```py\n{traceback.format_exc()}\n```')
+        else:
+            await ctx.message.add_reaction('✅')
+
+    @commands.command(hidden=True)
+    async def upload(self, ctx, filename: str = None):
+        """Uploads a file"""
+        def check(reaction, user):
+            if user.id == ctx.message.author.id and str(reaction.emoji) in ['✅', '❌']:
+                return True
+        try:
+            attachment = ctx.message.attachments[0]
+        except IndexError:
+            await ctx.send('No attachment found', delete_after=15)
+            return
+        base_path = os.path.dirname(os.path.realpath(__file__))
+        url = attachment.url
+        if filename is None:
+            filename = [attachment.filename]
+        elif '/' or '\\' in filename:
+            filename = re.split(r'[/\\]', filename)
+        dest_full_path = os.path.join(base_path, *filename)
+        reaction_msg = await ctx.send(f'Uploading {dest_full_path}\n✅ - OK | ❌ - Cancel')
+        for reaction in ['✅', '❌']:
+            await reaction_msg.add_reaction(reaction)
+        try:
+            reaction, user = await ctx.bot.wait_for('reaction_add', timeout=60.0, check=check)
+        except TimeoutError:
+            await ctx.send(f'Timeout, aborting.', delete_after=10)
+            await reaction_msg.delete()
+            await ctx.message.delete()
+            return
+        try:
+            await reaction_msg.clear_reactions()
+        except discord.Forbidden:
+            pass
+        try:
+            dest_dir = os.path.dirname(dest_full_path)
+            if not os.path.exists(dest_dir):
+                os.makedirs(dest_dir)
+            with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    content = await resp.read()
+            with open(dest_full_path, 'wb') as f:
+                f.write(content)
+            await ctx.send(f'✅ Uploaded {filename[-1]}')
+        except Exception as e:
+            await ctx.send(f'```py\n{traceback.format_exc()}\n```')
+        finally:
+            await reaction_msg.delete()
+            await ctx.message.delete()
 
 
 def setup(bot):
