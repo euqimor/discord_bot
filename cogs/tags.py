@@ -1,5 +1,6 @@
-from contextlib import closing
 import sqlite3
+import difflib
+from contextlib import closing
 from discord.ext import commands
 from cogs.utils.misc import check_admin_rights
 from cogs.utils.db import add_user_to_db_or_pass
@@ -36,9 +37,17 @@ class TagsCog:
                 tag_content = result[0]
                 await ctx.send(tag_content)
             else:
-                await ctx.send('Tag "{}" not found'.format(tag_name))
+                with closing(sqlite3.connect(self.bot.db_name)) as con:
+                    with con:
+                        tags = [x[0] for x in con.execute('SELECT tag_name FROM Tags').fetchall()]
+                matches = difflib.get_close_matches(tag_name, tags, cutoff=0.4)
+                if matches:
+                    matches = '\n'.join(matches)
+                    await ctx.send(f'Tag `{tag_name}` not found, did you mean:\n```\n{matches}\n```')
+                else:
+                    await ctx.send(f'Tag "{tag_name}" not found')
 
-    @tag.command(aliases=['search', 'filter'], name='list')
+    @tag.command(aliases=['search', 'find'], name='list')
     async def _list(self, ctx, *, _filter=''):
         """
         Lists existing tags. By default shows only the tags of the user invoking the command.
