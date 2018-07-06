@@ -19,6 +19,13 @@ TK_PAREN_LEFT = "PAREN_LEFT"
 TK_PAREN_RIGHT = "PAREN_RIGHT"
 TK_DICE = "DICE"
 
+# Rolls dice with a given number of sides and returns the sum
+def roll_dice(num_dice, num_sides):
+    result = 0
+    for i in range(num_dice):
+        result += randint(1, num_sides)
+    return result
+
 # The lexer will create tokens from substrings to feed to
 # the interpreter.
 class Token():
@@ -74,17 +81,10 @@ class Lexer():
             self.advance()
         if is_dice:
             num_sides = int(result)
-            roll = self.roll_dice(num_dice, num_sides)
+            roll = roll_dice(num_dice, num_sides)
             return Token(TK_DICE, (num_dice, num_sides, roll))
         else:
             return Token(TK_INT, int(result))
-
-    # Rolls dice with a given number of sides and returns the sum
-    def roll_dice(self, num_dice, num_sides):
-        result = 0
-        for i in range(num_dice):
-            result += randint(1, num_sides)
-        return result
 
     # This is used for outputting the dice rolls with some flair
     def append_fancy_string(self, string):
@@ -219,6 +219,23 @@ class DiceCog:
     @commands.command()
     async def dice_test(self, ctx):
         print("Dice test!")
+
+    # Uses the 4d6 drop the lowest method to generate a stat array for a Dungeons and Dragons 5e character
+    @commands.command()
+    async def roll_stats(self, context):
+        stat_rolls = []
+        NUM_STATS = 6
+        DICE_PER_STAT = 4
+        DICE_SIDES = 6
+        for i in range(NUM_STATS):
+            rolls = []
+            for j in range(DICE_PER_STAT):
+                rolls.append(roll_dice(1, DICE_SIDES))
+            rolls.remove(min(rolls))
+            stat_rolls.append(sum(rolls))
+        await context.send(
+            ":game_die: Rolling stats!\nResult: {}, {}, {}, {}, {}, {}".format(*stat_rolls)
+        )
 
 def setup(bot):
     bot.add_cog(DiceCog(bot))
