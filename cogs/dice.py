@@ -90,7 +90,7 @@ class Lexer():
                 if token.type == TK_INT:
                     self.append_fancy_string(token.value)
                 elif token.type == TK_DICE:
-                    self.append_fancy_string("[{}:game_die:]".format(token.value[2]))
+                    self.append_fancy_string("[{}]".format(token.value[2]))
                 return token
             if self.current_character == "+":
                 self.append_fancy_string("+")
@@ -192,7 +192,7 @@ class DiceCog:
         lexer = Lexer(roll_string)
         interpreter = Interpreter(lexer)
         result = interpreter.parse()
-        await context.send("Rolled: {}\nResult: {}".format(lexer.fancy_string, result))
+        await context.send(":game_die: Rolling: {}\nResult: {}".format(lexer.fancy_string, result))
 
     # This is just a test command to see if the cog is working.
     @commands.command()
