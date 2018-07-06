@@ -1,7 +1,14 @@
+# This is a dice rolling cog for a Discord bot. It supports all basic mathematical operations:
+# addition, subtraction, multiplication, division, and parentheses. It also includes support for
+# dice rolls. E.g. "1d20+6"
+# Author: ryanalexanderhughes@gmail.com
+# Based on: https://ruslanspivak.com/lsbasi-part1/ by Ryslan Spivak
+
 from discord.ext import commands
-import re
 from random import randint
 
+# TOKEN ENUM
+# Note: could use a class or enum library but this is dead simple.
 TK_INT = "INT"
 TK_PLUS = "PLUS"
 TK_EOF = "EOF"
@@ -12,6 +19,8 @@ TK_PAREN_LEFT = "PAREN_LEFT"
 TK_PAREN_RIGHT = "PAREN_RIGHT"
 TK_DICE = "DICE"
 
+# The lexer will create tokens from substrings to feed to
+# the interpreter.
 class Token():
     def __init__(self, token_type, value):
         self.type = token_type
@@ -32,6 +41,7 @@ class Lexer():
     def error(self):
         raise Exception("Lexer error.")
 
+    # Advances the lexer to the next character
     def advance(self):
         self.pos += 1
         if self.pos > len(self.text) - 1:
@@ -41,10 +51,9 @@ class Lexer():
 
     def skip_whitespace(self):
         while self.current_character is not None and self.current_character.isspace():
-            # Preserve whitespace?
-            # self.append_fancy_string(self.current_character)
             self.advance()
 
+    # Determines whether a substring is suitable for either an integer or a dice token
     def integer_or_dice(self):
         result = ""
         is_dice = False
@@ -70,15 +79,19 @@ class Lexer():
         else:
             return Token(TK_INT, int(result))
 
+    # Rolls dice with a given number of sides and returns the sum
     def roll_dice(self, num_dice, num_sides):
         result = 0
         for i in range(num_dice):
             result += randint(1, num_sides)
         return result
 
+    # This is used for outputting the dice rolls with some flair
     def append_fancy_string(self, string):
         self.fancy_string += str(string)
 
+    # Grabs the next token in the string. This acts greedily and will try to
+    # match the largest substring where possible (e.g. ints)
     def get_next_token(self):
         while self.current_character is not None:
             # print("Current character: " + str(self.current_character))
@@ -119,6 +132,9 @@ class Lexer():
             self.error()
         return Token(TK_EOF, None)
 
+# The interpreter relies on a lexer to convert a string into tokens, then evaluates 
+# those tokens to return a result. If the token list is ungrammatical, an exception will 
+# be thrown.
 class Interpreter():
     def __init__(self, lexer):
         self.lexer = lexer
@@ -127,6 +143,7 @@ class Interpreter():
     def error(self):
         raise Exception("Invalid syntax.")
 
+    # Consumes a token of a given type, advancing the lexer
     def eat(self, token_type):
         if self.current_token.type == token_type:
             #print(self.current_token)
@@ -138,8 +155,10 @@ class Interpreter():
     def parse(self):
         return self.expr()
 
+    # Evaluates an expression
     def expr(self):
         result = self.term()
+        # Handles addition and subtraction tokens
         while self.current_token.type in (TK_PLUS, TK_MINUS):
             if self.current_token.type == TK_PLUS:
                 self.eat(TK_PLUS)
@@ -151,6 +170,7 @@ class Interpreter():
 
     def term(self):
         result = self.factor()
+        # Handles multiplication and division tokens
         while self.current_token.type in (TK_MULTIPLY, TK_DIVIDE):
             if self.current_token.type == TK_MULTIPLY:
                 self.eat(TK_MULTIPLY)
@@ -161,6 +181,7 @@ class Interpreter():
         return result
 
     def factor(self):
+        # Handles parenthesis, int, and dice tokens
         if self.current_token.type == TK_PAREN_LEFT:
             self.paren_left()
             result = self.expr()
@@ -188,7 +209,7 @@ class DiceCog:
     # The result is sent as a message in response to the command.
     @commands.command()
     async def roll(self, context, *args):
-        roll_string = " ".join(args)
+        roll_string = "".join(args)
         lexer = Lexer(roll_string)
         interpreter = Interpreter(lexer)
         result = interpreter.parse()
