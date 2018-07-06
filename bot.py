@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from sys import exit
-from os import environ
+from os import environ, path
 from cogs.utils.db import check_database
 from cogs.utils.misc import add_role_to_streamers, remove_role_from_non_streamers
 import random
@@ -15,7 +15,8 @@ initial_extensions = ['cogs.suggestions',
                       'cogs.dictionaries',
                       'cogs.silly',
                       'cogs.admin',
-                      'cogs.owner']
+                      'cogs.owner',
+                      'cogs.dice']
 
 
 def get_prefix(_bot, message):
@@ -87,9 +88,15 @@ async def on_member_update(before, after):
         if not role in after.roles:
             await after.add_roles(role)
 
-
 if __name__ == '__main__':
     if check_database(bot.db_name):
-        bot.run(environ['BOT_PROD'])
+        if path.exists("secret.txt"):
+            with open("secret.txt") as f:
+                print("Reading secret from local file.")
+                secret_key = f.read()
+        else:
+            print("Reading secret from environment variable.")
+            secret_key = environ['BOT_PROD']
+        bot.run(secret_key)
     else:
         exit(1)
