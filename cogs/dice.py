@@ -90,7 +90,7 @@ class Lexer():
                 if token.type == TK_INT:
                     self.append_fancy_string(token.value)
                 elif token.type == TK_DICE:
-                    self.append_fancy_string("[{}]".format(token.value[2]))
+                    self.append_fancy_string("[{}:game_die:]".format(token.value[2]))
                 return token
             if self.current_character == "+":
                 self.append_fancy_string("+")
@@ -187,7 +187,8 @@ class DiceCog:
     # E.g. roll 1d20 + 3
     # The result is sent as a message in response to the command.
     @commands.command()
-    async def roll(self, context, roll_string):
+    async def roll(self, context, *args):
+        roll_string = " ".join(args)
         lexer = Lexer(roll_string)
         interpreter = Interpreter(lexer)
         result = interpreter.parse()
