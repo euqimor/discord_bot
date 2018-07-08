@@ -90,6 +90,7 @@ class TwitterCog:
         with open("twitter.txt", 'r+') as f:
             secrets = f.read().splitlines()
             secrets[line_number] = value
+            f.seek(0)
             f.write('\n'.join(secrets))
 
     @commands.group(invoke_without_command=True, aliases=['twitter'])
