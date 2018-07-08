@@ -82,7 +82,7 @@ class TwitterCog:
         return posts
 
     # Helper method to save settings
-    def save_settings(self, value, line_number):
+    def save_settings(self, value: str, line_number: int):
         """
         replaces line `line_number` with `value` in twitter.txt
         the first line is line_number 0
