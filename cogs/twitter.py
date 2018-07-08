@@ -26,6 +26,7 @@ class TwitterCog:
         self.last_posted_tweet_time = 0
         self.TEXT_CHANNEL_ID = 0
         self.TWITTER_ACCOUNT_NAME = ""
+        self.twitter_task = None
 
     # Cog setup
     async def on_ready(self):
@@ -50,7 +51,7 @@ class TwitterCog:
             self.last_posted_tweet_time = tweets[-1].created_at_in_seconds
         print("Running TwitterCog loop.")
         # This starts the asyc loop for checking and posting tweets
-        self.bot.loop.create_task(
+        self.twitter_task = self.bot.loop.create_task(
             self.post_tweets()
         )
 
@@ -77,6 +78,18 @@ class TwitterCog:
         posts = self.api.GetUserTimeline(screen_name=self.TWITTER_ACCOUNT_NAME)
         posts.reverse()
         return posts
+
+    @commands.group(invoke_without_command=True, aliases=['twitter'])
+    async def _twitter(self, ctx):
+        await ctx.channel.send(f'Twitter account: {self.TWITTER_ACCOUNT_NAME}\nPosting to: {self.bot.get_channel(self.TEXT_CHANNEL_ID)}')
+
+    @_twitter.command()
+    async def channel(self, ctx, channel_id):
+        self.TEXT_CHANNEL_ID = int(channel_id)
+        self.twitter_task.cancel()
+        self.twitter_task = self.bot.loop.create_task(self.post_tweets())
+        await ctx.channel.send(f'Tweet channel set to {self.bot.get_channel(self.TEXT_CHANNEL_ID)}')
+
 
 def setup(bot):
     try:
