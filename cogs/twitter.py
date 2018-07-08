@@ -96,7 +96,8 @@ class TwitterCog:
     @commands.group(invoke_without_command=True, aliases=['twitter'])
     async def _twitter(self, ctx):
         """
-        Show current twitter settings, change settings with subcommands (see $help twitter)
+        Show/change current twitter settings, see $help twitter
+        `$twitter` with no arguments shows current settings
         """
         await ctx.channel.send(f'Twitter account: {self.TWITTER_ACCOUNT_NAME}\nPosting to: {self.bot.get_channel(self.TEXT_CHANNEL_ID)}')
 
