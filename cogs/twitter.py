@@ -87,7 +87,7 @@ class TwitterCog:
         replaces line `line_number` with `value` in twitter.txt
         the first line is line_number 0
         """
-        with open("twitter.txt", 'rw') as f:
+        with open("twitter.txt", 'r+') as f:
             secrets = f.read().splitlines()
             secrets[line_number] = value
             f.write('\n'.join(secrets))
