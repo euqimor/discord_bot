@@ -40,6 +40,7 @@ class CompanionCube(commands.Bot):
             'Spice? Spice it? Little spice?'
         ]
         self.spice_cooldown_start = 0.0
+        self.run_twitter_loop = True
 
         for extension in initial_extensions:
             try:
@@ -97,7 +98,7 @@ if __name__ == '__main__':
                 secret_key = f.read()
         else:
             print("Reading secret from environment variable.")
-            secret_key = environ['BOT_PROD']
+            secret_key = environ['BOT_TEST']
         bot.run(secret_key)
     else:
         exit(1)

@@ -57,7 +57,7 @@ class TwitterCog:
     # Post tweets to the provided Discord channel. The loop runs every 30 seconds.
     async def post_tweets(self):
         text_channel = self.bot.get_channel(self.TEXT_CHANNEL_ID)
-        while True:
+        while self.bot.run_twitter_loop:
             tweets = await self.get_tweets()
             for tweet in tweets:
                 if tweet.created_at_in_seconds > self.last_posted_tweet_time:
@@ -69,6 +69,8 @@ class TwitterCog:
                         )
                     )
             await asyncio.sleep(30)
+        print('Stopping TwitterCog loop, reverting bot.run_twitter_loop back to True')
+        self.bot.run_twitter_loop = True
     
     # Return a list of tweets, oldest to newest
     async def get_tweets(self):
