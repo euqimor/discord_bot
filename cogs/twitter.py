@@ -99,7 +99,7 @@ class TwitterCog:
         Show/change current twitter settings, see $help twitter
         `$twitter` with no arguments shows current settings
         """
-        await ctx.channel.send(f'Twitter account: {self.TWITTER_ACCOUNT_NAME}\nPosting to: <#{self.TEXT_CHANNEL_ID}>')
+        await ctx.channel.send(f'Twitter account: `@{self.TWITTER_ACCOUNT_NAME}`\nPosting to: <#{self.TEXT_CHANNEL_ID}>')
 
     @_twitter.command()
     async def channel(self, ctx, channel_id):
