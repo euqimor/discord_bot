@@ -108,8 +108,8 @@ class TwitterCog:
         or
         $twitter channel 337724971348525057
         """
-        channel_id = int(channel_id.strip('<#>'))
-        self.TEXT_CHANNEL_ID = channel_id
+        channel_id = channel_id.strip('<#>')
+        self.TEXT_CHANNEL_ID = int(channel_id)
         self.twitter_task.cancel()
         self.twitter_task = self.bot.loop.create_task(self.post_tweets())
         self.save_settings(channel_id, 1)
