@@ -33,7 +33,7 @@ class TwitterCog:
         with open("twitter.txt") as f:
             secrets = f.read().splitlines()
             self.TWITTER_ACCOUNT_NAME = secrets[0]
-            self.TEXT_CHANNEL_ID = secrets[1]
+            self.TEXT_CHANNEL_ID = int(secrets[1])
             self.api = twitter.Api(
                 consumer_key=secrets[2],
                 consumer_secret=secrets[3],
