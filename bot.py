@@ -40,7 +40,6 @@ class CompanionCube(commands.Bot):
             'Spice? Spice it? Little spice?'
         ]
         self.spice_cooldown_start = 0.0
-        self.run_twitter_loop = True
 
         for extension in initial_extensions:
             try:

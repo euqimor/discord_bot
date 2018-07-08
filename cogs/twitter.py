@@ -28,6 +28,10 @@ class TwitterCog:
         self.TWITTER_ACCOUNT_NAME = ""
         self.twitter_task = None
 
+    # Make cog commands only available to admins
+    async def __local_check(self, ctx):
+        return await self.bot.is_owner(ctx.author) or ctx.author.guild_permissions.administrator
+
     # Cog setup
     async def on_ready(self):
         print("Reading from twitter.txt.")
@@ -58,7 +62,7 @@ class TwitterCog:
     # Post tweets to the provided Discord channel. The loop runs every 30 seconds.
     async def post_tweets(self):
         text_channel = self.bot.get_channel(self.TEXT_CHANNEL_ID)
-        while self.bot.run_twitter_loop:
+        while True:
             tweets = await self.get_tweets()
             for tweet in tweets:
                 if tweet.created_at_in_seconds > self.last_posted_tweet_time:
@@ -70,8 +74,6 @@ class TwitterCog:
                         )
                     )
             await asyncio.sleep(30)
-        print('Stopping TwitterCog loop, reverting bot.run_twitter_loop back to True')
-        self.bot.run_twitter_loop = True
     
     # Return a list of tweets, oldest to newest
     async def get_tweets(self):
@@ -79,16 +81,55 @@ class TwitterCog:
         posts.reverse()
         return posts
 
+    # Helper method to save settings
+    def save_settings(self, value, line_number):
+        """
+        replaces line `line_number` with `value` in twitter.txt
+        the first line is line_number 0
+        """
+        with open("twitter.txt", 'w') as f:
+            secrets = f.read().splitlines()
+            secrets[line_number] = value
+            f.write('\n'.join(secrets))
+
     @commands.group(invoke_without_command=True, aliases=['twitter'])
     async def _twitter(self, ctx):
+        """
+        Show current twitter settings, change settings with subcommands (see $help twitter)
+        """
         await ctx.channel.send(f'Twitter account: {self.TWITTER_ACCOUNT_NAME}\nPosting to: {self.bot.get_channel(self.TEXT_CHANNEL_ID)}')
 
     @_twitter.command()
     async def channel(self, ctx, channel_id):
-        self.TEXT_CHANNEL_ID = int(channel_id)
+        """
+        Set to which channel to post tweets, accepts #channel or numeric channel id
+        Usage examples:
+        $twitter channel #general
+        or
+        $twitter channel 337724971348525057
+        """
+        channel_id = int(channel_id.strip('<#>'))
+        self.TEXT_CHANNEL_ID = channel_id
         self.twitter_task.cancel()
         self.twitter_task = self.bot.loop.create_task(self.post_tweets())
-        await ctx.channel.send(f'Tweet channel set to {self.bot.get_channel(self.TEXT_CHANNEL_ID)}')
+        self.save_settings(channel_id, 1)
+        await ctx.channel.send(f'Tweet channel set to #{self.bot.get_channel(self.TEXT_CHANNEL_ID)}')
+
+    @_twitter.command()
+    async def account(self, ctx, account_name):
+        """
+        Set which twitter account to track
+        Usage examples:
+        $twitter account @broccoligamedev
+        or
+        $twitter account broccoligamedev
+        """
+        account_name = account_name.strip('@')
+        self.TWITTER_ACCOUNT_NAME = account_name
+        self.twitter_task.cancel()
+        self.twitter_task = self.bot.loop.create_task(self.post_tweets())
+        self.save_settings(account_name, 0)
+        await ctx.channel.send(f'Tracking twitter account `@{self.TWITTER_ACCOUNT_NAME}`')
 
 
 def setup(bot):
