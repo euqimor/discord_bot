@@ -26,6 +26,11 @@ class TwitterCog:
         self.last_posted_tweet_time = 0
         self.TEXT_CHANNEL_ID = 0
         self.TWITTER_ACCOUNT_NAME = ""
+        self.twitter_task = None
+
+    # Make cog commands only available to admins
+    async def __local_check(self, ctx):
+        return await self.bot.is_owner(ctx.author) or ctx.author.guild_permissions.administrator
 
     # Cog setup
     async def on_ready(self):
@@ -50,7 +55,7 @@ class TwitterCog:
             self.last_posted_tweet_time = tweets[-1].created_at_in_seconds
         print("Running TwitterCog loop.")
         # This starts the asyc loop for checking and posting tweets
-        self.bot.loop.create_task(
+        self.twitter_task = self.bot.loop.create_task(
             self.post_tweets()
         )
 
@@ -75,6 +80,59 @@ class TwitterCog:
         posts = self.api.GetUserTimeline(screen_name=self.TWITTER_ACCOUNT_NAME)
         posts.reverse()
         return posts
+
+    # Helper method to save settings
+    def save_settings(self, value: str, line_number: int):
+        """
+        replaces line `line_number` with `value` in twitter.txt
+        the first line is line_number 0
+        """
+        with open("twitter.txt", 'r+') as f:
+            secrets = f.read().splitlines()
+            secrets[line_number] = value
+            f.seek(0)
+            f.write('\n'.join(secrets)+'\n')
+
+    @commands.group(invoke_without_command=True, aliases=['twitter'])
+    async def _twitter(self, ctx):
+        """
+        Show/change current twitter settings, see $help twitter
+        `$twitter` with no arguments shows current settings
+        """
+        await ctx.channel.send(f'Twitter account: `@{self.TWITTER_ACCOUNT_NAME}`\n\nPosting to: <#{self.TEXT_CHANNEL_ID}>')
+
+    @_twitter.command()
+    async def channel(self, ctx, channel_id):
+        """
+        Set to which channel to post tweets, accepts #channel or numeric channel id
+        Usage examples:
+        $twitter channel #general
+        or
+        $twitter channel 337724971348525057
+        """
+        channel_id = channel_id.strip('<#>')
+        self.TEXT_CHANNEL_ID = int(channel_id)
+        self.twitter_task.cancel()
+        self.twitter_task = self.bot.loop.create_task(self.post_tweets())
+        self.save_settings(channel_id, 1)
+        await ctx.channel.send(f'Tweet channel set to <#{self.TEXT_CHANNEL_ID}>')
+
+    @_twitter.command()
+    async def account(self, ctx, account_name):
+        """
+        Set which twitter account to track
+        Usage examples:
+        $twitter account @broccoligamedev
+        or
+        $twitter account broccoligamedev
+        """
+        account_name = account_name.strip('@')
+        self.TWITTER_ACCOUNT_NAME = account_name
+        self.twitter_task.cancel()
+        self.twitter_task = self.bot.loop.create_task(self.post_tweets())
+        self.save_settings(account_name, 0)
+        await ctx.channel.send(f'Tracking twitter account `@{self.TWITTER_ACCOUNT_NAME}`')
+
 
 def setup(bot):
     try:
