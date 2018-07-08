@@ -12,6 +12,7 @@ description = '''An awkward attempt at making a discord bot'''
 
 initial_extensions = ['cogs.suggestions',
                       'cogs.tags',
+                      'cogs.twitter',
                       'cogs.dictionaries',
                       'cogs.silly',
                       'cogs.admin',
