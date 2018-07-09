@@ -1,4 +1,5 @@
 from discord.utils import get
+import yaml
 
 
 async def check_admin_rights(ctx):
@@ -32,3 +33,11 @@ async def remove_role_from_non_streamers(guild):
         if not member.activity or (member.activity and member.activity.type.name != 'streaming'):
             if member.top_role < guild.me.top_role:
               await member.remove_roles(role)
+
+
+async def save_to_config(variable_name, variable_value):
+    with open('config.yaml', 'r+') as f:
+        config = yaml.load(f)
+        config[variable_name] = variable_value
+        f.seek(0)
+        yaml.dump(config, f, default_flow_style=False)

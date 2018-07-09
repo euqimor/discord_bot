@@ -1,5 +1,4 @@
 import requests
-import os
 from discord.ext import commands
 from discord import Embed, Colour
 from string import ascii_lowercase as alphabet
@@ -18,7 +17,7 @@ class DictionariesCog:
         """Queries Merriam-Webster's Collegiate Dictionary for a word definition. Well, tries to at least..."""
         word = ' '.join(word.split())
         # try:
-        query_result = self.query_merriam(word, os.environ['MERRIAM'])
+        query_result = self.query_merriam(word, self.bot.config["merriam_webster_key"])
         cases = query_result  # the word may have changed if you queried for the past tense for example
         # except:
         #     await ctx.send('Something went wrong during online query')
@@ -44,8 +43,8 @@ class DictionariesCog:
     async def oxford(self, ctx, *, word: str):
         """Query Oxford Dictionary for a word definition."""
         word = ' '.join(word.split())
-        app_id = os.environ['OXFORD_APP_ID']
-        app_key = os.environ['OXFORD_APP_KEY']
+        app_id = self.bot.config["oxford_app_id"]
+        app_key = self.bot.config["oxford_app_key"]
         json_data = self.query_oxford(word, app_id, app_key)
         code = json_data[1]
         if code == 0:

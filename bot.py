@@ -96,9 +96,10 @@ if __name__ == '__main__':
                 print("Reading from config file.")
                 bot.config = yaml.load(f)
                 secret_key = bot.config["discord_token"]
+                bot.run(secret_key)
         else:
-            print("Reading secret from environment variable.")
-            secret_key = environ['BOT_TEST']
-        bot.run(secret_key)
+            print("Config file not found, terminating.")
+            exit(1)
     else:
+        print("Database connection failed, terminating.")
         exit(1)

@@ -5,6 +5,8 @@
 from discord.ext import commands
 import asyncio
 import twitter
+from cogs.utils.misc import save_to_config
+
 
 class TwitterCog:
     def __init__(self, bot):
@@ -98,7 +100,7 @@ class TwitterCog:
         self.text_channel_id = int(channel_id)
         self.twitter_task.cancel()
         self.twitter_task = self.bot.loop.create_task(self.post_tweets())
-        self.save_settings(channel_id, 1)
+        save_to_config('twitter_text_channel_id', channel_id)
         await ctx.channel.send(f'Tweet channel set to <#{self.text_channel_id}>')
 
     @_twitter.command()
@@ -114,7 +116,7 @@ class TwitterCog:
         self.twitter_account_name = account_name
         self.twitter_task.cancel()
         self.twitter_task = self.bot.loop.create_task(self.post_tweets())
-        self.save_settings(account_name, 0)
+        save_to_config('twitter_account_name', account_name)
         await ctx.channel.send(f'Tracking twitter account `@{self.twitter_account_name}`')
 
 def setup(bot):
