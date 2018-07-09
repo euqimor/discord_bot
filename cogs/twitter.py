@@ -93,7 +93,7 @@ class TwitterCog:
             f.seek(0)
             f.write('\n'.join(secrets)+'\n')
 
-    @commands.group(invoke_without_command=True, aliases=['twitter'])
+    @commands.group(invoke_without_command=True, name='twitter')
     async def _twitter(self, ctx):
         """
         Show/change current twitter settings, see $help twitter
