@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from sys import exit
-from os import environ, path
+from os import path
 from cogs.utils.db import check_database
 from cogs.utils.misc import add_role_to_streamers, remove_role_from_non_streamers
 import random
