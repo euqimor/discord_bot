@@ -100,6 +100,42 @@ class SillyCog:
         """
         answer = choice(options)
         await ctx.send(answer)
+    
+    @commands.command(name='8ball')
+    async def ball(self, ctx):
+        """
+        Ask the 8ball a question.
+        """
+        options = [
+            "Signs point to yes.",
+            "Yes.",
+            "Reply hazy, try again.",
+            "Without a doubt.",
+            "My sources say no.",
+            "As I see it, yes.",
+            "You may rely on it.",
+            "Concentrate and ask again.",
+            "Outlook not so good.",
+            "It is decidedly so.",
+            "Very doubtful.",
+            "Yes - definitely.",
+            "It is certain.",
+            "Cannot predict now.",
+            "Most likely.",
+            "Ask again later.",
+            "My reply is no.",
+            "Outlook good.",
+            "Don't count on it.",
+            "Definitely not.",
+            "I have my doubts.",
+            "Outlook so so.",
+            "Who knows?",
+            "Are you kidding?",
+            "Don't bet on it.",
+            "Forget about it.",
+            ]
+        answer = choice(options)
+        await ctx.channel.send(answer)
 
 
 def setup(bot):
