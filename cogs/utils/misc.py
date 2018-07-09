@@ -35,7 +35,7 @@ async def remove_role_from_non_streamers(guild):
               await member.remove_roles(role)
 
 
-async def save_to_config(variable_name, variable_value):
+def save_to_config(variable_name, variable_value):
     with open('config.yaml', 'r+') as f:
         config = yaml.load(f)
         config[variable_name] = variable_value
