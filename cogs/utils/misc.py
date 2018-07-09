@@ -40,4 +40,5 @@ def save_to_config(variable_name, variable_value):
         config = yaml.load(f)
         config[variable_name] = variable_value
         f.truncate(0)
+        f.seek(0)
         yaml.dump(config, f, default_flow_style=False)
