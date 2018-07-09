@@ -1,5 +1,4 @@
-secret.txt
-twitter.txt
+config.yaml
 cogs/__pycache__
 cogs/utils/__pycache__
 cube.db
