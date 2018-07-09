@@ -6,6 +6,7 @@ from cogs.utils.db import check_database
 from cogs.utils.misc import add_role_to_streamers, remove_role_from_non_streamers
 import random
 import time
+import yaml
 
 description = '''An awkward attempt at making a discord bot'''
 
@@ -33,6 +34,7 @@ def get_prefix(_bot, message):
 class CompanionCube(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=get_prefix, description=description)
+        self.config = {}
         self.db_name = 'cube.db'
         self.spice = [
             'Spice? Do you spice?',
@@ -45,7 +47,7 @@ class CompanionCube(commands.Bot):
             try:
                 self.load_extension(extension)
             except Exception as e:
-                print(f'Failed to load extension {extension}.')
+                print(f'Failed to load extension {extension}.\nException: {e}')
 
 
 bot = CompanionCube()
@@ -53,9 +55,7 @@ bot = CompanionCube()
 
 @bot.event
 async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
+    print(f'Logged in as: {bot.user.name} ({bot.user.id})')
     print('------')
     await bot.change_presence(activity=discord.Game('with turrets'))
     for guild in bot.guilds:
@@ -91,10 +91,11 @@ async def on_member_update(before, after):
 
 if __name__ == '__main__':
     if check_database(bot.db_name):
-        if path.exists("secret.txt"):
-            with open("secret.txt") as f:
-                print("Reading secret from local file.")
-                secret_key = f.read()
+        if path.exists("config.yaml"):
+            with open("config.yaml") as f:
+                print("Reading from config file.")
+                bot.config = yaml.load(f)
+                secret_key = bot.config["discord_token"]
         else:
             print("Reading secret from environment variable.")
             secret_key = environ['BOT_TEST']

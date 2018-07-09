@@ -2,19 +2,6 @@
 # posts them to a channel in the Discord server.
 # Author: ryanalexanderhughes@gmail.com (@broccoligamedev)
 
-# --- NOTES ON SETUP ---
-# The cog is going to look for a file called "twitter.txt" for the info it needs to function.
-# The file should contain the following, in order, on separate lines:
-#
-# 1. The name of the Twitter account you want to watch. e.g. "broccoligamedev"
-# 2. The ID of the Discord channel you want to post tweets to.
-# 3. The Twitter app consumer key.
-# 4. The Twitter app consumer secret.
-# 5. The Twitter app access token key.
-# 6. The Twitter app access token secret.
-#
-# ----------------------
-
 from discord.ext import commands
 import asyncio
 import twitter
@@ -24,8 +11,8 @@ class TwitterCog:
         self.api = None
         self.bot = bot
         self.last_posted_tweet_time = 0
-        self.TEXT_CHANNEL_ID = 0
-        self.TWITTER_ACCOUNT_NAME = ""
+        self.text_channel_id = 0
+        self.twitter_account_name = ""
         self.twitter_task = None
 
     # Make cog commands only available to admins
@@ -34,18 +21,15 @@ class TwitterCog:
 
     # Cog setup
     async def on_ready(self):
-        print("Reading from twitter.txt.")
-        with open("twitter.txt") as f:
-            secrets = f.read().splitlines()
-            self.TWITTER_ACCOUNT_NAME = secrets[0]
-            self.TEXT_CHANNEL_ID = int(secrets[1])
-            self.api = twitter.Api(
-                consumer_key=secrets[2],
-                consumer_secret=secrets[3],
-                access_token_key=secrets[4],
-                access_token_secret=secrets[5]
-            )
-        print("Ok.")
+        print("Initializing TwitterCog.")
+        self.twitter_account_name = self.bot.config["twitter_account_name"]
+        self.text_channel_id = self.bot.config["twitter_text_channel_id"]
+        self.api = twitter.Api(
+            consumer_key=self.bot.config["twitter_consumer_key"],
+            consumer_secret=self.bot.config["twitter_consumer_secret"],
+            access_token_key=self.bot.config["twitter_access_token"],
+            access_token_secret=self.bot.config["twitter_access_secret"]
+        )
         # Check the current timeline so we only post new tweets.
         # Note: If the bot goes down, it could miss tweets. In practice, this isn't a big deal
         # but it could be improved by using the database so the bot remembers which tweets it's 
@@ -61,7 +45,7 @@ class TwitterCog:
 
     # Post tweets to the provided Discord channel. The loop runs every 30 seconds.
     async def post_tweets(self):
-        text_channel = self.bot.get_channel(self.TEXT_CHANNEL_ID)
+        text_channel = self.bot.get_channel(self.text_channel_id)
         while True:
             tweets = await self.get_tweets()
             for tweet in tweets:
@@ -77,7 +61,7 @@ class TwitterCog:
     
     # Return a list of tweets, oldest to newest
     async def get_tweets(self):
-        posts = self.api.GetUserTimeline(screen_name=self.TWITTER_ACCOUNT_NAME)
+        posts = self.api.GetUserTimeline(screen_name=self.twitter_account_name)
         posts.reverse()
         return posts
 
@@ -93,13 +77,13 @@ class TwitterCog:
             f.seek(0)
             f.write('\n'.join(secrets)+'\n')
 
-    @commands.group(invoke_without_command=True, aliases=['twitter'])
+    @commands.group(invoke_without_command=True, name='twitter')
     async def _twitter(self, ctx):
         """
         Show/change current twitter settings, see $help twitter
         `$twitter` with no arguments shows current settings
         """
-        await ctx.channel.send(f'Twitter account: `@{self.TWITTER_ACCOUNT_NAME}`\n\nPosting to: <#{self.TEXT_CHANNEL_ID}>')
+        await ctx.channel.send(f'Twitter account: `@{self.twitter_account_name}`\n\nPosting to: <#{self.text_channel_id}>')
 
     @_twitter.command()
     async def channel(self, ctx, channel_id):
@@ -111,11 +95,11 @@ class TwitterCog:
         $twitter channel 337724971348525057
         """
         channel_id = channel_id.strip('<#>')
-        self.TEXT_CHANNEL_ID = int(channel_id)
+        self.text_channel_id = int(channel_id)
         self.twitter_task.cancel()
         self.twitter_task = self.bot.loop.create_task(self.post_tweets())
         self.save_settings(channel_id, 1)
-        await ctx.channel.send(f'Tweet channel set to <#{self.TEXT_CHANNEL_ID}>')
+        await ctx.channel.send(f'Tweet channel set to <#{self.text_channel_id}>')
 
     @_twitter.command()
     async def account(self, ctx, account_name):
@@ -127,12 +111,11 @@ class TwitterCog:
         $twitter account broccoligamedev
         """
         account_name = account_name.strip('@')
-        self.TWITTER_ACCOUNT_NAME = account_name
+        self.twitter_account_name = account_name
         self.twitter_task.cancel()
         self.twitter_task = self.bot.loop.create_task(self.post_tweets())
         self.save_settings(account_name, 0)
-        await ctx.channel.send(f'Tracking twitter account `@{self.TWITTER_ACCOUNT_NAME}`')
-
+        await ctx.channel.send(f'Tracking twitter account `@{self.twitter_account_name}`')
 
 def setup(bot):
     try:
