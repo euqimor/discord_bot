@@ -65,7 +65,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if 'spice' in message.clean_content.strip('?!,.').split() and (time.time() - bot.spice_cooldown_start) > 21600:
+    if 'spice' in message.clean_content.strip('?!,.*').split() and (time.time() - bot.spice_cooldown_start) > 21600:
         bot.spice_cooldown_start = time.time()
         await message.channel.send(random.choice(bot.spice))
     await bot.process_commands(message)
