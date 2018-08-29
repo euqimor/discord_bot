@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from sys import exit
-from os import path
+from os import environ, path
 from cogs.utils.db import check_database
 from cogs.utils.misc import add_role_to_streamers, remove_role_from_non_streamers
 import random
@@ -36,12 +36,12 @@ class CompanionCube(commands.Bot):
         super().__init__(command_prefix=get_prefix, description=description)
         self.config = {}
         self.db_name = 'cube.db'
-        self.spice = [
-            'Spice? Do you spice?',
-            'Spice? What do you think? Little spice?',
-            'Spice? Spice it? Little spice?'
-        ]
-        self.spice_cooldown_start = 0.0
+        # self.spice = [
+        #     'Spice? Do you spice?',
+        #     'Spice? What do you think? Little spice?',
+        #     'Spice? Spice it? Little spice?'
+        # ]
+        # self.spice_cooldown_start = 0.0
 
         for extension in initial_extensions:
             try:
