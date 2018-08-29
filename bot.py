@@ -36,12 +36,12 @@ class CompanionCube(commands.Bot):
         super().__init__(command_prefix=get_prefix, description=description)
         self.config = {}
         self.db_name = 'cube.db'
-        self.spice = [
-            'Spice? Do you spice?',
-            'Spice? What do you think? Little spice?',
-            'Spice? Spice it? Little spice?'
-        ]
-        self.spice_cooldown_start = 0.0
+        # self.spice = [
+        #     'Spice? Do you spice?',
+        #     'Spice? What do you think? Little spice?',
+        #     'Spice? Spice it? Little spice?'
+        # ]
+        # self.spice_cooldown_start = 0.0
 
         for extension in initial_extensions:
             try:
@@ -63,12 +63,12 @@ async def on_ready():
         await remove_role_from_non_streamers(guild)
 
 
-@bot.event
-async def on_message(message):
-    if 'spice' in message.clean_content.strip('?!,.').split() and (time.time() - bot.spice_cooldown_start) > 21600:
-        await message.channel.send(random.choice(bot.spice))
-        bot.spice_cooldown_start = time.time()
-    await bot.process_commands(message)
+# @bot.event
+# async def on_message(message):
+#     if 'spice' in message.clean_content.strip('?!,.').split() and (time.time() - bot.spice_cooldown_start) > 21600:
+#         await message.channel.send(random.choice(bot.spice))
+#         bot.spice_cooldown_start = time.time()
+#     await bot.process_commands(message)
 
 
 @bot.event
