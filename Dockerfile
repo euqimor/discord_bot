@@ -7,6 +7,7 @@ ADD . /app
 RUN apk update \
     && apk add sqlite \
     && apk add socat \
+    && apk add python-dev \
     && apk add libffi-dev \
     && apk add openssl-dev \
     && apk add zlib-dev
