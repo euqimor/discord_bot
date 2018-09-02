@@ -12,6 +12,8 @@ RUN apk update \
     && apk add libffi-dev \
     && apk add openssl-dev \
     && apk add musl-dev \
+    && apk add libxml2-dev \
+    && apk add libxslt-dev \
     && apk add zlib-dev \
     && apk add make \
     && apk add gcc
