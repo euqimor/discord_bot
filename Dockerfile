@@ -10,7 +10,9 @@ RUN apk update \
     && apk add python3-dev \
     && apk add libffi-dev \
     && apk add openssl-dev \
-    && apk add zlib-dev
+    && apk add zlib-dev \
+    && apk add make \
+    && apk add gcc
 
 RUN pip install -r requirements.txt
 
