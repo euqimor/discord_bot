@@ -11,6 +11,7 @@ RUN apk update \
     && apk add python3-dev \
     && apk add libffi-dev \
     && apk add openssl-dev \
+    && apk add musl-dev \
     && apk add zlib-dev \
     && apk add make \
     && apk add gcc
