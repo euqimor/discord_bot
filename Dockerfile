@@ -5,6 +5,7 @@ WORKDIR /app
 ADD . /app
 
 RUN apk update \
+    && apk add git \
     && apk add sqlite \
     && apk add socat \
     && apk add python3-dev \
