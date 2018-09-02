@@ -6,7 +6,10 @@ ADD . /app
 
 RUN apk update \
     && apk add sqlite \
-    && apk add socat
+    && apk add socat \
+    && apk add libffi-dev \
+    && apk add openssl-dev \
+    && apk add zlib-dev
 
 RUN pip install -r requirements.txt
 
