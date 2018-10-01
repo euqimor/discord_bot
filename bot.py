@@ -3,10 +3,9 @@ from discord.ext import commands
 from sys import exit
 from os import environ, path
 from cogs.utils.db import check_database
-from cogs.utils.misc import add_role_to_streamers, remove_role_from_non_streamers
-import random
-import time
+from cogs.utils.misc import add_role_to_streamers, remove_role_from_non_streamers, append_partner_link
 import yaml
+import re
 
 description = '''An awkward attempt at making a discord bot'''
 
@@ -36,6 +35,7 @@ class CompanionCube(commands.Bot):
         super().__init__(command_prefix=get_prefix, description=description)
         self.config = {}
         self.db_name = 'cube.db'
+        self.humble_expr = re.compile('(https?://www.humblebundle.com.*?)(?:\s|$)')
         # self.spice = [
         #     'Spice? Do you spice?',
         #     'Spice? What do you think? Little spice?',
@@ -69,6 +69,16 @@ async def on_ready():
 #         bot.spice_cooldown_start = time.time()
 #         await message.channel.send(random.choice(bot.spice))
 #     await bot.process_commands(message)
+
+
+@bot.event
+async def on_message(message):
+    regex_search = re.match(bot.humble_expr, message.clean_content)
+    if regex_search and not '?partner=' in regex_search[1]:
+        partner_link = append_partner_link(regex_search[1])
+        await message.channel.send(f"Humbly converting the link to Aella's partner link if you feel like using it:\
+                                   \n{partner_link}")
+    await bot.process_commands(message)
 
 
 @bot.event

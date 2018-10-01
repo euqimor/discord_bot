@@ -42,3 +42,12 @@ def save_to_config(variable_name, variable_value):
         f.truncate(0)
         f.seek(0)
         yaml.dump(config, f, default_flow_style=False)
+
+
+def append_partner_link(base_link):
+    if '?' in base_link:
+        return f'{base_link}&partner=aellaq'
+    elif base_link[-1] == '/':
+        return f'{base_link}?partner=aellaq'
+    else:
+        return f'{base_link}/?partner=aellaq'
