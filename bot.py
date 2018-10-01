@@ -77,7 +77,9 @@ async def on_message(message):
     if regex_search and not '?partner=' in regex_search[1]:
         partner_link = append_partner_link(regex_search[1])
         await message.channel.send(f"Humbly converting the link to Aella's partner link if you feel like using it:\
-                                   \n{partner_link}")
+                                   \n{partner_link}\
+                                   \n\nIf you want more information on how the Humble Partner program works, here's the FAQ: \
+                                   \nhttps://support.humblebundle.com/hc/en-us/articles/223517768-Humble-Partner-Program-FAQ")
     await bot.process_commands(message)
 
 
