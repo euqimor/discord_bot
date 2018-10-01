@@ -35,7 +35,7 @@ class CompanionCube(commands.Bot):
         super().__init__(command_prefix=get_prefix, description=description)
         self.config = {}
         self.db_name = 'cube.db'
-        self.humble_expr = re.compile('(https?://www.humblebundle.com.*?)(?:\s|$)')
+        self.humble_expr = re.compile('(?:^|.*)(https?://www.humblebundle.com.*?)(?:\s|$)')
         # self.spice = [
         #     'Spice? Do you spice?',
         #     'Spice? What do you think? Little spice?',
