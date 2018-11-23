@@ -3,7 +3,7 @@ from random import randint
 from contextlib import closing
 import sqlite3
 import aiohttp
-from io import BytesIO
+import mimetypes
 from discord import File, Embed, Colour
 from random import choice
 
@@ -81,12 +81,17 @@ class SillyCog:
         Posts a random cat pic.
         """
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://cataas.com/cat') as resp:
-                img_type = resp.headers['content-type'][6:]
-                cat_bytes = BytesIO(await resp.read())
-                filename = f'cat.{img_type}'
+            headers = {"x-api-key": self.bot.config["cat_token"], }
+            size = choice(["small", "medium", "large"])
+            params = {"size": size, "mime_types": "jpg,png"}
+            async with session.get('https://api.thecatapi.com/v1/images/search', headers=headers, params=params) as resp:
+                cat_json = await resp.json()
+                cat_url = cat_json[0]['url']
+                extension = mimetypes.guess_extension(mimetypes.guess_type(cat_url)[0]) if not '.jpe' else '.jpg'
+            async with session.get(cat_url) as resp:
+                cat_bytes = await resp.content.read()
+                filename = f'cat{extension}'
         cat_file = File(cat_bytes, filename)
-        # e = Embed()
         # e.colour = Colour.from_rgb(206, 24, 188)
         # e.title = 'Das a cat.'
         # e.set_image(url=f"attachment://{filename}")
