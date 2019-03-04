@@ -6,6 +6,8 @@ import aiohttp
 import mimetypes
 from discord import File, Embed, Colour
 from random import choice
+from cogs.utils.image import write_on_image, resize_image
+from io import BytesIO
 
 
 class SillyCog:
@@ -74,7 +76,7 @@ class SillyCog:
             pass
         await ctx.send('{} {}'.format(line, emoji))
 
-    @commands.command()
+    @commands.group(invoke_without_command=True)
     async def cat(self, ctx):
         """
         Cat.
@@ -95,6 +97,23 @@ class SillyCog:
         # e.colour = Colour.from_rgb(206, 24, 188)
         # e.title = 'Das a cat.'
         # e.set_image(url=f"attachment://{filename}")
+        await ctx.send(file=cat_file)
+
+    @cat.command()
+    async def says(self, ctx, *, phrase):
+        async with aiohttp.ClientSession() as session:
+            headers = {"x-api-key": self.bot.config["cat_token"], }
+            size = choice(["medium", "large"])
+            params = {"size": size, "mime_types": "jpg,png"}
+            async with session.get('https://api.thecatapi.com/v1/images/search', headers=headers, params=params) as resp:
+                cat_json = await resp.json()
+            cat_url = cat_json[0]['url']
+            async with session.get(cat_url) as resp:
+                cat_bytes = await resp.content.read()
+            cat_bytes_io = BytesIO(cat_bytes)
+            photo = resize_image(cat_bytes_io, 800)
+            photo_with_text = write_on_image(photo, phrase.split())
+        cat_file = File(photo_with_text, 'cat.jpg')
         await ctx.send(file=cat_file)
 
     @commands.command()
