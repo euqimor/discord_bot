@@ -17,7 +17,9 @@ initial_extensions = ['cogs.suggestions',
                       'cogs.silly',
                       'cogs.admin',
                       'cogs.owner',
-                      'cogs.dice']
+                      'cogs.dice',
+                      'cogs.steam',
+                      ]
 
 
 def get_prefix(_bot, message):
