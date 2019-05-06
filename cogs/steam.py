@@ -20,7 +20,7 @@ class SteamCog:
                 con.execute(f'CREATE TABLE IF NOT EXISTS Steam (app_id INT PRIMARY KEY , app_name TEXT)')
                 for app in r.json()['applist']['apps']:
                     app_id = app["appid"]
-                    app_name = app["name"].lower()
+                    app_name = app["name"].lower().replace('™', '')
                     con.execute(f'INSERT OR IGNORE INTO Steam (app_id, app_name) VALUES (?, ?);', (app_id, app_name))
 
     async def get_steam_apps_list_async(self):
