@@ -4,7 +4,7 @@ from contextlib import closing
 import sqlite3
 import aiohttp
 import mimetypes
-from discord import File, Embed, Colour
+from discord import File, Forbidden, Embed, Colour
 from random import choice
 from cogs.utils.image import write_on_image, resize_image
 from io import BytesIO
@@ -160,6 +160,26 @@ class SillyCog:
             ]
         answer = choice(options)
         await ctx.channel.send(answer)
+
+    @commands.command(name='name')
+    async def rename(self, ctx, *, new_name=''):
+        """
+        Give _the channel_ a new name.
+        """
+        if ctx.message.guild.id != 270742592977633280 or ctx.message.channel.id != 593911566676787230:
+            return
+        if len(new_name) > 30:
+            await ctx.channel.send('Sorry, this name is too long, character limit is 30 symbols.')
+            return
+        if ctx.message.author.top_role.is_default():
+            await ctx.channel.send('Sorry, your role doesn\'t have enough permissions to edit the channel name.')
+        target_channel = self.bot.get_channel(337724971348525057)
+        try:
+            await target_channel.edit(name=new_name)
+        except Forbidden:
+            await ctx.channel.send('I don\'t have enough rights to rename the channel. Please check permissions.')
+            return
+        await ctx.channel.send(f'Welcome to #{new_name}, this channel will be deleted in 48 hours.')
 
 
 def setup(bot):
