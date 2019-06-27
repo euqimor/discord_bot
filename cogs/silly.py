@@ -173,7 +173,7 @@ class SillyCog:
             return
         if ctx.message.author.top_role.is_default():
             await ctx.channel.send('Sorry, your role doesn\'t have enough permissions to edit the channel name.')
-        target_channel = self.bot.get_channel(337724971348525057)
+        target_channel = self.bot.get_channel(593911566676787230)
         try:
             await target_channel.edit(name=new_name)
         except Forbidden:
