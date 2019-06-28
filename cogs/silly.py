@@ -161,21 +161,20 @@ class SillyCog:
         answer = choice(options)
         await ctx.channel.send(answer)
 
-    @commands.command(name='name')
+    @commands.command(aliases=['name'])
     async def rename(self, ctx, *, new_name=''):
         """
         Give _the channel_ a new name.
         """
-        if ctx.message.guild.id != 270742592977633280 or ctx.message.channel.id != 593911566676787230:
+        if ctx.message.channel.id != 593911566676787230:
             return
         if len(new_name) > 30:
             await ctx.channel.send('Sorry, this name is too long, character limit is 30 symbols.')
             return
         if ctx.message.author.top_role.is_default():
             await ctx.channel.send('Sorry, your role doesn\'t have enough permissions to edit the channel name.')
-        target_channel = self.bot.get_channel(593911566676787230)
         try:
-            await target_channel.edit(name=new_name)
+            await ctx.channel.edit(name=new_name)
         except Forbidden:
             await ctx.channel.send('I don\'t have enough rights to rename the channel. Please check permissions.')
             return
