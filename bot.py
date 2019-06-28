@@ -7,9 +7,8 @@ from cogs.utils.misc import add_role_to_streamers, remove_role_from_non_streamer
 import yaml
 import re
 
+
 description = '''An awkward attempt at making a discord bot'''
-
-
 initial_extensions = ['cogs.suggestions',
                       'cogs.tags',
                       # 'cogs.twitter',
@@ -63,6 +62,15 @@ async def on_ready():
     for guild in bot.guilds:
         await add_role_to_streamers(guild)
         await remove_role_from_non_streamers(guild)
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        return
+    else:
+        user = ctx.bot.get_user(173747843314483210)
+        await user.send(error)
 
 
 # @bot.event
