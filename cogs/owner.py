@@ -13,7 +13,7 @@ from discord.ext import commands
 from cogs.utils.messages import update_banner
 
 
-class OwnerCog:
+class OwnerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

@@ -200,7 +200,8 @@ class Interpreter():
     def paren_right(self):
         self.eat(TK_PAREN_RIGHT)
 
-class DiceCog:
+
+class DiceCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -236,6 +237,7 @@ class DiceCog:
         await context.send(
             ":game_die: Rolling stats!\nResult: {}, {}, {}, {}, {}, {}".format(*stat_rolls)
         )
+
 
 def setup(bot):
     bot.add_cog(DiceCog(bot))

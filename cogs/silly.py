@@ -10,7 +10,7 @@ from cogs.utils.image import write_on_image, resize_image
 from io import BytesIO
 
 
-class SillyCog:
+class SillyCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

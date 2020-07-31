@@ -6,7 +6,7 @@ import difflib
 import requests
 
 
-class SteamCog:
+class SteamCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.get_steam_apps_list()

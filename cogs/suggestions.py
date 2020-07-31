@@ -6,7 +6,7 @@ from cogs.utils.misc import check_admin_rights
 from contextlib import closing
 
 
-class SuggestionsCog:
+class SuggestionsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

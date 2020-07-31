@@ -8,7 +8,7 @@ import twitter
 from cogs.utils.misc import save_to_config
 
 
-class TwitterCog:
+class TwitterCog(commands.Cog):
     def __init__(self, bot):
         self.api = None
         self.bot = bot

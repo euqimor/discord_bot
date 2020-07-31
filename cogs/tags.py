@@ -6,7 +6,7 @@ from cogs.utils.misc import check_admin_rights
 from cogs.utils.db import add_user_to_db_or_pass
 
 
-class TagsCog:
+class TagsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
