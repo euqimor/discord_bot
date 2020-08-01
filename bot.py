@@ -116,7 +116,7 @@ if __name__ == '__main__':
         if path.exists("config.yaml"):
             with open("config.yaml") as f:
                 print("Reading from config file.")
-                bot.config = yaml.load(f)
+                bot.config = yaml.load(f, Loader=yaml.BaseLoader)
                 secret_key = bot.config["discord_token"]
                 bot.run(secret_key)
         else:
