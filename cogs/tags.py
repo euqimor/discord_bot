@@ -43,9 +43,9 @@ class TagsCog(commands.Cog):
                 matches = difflib.get_close_matches(tag_name, tags, cutoff=0.4)
                 if matches:
                     matches = '\n'.join(matches)
-                    await ctx.send(f'Tag `{tag_name}` not found, did you mean:\n```\n{matches}\n```')
+                    await ctx.send(f'Command or tag `{tag_name}` not found, did you mean:\n```\n{matches}\n```')
                 else:
-                    await ctx.send(f'Tag "{tag_name}" not found')
+                    await ctx.send(f'Command or tag "{tag_name}" not found')
 
     @tag.command(aliases=['search', 'find'], name='list')
     async def _list(self, ctx, *, _filter=''):

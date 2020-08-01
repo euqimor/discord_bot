@@ -67,7 +67,9 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        return
+        tags = ctx.bot.get_cog('TagsCog')
+        if tags is not None:
+            await tags.tag(ctx, tag_name=f'{ctx.message.content[1:]}')
     else:
         user = ctx.bot.get_user(173747843314483210)
         await user.send(error)
