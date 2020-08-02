@@ -31,14 +31,14 @@ class OwnerCog(commands.Cog):
             if exists:
                 username = exists[0][0]
                 with con:
-                    con.execute('PRAGMA FOREIGN_KEYS=ON;')
+                    con.execute('PRAGMA foreign_keys = 1;')
                     con.execute('DELETE FROM Users WHERE user_id=?;', (user_id,))
                     exists = con.execute('SELECT username FROM Users WHERE user_id=? LIMIT 1;',
                                          (user_id,)).fetchall()
                 if not exists:
                     await update_banner(ctx, 'movies')
                     await update_banner(ctx, 'games')
-                    await ctx.send('Successfully deleted user {} from the database'.format(username))
+                    await ctx.send(f'Successfully deleted user {username} from the database')
                 else:
                     await ctx.send('Couldn\'t delete the user, please contact Euqimor for troubleshooting')
             else:

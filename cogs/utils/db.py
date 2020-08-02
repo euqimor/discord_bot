@@ -32,7 +32,7 @@ def add_guild_to_db_or_pass(con, guild_id, prefix_list, locale='en'):
 
 
 def delete_guild_from_db(con, guild_id):
-    con.execute("PRAGMA foreign_keys = 1")
+    con.execute('PRAGMA foreign_keys = 1;')
     con.execute('DELETE FROM Guilds WHERE guild_id=?;',
                 (guild_id,))
 

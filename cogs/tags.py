@@ -233,7 +233,7 @@ class TagsCog(commands.Cog):
             if tag_name[0] == '\"':
                 tag_name = tag_name.strip('"')
             with closing(sqlite3.connect(self.bot.db_name)) as con:
-                con.execute("PRAGMA foreign_keys = 1")
+                con.execute('PRAGMA foreign_keys = 1;')
                 with con:
                     result = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=? AND guild_id=?',
                                          (tag_name, guild_id)).fetchone()

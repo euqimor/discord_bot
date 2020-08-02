@@ -30,8 +30,8 @@ class DictionariesCog(commands.Cog):
                 message_list = split_message(phrase)
                 # for message in message_list:
                 await ctx.send(message_list[0])
-                await ctx.send('\_' * 20 + '\nRead more: ' + 'https://www.merriam-webster.com/dictionary/' + '%20'.join(
-                    word.split(' ')))
+                word_url_friendly = '%20'.join(word.lower().strip().split(' '))
+                await ctx.send('\_'*20 + f'\nRead more: https://www.merriam-webster.com/dictionary/{word_url_friendly}')
             else:
                 await ctx.send(phrase)
         else:
@@ -52,6 +52,7 @@ class DictionariesCog(commands.Cog):
             sleep(4)
             await message.delete()
         else:
+            parsed_data = None
             if code == 1:  # if API returned the definition
                 parsed_data = self.parse_oxford(json_data[0])
             elif code == 2:  # if the word couldn't be found and we are being redirected to the closest match
@@ -59,15 +60,19 @@ class DictionariesCog(commands.Cog):
                 word = ' '.join(redirect_data['results'][0]['word'].split('_'))
                 json_data = self.query_oxford(word, app_id, app_key)
                 parsed_data = self.parse_oxford(json_data[0])
+            if parsed_data is None:
+                await ctx.send('Error: no data returned by the query.')
+                return
             fields = parsed_data[2]
-            title = '{} | Oxford Dictionary'.format(parsed_data[0])
+            title = f'{parsed_data[0]} | Oxford Dictionary'
             e = Embed(colour=Colour.blurple(), title=title)
             e.url = parsed_data[1]
             for field in fields:
                 e.add_field(name=field['name'], value=field['value'], inline=False)
             await ctx.send(embed=e)
 
-    def query_oxford(self, word, app_id, app_key, category=None):
+    @staticmethod
+    def query_oxford(word, app_id, app_key, category=None):
         """
         :param word: the word to look up in the dictionary
         :param category: noun, verb, adjective, etc.
@@ -79,22 +84,21 @@ class DictionariesCog(commands.Cog):
         word_in_url_format = '%20'.join(word.lower().strip().split(' '))
         lexical_category = ''
         if category:
-            lexical_category = '/lexicalCategory={}'.format(category)
-        url = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/{}{}'.format(word_in_url_format, lexical_category)
+            lexical_category = f'/lexicalCategory={category}'
+        url = f'https://od-api.oxforddictionaries.com/api/v1/entries/en/{word_in_url_format}{lexical_category}'
         r = requests.get(url, headers={'app_id': app_id, 'app_key': app_key})
         if r.status_code == 200:
             data = r.json()
             result_code = 1
             return data, result_code
         elif r.status_code == 404:
-            url_s = 'https://od-api.oxforddictionaries.com/api/v1/search/en?q={}&prefix=false'.format(
-                word_in_url_format)
+            url_s = f'https://od-api.oxforddictionaries.com/api/v1/search/en?q={word_in_url_format}&prefix=false'
             r_search = requests.get(url_s, headers={'app_id': app_id, 'app_key': app_key})
             if r_search.status_code == 200 and r_search.json()['results']:
                 word_new = r_search.json()['results'][0]['id']
                 word_new_in_url_format = '%20'.join(word_new.lower().strip().split(' '))
-                url_new = 'https://od-api.oxforddictionaries.com/api/v1/entries/en/{}/definitions{}'.format(
-                    word_new_in_url_format, lexical_category)
+                url_new = f'https://od-api.oxforddictionaries.com/api/v1/entries/en/' \
+                          f'{word_new_in_url_format}/definitions{lexical_category}'
                 r_new = requests.get(url_new, headers={'app_id': app_id, 'app_key': app_key})
                 if r_new.status_code == 200:
                     data = r_new.json()
@@ -103,36 +107,38 @@ class DictionariesCog(commands.Cog):
         result_code = 0
         return None, result_code
 
-    def parse_oxford(self, data):
+    @staticmethod
+    def parse_oxford(data):
         """
         :param data: JSON, the result of the oxford API query
-        :return: a tuple (word, url, embed_fields). The word as it's stated in the API's reply; url link to the word in \
+        :return: a tuple (word, url, embed_fields). The word as it's stated in the API's reply; url link to the word in
         the oxford dictionary; a list of dictionaries to create embed fields from, the keys are 'name' and 'value'
         """
         word = data['results'][0]['word'].capitalize()
-        url = 'https://en.oxforddictionaries.com/definition/{}'.format('%20'.join(word.lower().strip().split(' ')))
+        word_url_friendly = '%20'.join(word.lower().strip().split(' '))
+        url = f'https://en.oxforddictionaries.com/definition/{word_url_friendly}'
         embed_fields = []
         for lexicalEntry in data['results'][0]['lexicalEntries']:
+            category = lexicalEntry['lexicalCategory'].lower()
             i = 1
             d = dict()
-            d['name'] = '{}, *{}*'.format(word, lexicalEntry['lexicalCategory'].lower())
+            d['name'] = f'{word}, *{category}*'
             d['value'] = ''
             for entry in lexicalEntry['entries']:
                 for sense in entry['senses']:
                     if sense.get('definitions'):
-                        if sense.get('domains'):
-                            domain = sense['domains'][0]
-                        else:
-                            domain = ''
+                        domain = '*' + sense['domains'][0] + '*: ' if sense.get('domains') else ''
                         definition = sense['definitions'][0]
-                        d['value'] += '{}. {}{}\n'.format(i, '*' + domain + '*: ' if domain else '', definition)
+                        d['value'] += f'{i}. {domain}{definition}\n'
                     elif sense.get('crossReferenceMarkers'):
-                        d['value'] += '{}. {}\n'.format(i, sense['crossReferenceMarkers'][0])
+                        cross_reference = sense['crossReferenceMarkers'][0]
+                        d['value'] += f'{i}. {cross_reference}\n'
                     i += 1
             embed_fields.append(d)
         return word, url, embed_fields
 
-    def query_merriam(self, word, key):
+    @staticmethod
+    def query_merriam(word, key):
         """
         :param word: the word to search for in the dictionaries
         :param key: merriam api key
@@ -142,7 +148,8 @@ class DictionariesCog(commands.Cog):
         url = 'http://www.dictionaryapi.com/api/v1/references/collegiate/xml/' + word.lower() + '?key=' + key
         r = requests.get(url)
         soup = Soup(r.text, 'xml')
-        # word = soup.ew.string #the word may change during the request if you have originally queried for the past tense for example, this ensures we get the right one
+        # word = soup.ew.string #the word may change during the request if you have originally queried
+        # for the past tense for example, this ensures we get the right one
         cases = soup.find_all('entry')
         # regex = re.compile(word.lower()+'(?:\[\d\])')
         # cases+= soup.find_all(id=regex)
@@ -162,7 +169,8 @@ class DictionariesCog(commands.Cog):
             i += 1
             phrase += '__**' + entry.ew.text
             if entry.fl:
-                phrase += '**, *' + entry.fl.text + '*__\n'  # opening text. <ew> = word, <fl> = what part of speech it is
+                # opening text. <ew> = word, <fl> = what part of speech it is
+                phrase += '**, *' + entry.fl.text + '*__\n'
             else:
                 phrase += '**__\n'
 
@@ -175,13 +183,13 @@ class DictionariesCog(commands.Cog):
                 try:
                     phrase += self.parse_tag_list(definition_content)
                 except Exception as error:
-                    print('Caught an exception while parsing tags:\n{}'.format(error))
+                    print(f'Caught an exception while parsing tags:\n{error}')
             else:
                 try:
                     definition_content = entry.cx
                     phrase += self.parse_tag_list(definition_content)
                 except Exception as error:
-                    print('Caught an exception while trying to parse an entry with no <def>:\n{}'.format(error))
+                    print(f'Caught an exception while trying to parse an entry with no <def>:\n{error}')
         return phrase
 
     def parse_tag_list(self, tag_list):
@@ -213,7 +221,8 @@ class DictionariesCog(commands.Cog):
                     phrase += self.parse_tag_list(tag)
         return phrase
 
-    def parse_sn(self, sn):
+    @staticmethod
+    def parse_sn(sn):
         phrase = ''
         if not sn.next.name:  # if there's no other tag (namely <snm>) inside the <sn> tag
             if sn.text[0] in alphabet:  # if <sn> content starts with a letter create an indentation on new line
@@ -224,7 +233,8 @@ class DictionariesCog(commands.Cog):
             phrase += sn.text + ' '
         return phrase
 
-    def parse_it(self, it):
+    @staticmethod
+    def parse_it(it):
         phrase = ''
         if it.previous_sibling and it.previous_sibling.name:
             previous_tag = it.previous_sibling.name

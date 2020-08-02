@@ -105,7 +105,7 @@ def find_suggestion_name_by_index(message, index):
     # i.e. index = 15, finds "15. Nier: Automata", returns "Nier: Automata"
     e = message.embeds[0]
     items = e.fields[0].value
-    match = search(r'{}\. (.*)'.format(index), items)
+    match = search(rf'{index}\. (.*)', items)
     if match:
         return match.group(1)
 

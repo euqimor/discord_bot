@@ -24,7 +24,7 @@ class SillyCog(commands.Cog):
         line = ''
         with closing(sqlite3.connect(self.bot.db_name)) as con:
             if word_or_phrase:
-                word_or_phrase = '%{}%'.format(word_or_phrase.strip())
+                word_or_phrase = f'%{word_or_phrase.strip()}%'
                 with con:
                     line = con.execute('SELECT proverb FROM Proverbs WHERE proverb LIKE ?',
                                        (word_or_phrase,)).fetchone()
@@ -43,7 +43,7 @@ class SillyCog(commands.Cog):
                     break
         except:
             pass
-        await ctx.send('{} {}'.format(line, emoji))
+        await ctx.send(f'{line} {emoji}')
 
     @wisdom.command()
     async def use(self, ctx, *, word_or_phrase=''):
@@ -74,7 +74,7 @@ class SillyCog(commands.Cog):
                 emoji = ctx.guild.emojis[roll_emoji]
         except:
             pass
-        await ctx.send('{} {}'.format(line, emoji))
+        await ctx.send(f'{line} {emoji}')
 
     @commands.group(invoke_without_command=True)
     async def cat(self, ctx):

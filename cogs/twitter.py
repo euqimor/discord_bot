@@ -53,12 +53,7 @@ class TwitterCog(commands.Cog):
             for tweet in tweets:
                 if tweet.created_at_in_seconds > self.last_posted_tweet_time:
                     self.last_posted_tweet_time = tweet.created_at_in_seconds
-                    await text_channel.send(
-                        "https://twitter.com/{}/status/{}".format(
-                            tweet.user.screen_name, 
-                            tweet.id
-                        )
-                    )
+                    await text_channel.send(f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}")
             await asyncio.sleep(30)
     
     # Return a list of tweets, oldest to newest
@@ -68,7 +63,8 @@ class TwitterCog(commands.Cog):
         return posts
 
     # Helper method to save settings
-    def save_settings(self, value: str, line_number: int):
+    @staticmethod
+    def save_settings(value: str, line_number: int):
         """
         replaces line `line_number` with `value` in twitter.txt
         the first line is line_number 0
@@ -85,7 +81,8 @@ class TwitterCog(commands.Cog):
         Show/change current twitter settings, see $help twitter
         `$twitter` with no arguments shows current settings
         """
-        await ctx.channel.send(f'Twitter account: `@{self.twitter_account_name}`\n\nPosting to: <#{self.text_channel_id}>')
+        await ctx.channel.send(f'Twitter account: `@{self.twitter_account_name}`'
+                               f'\n\nPosting to: <#{self.text_channel_id}>')
 
     @_twitter.command()
     async def channel(self, ctx, channel_id):
@@ -118,6 +115,7 @@ class TwitterCog(commands.Cog):
         self.twitter_task = self.bot.loop.create_task(self.post_tweets())
         save_to_config('twitter_account_name', account_name)
         await ctx.channel.send(f'Tracking twitter account `@{self.twitter_account_name}`')
+
 
 def setup(bot):
     try:
