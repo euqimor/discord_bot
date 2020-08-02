@@ -2,53 +2,43 @@ import discord
 from discord.ext import commands
 from sys import exit
 from os import path
-from cogs.utils.db import check_database
+from cogs.utils.db import check_database, add_guild_to_db_or_pass, delete_guild_from_db, load_guild_prefixes
 from cogs.utils.misc import add_role_to_streamers, remove_role_from_non_streamers, append_partner_link
 import yaml
 import re
 
 
-description = '''An awkward attempt at making a discord bot'''
-initial_extensions = ['cogs.suggestions',
-                      'cogs.tags',
-                      # 'cogs.twitter',
-                      'cogs.dictionaries',
-                      'cogs.silly',
-                      'cogs.admin',
-                      'cogs.owner',
-                      'cogs.dice',
-                      'cogs.steam',
-                      ]
-
-
-def get_prefix(_bot, message):
-    """A callable Prefix. This could be edited to allow per server prefixes."""
-    prefixes = ['$']
-
-    if not message.guild:
-        return ['$', '!', '?']
-
-    return commands.when_mentioned_or(*prefixes)(_bot, message)
-
-
 class CompanionCube(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix=get_prefix, description=description)
+        super().__init__(command_prefix=self.get_prefix)
         self.config = {}
+        self.prefixes = {}
         self.db_name = 'cube.db'
         self.humble_expr = re.compile('(?:^|.*)(https?://www.humblebundle.com.*?)(?:\s|$)')
-        # self.spice = [
-        #     'Spice? Do you spice?',
-        #     'Spice? What do you think? Little spice?',
-        #     'Spice? Spice it? Little spice?'
-        # ]
-        # self.spice_cooldown_start = 0.0
-
-        for extension in initial_extensions:
+        self.initial_extensions = ['cogs.suggestions',
+                                   'cogs.tags',
+                                   # 'cogs.twitter',
+                                   'cogs.dictionaries',
+                                   'cogs.silly',
+                                   'cogs.admin',
+                                   'cogs.owner',
+                                   'cogs.dice',
+                                   'cogs.steam',
+                                   ]
+        for extension in self.initial_extensions:
             try:
                 self.load_extension(extension)
             except Exception as e:
                 print(f'Failed to load extension {extension}.\nException: {e}')
+
+    async def get_prefix(self, message):
+        """A callable Prefix. This could be edited to allow per server prefixes."""
+        default_prefix = ['$']
+        if not message.guild:
+            return ['$', '!', '?']  # pm prefixes
+        # try to load guild-specific prefixes, fallback to default
+        prefixes = self.prefixes.get(message.guild.id, default_prefix)
+        return commands.when_mentioned_or(*prefixes)(self, message)
 
 
 bot = CompanionCube()
@@ -62,6 +52,17 @@ async def on_ready():
     for guild in bot.guilds:
         await add_role_to_streamers(guild)
         await remove_role_from_non_streamers(guild)
+        bot.prefixes[guild.id] = await load_guild_prefixes(bot, guild.id)
+
+
+@bot.event
+async def on_guild_join(guild):
+    await add_guild_to_db_or_pass(bot, guild.id, prefixes='$', locale='en')
+
+
+@bot.event
+async def on_guild_remove(guild):
+    await delete_guild_from_db(bot, guild.id)
 
 
 @bot.event
@@ -73,14 +74,6 @@ async def on_command_error(ctx, error):
     else:
         user = ctx.bot.get_user(173747843314483210)
         await user.send(error)
-
-
-# @bot.event
-# async def on_message(message):
-#     if 'spice' in message.clean_content.strip('?!,.*').split() and (time.time() - bot.spice_cooldown_start) > 21600:
-#         bot.spice_cooldown_start = time.time()
-#         await message.channel.send(random.choice(bot.spice))
-#     await bot.process_commands(message)
 
 
 @bot.event
@@ -112,6 +105,7 @@ async def on_member_update(before, after):
     else:
         if not role in after.roles:
             await after.add_roles(role)
+
 
 if __name__ == '__main__':
     if check_database(bot.db_name):
