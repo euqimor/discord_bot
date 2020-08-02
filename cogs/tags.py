@@ -19,6 +19,7 @@ class TagsCog(commands.Cog):
         $tag mytag
         will fetch `mytag` from saved tags
         """
+        guild_id = ctx.guild.id
         if tag_name == '':
             await ctx.send('Tag name required')
         else:
@@ -27,19 +28,23 @@ class TagsCog(commands.Cog):
                 tag_name = tag_name.strip('"')
             with closing(sqlite3.connect(self.bot.db_name)) as con:
                 with con:
-                    result = con.execute('SELECT tag_content FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
+                    result = con.execute('SELECT tag_content FROM Tags WHERE tag_name=? AND guild_id=?',
+                                         (tag_name, guild_id,)).fetchone()
                     if not result:
-                        tag_id = con.execute('SELECT tag_id, alias FROM Tag_Aliases WHERE alias=?', (tag_name,)).fetchone()
+                        tag_id = con.execute('SELECT tag_id, alias FROM Tag_Aliases WHERE alias=? AND guild_id=?',
+                                             (tag_name, guild_id,)).fetchone()
                         if tag_id:
                             tag_id = tag_id[0]
-                            result = con.execute('SELECT tag_content FROM Tags WHERE ROWID=?', (tag_id,)).fetchone()
+                            result = con.execute('SELECT tag_content FROM Tags WHERE ROWID=?',
+                                                 (tag_id,)).fetchone()
             if result:
                 tag_content = result[0]
                 await ctx.send(tag_content)
             else:
                 with closing(sqlite3.connect(self.bot.db_name)) as con:
                     with con:
-                        tags = [x[0] for x in con.execute('SELECT tag_name FROM Tags').fetchall()]
+                        tags = [x[0] for x in con.execute('SELECT tag_name FROM Tags WHERE guild_id=?',
+                                                          (guild_id,)).fetchall()]
                 matches = difflib.get_close_matches(tag_name, tags, cutoff=0.4)
                 if matches:
                     matches = '\n'.join(matches)
@@ -67,18 +72,22 @@ class TagsCog(commands.Cog):
         $tag filter nice meme
         lists all tags with `nice meme` in their names
         """
+        guild_id = ctx.guild.id
         user_id = ctx.author.id
         username = str(ctx.author.name)
         with closing(sqlite3.connect(self.bot.db_name)) as con:
             with con:
                 if _filter == '':
-                    result = con.execute('SELECT tag_name, user_id FROM Tags WHERE user_id=?', (user_id,)).fetchall()
+                    result = con.execute('SELECT tag_name, user_id FROM Tags WHERE user_id=? AND guild_id=?',
+                                         (user_id, guild_id,)).fetchall()
                     message = f"Tags owned by {username}:\n```\n"
                 elif _filter == 'all':
-                    result = con.execute('SELECT tag_name FROM Tags').fetchall()
+                    result = con.execute('SELECT tag_name FROM Tags WHERE guild_id=?',
+                                         (guild_id,)).fetchall()
                     message = f"All available tags:\n```\n"
                 else:
-                    result = con.execute('SELECT tag_name FROM Tags WHERE tag_name LIKE ?', (f"%{_filter}%",)).fetchall()
+                    result = con.execute('SELECT tag_name FROM Tags WHERE tag_name LIKE ? AND guild_id=?',
+                                         (f"%{_filter}%", guild_id,)).fetchall()
                     message = f"Tags filtered by `{_filter}`:\n```\n"
         if result:
             for entry in result:
@@ -102,6 +111,7 @@ class TagsCog(commands.Cog):
         if not tag_content:
             await ctx.send('Tag content cannot be empty')
             return
+        guild_id = ctx.guild.id
         user_id = ctx.author.id
         username = str(ctx.author.name)
         with closing(sqlite3.connect(self.bot.db_name)) as con:
@@ -109,10 +119,11 @@ class TagsCog(commands.Cog):
                 add_user_to_db_or_pass(con, username, user_id)
             try:
                 with con:
-                    con.execute('INSERT INTO Tags(user_id, tag_name, tag_content) VALUES(?, ?, ?);', (user_id, tag_name, tag_content))
-                await ctx.send('Successfully added "{}" to {}\'s tags'.format(tag_name, username))
+                    con.execute('INSERT INTO Tags(user_id, tag_name, tag_content, guild_id) VALUES(?, ?, ?, ?);',
+                                (user_id, tag_name, tag_content, guild_id))
+                await ctx.send(f'Successfully added "{tag_name}" to {username}\'s tags')
             except sqlite3.IntegrityError:
-                await ctx.send('Failed to add tag "{}", name already exists'.format(tag_name))
+                await ctx.send(f'Failed to add tag "{tag_name}", name already exists')
 
     @tag.command()
     async def alias(self, ctx, tag_name, *, tag_alias):
@@ -125,20 +136,23 @@ class TagsCog(commands.Cog):
         If the tag's name or alias is more than one word long, put it in quotes.
         For single-word names and aliases quotes will work but are not required.
         """
+        guild_id = ctx.guild.id
         if not tag_alias:
             await ctx.send('Tag alias cannot be empty')
             return
         with closing(sqlite3.connect(self.bot.db_name)) as con:
             with con:
-                result = con.execute('SELECT tag_name FROM Tags WHERE tag_name = ?;', (tag_alias,)).fetchone()
+                result = con.execute('SELECT tag_name FROM Tags WHERE tag_name = ? AND guild_id=?;',
+                                     (tag_alias, guild_id,)).fetchone()
                 if result:
                     await ctx.send(f"Failed to add alias \"{tag_alias}\", a tag with that name already exists")
                 else:
-                    result = con.execute('SELECT tag_name, ROWID FROM Tags WHERE tag_name = ?', (tag_name,)).fetchone()
+                    result = con.execute('SELECT tag_name, ROWID FROM Tags WHERE tag_name = ? AND guild_id=?',
+                                         (tag_name, guild_id,)).fetchone()
                     tag_id = result[1] if result else await ctx.send(f"Failed to add alias, tag \"{tag_name}\" not found")
                     try:
-                        con.execute('INSERT INTO Tag_Aliases(user_id, tag_id, alias) VALUES(?, ?, ?);',
-                                    (ctx.author.id, tag_id, tag_alias))
+                        con.execute('INSERT INTO Tag_Aliases(user_id, tag_id, alias, guild_id) VALUES(?, ?, ?, ?);',
+                                    (ctx.author.id, tag_id, tag_alias, guild_id))
                         await ctx.send(f"Successfully added alias \"{tag_alias}\" for tag \"{tag_name}\"")
                     except sqlite3.IntegrityError:
                         await ctx.send(f"Failed to add alias \"{tag_alias}\", name already exists")
@@ -151,22 +165,24 @@ class TagsCog(commands.Cog):
         $tag append "my tag name" This is the text I want to append
         The content will be added to the tag on a new line.
         """
+        guild_id = ctx.guild.id
         if appended_content == '':
             await ctx.send('Specify the text you want to append after the tag\'s name')
         else:
             with closing(sqlite3.connect(self.bot.db_name)) as con:
                 with con:
-                    result = con.execute('SELECT ROWID, user_id, tag_content FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
+                    result = con.execute('SELECT ROWID, user_id, tag_content FROM Tags WHERE tag_name=? AND guild_id=?',
+                                         (tag_name, guild_id,)).fetchone()
                     if result:
                         tag_id, owner_id, tag_content = result[0], result[1], result[2]
                         if owner_id == ctx.author.id or await check_admin_rights(ctx):
                             con.execute('UPDATE Tags SET tag_content=? WHERE ROWID=?;',
                                         (f"{tag_content}\n{appended_content}", tag_id,))
-                            await ctx.send('Successfully edited tag "{}"'.format(tag_name))
+                            await ctx.send(f'Successfully edited tag "{tag_name}"')
                         else:
-                            await ctx.send('You are not this tag\'s owner or admin, {}, stop ruckusing!'.format(ctx.author.name))
+                            await ctx.send(f'You are not this tag\'s owner or admin, {ctx.author.name}, stop ruckusing!')
                     else:
-                        await ctx.send('Tag "{}" not found'.format(tag_name))
+                        await ctx.send(f'Tag "{tag_name}" not found')
 
     @tag.command()
     async def edit(self, ctx, tag_name, *, new_content):
@@ -175,22 +191,24 @@ class TagsCog(commands.Cog):
         Usage exapmle:
         $tag edit "my tag name" This is the new tag text
         """
+        guild_id = ctx.guild.id
         if new_content == '':
             await ctx.send('Tag content cannot be empty')
         else:
             with closing(sqlite3.connect(self.bot.db_name)) as con:
                 with con:
-                    result = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
+                    result = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=? AND guild_id=?',
+                                         (tag_name, guild_id,)).fetchone()
                     if result:
                         tag_id, owner_id = result[0], result[1]
                         if owner_id == ctx.author.id or await check_admin_rights(ctx):
                             con.execute('UPDATE Tags SET tag_content=? WHERE ROWID=?;',
                                         (new_content, tag_id,))
-                            await ctx.send('Successfully edited tag "{}"'.format(tag_name))
+                            await ctx.send(f'Successfully edited tag "{tag_name}"')
                         else:
-                            await ctx.send('You are not this tag\'s owner or admin, {}, stop ruckusing!'.format(ctx.author.name))
+                            await ctx.send(f'You are not this tag\'s owner or admin, {ctx.author.name}, stop ruckusing!')
                     else:
-                        await ctx.send('Tag "{}" not found'.format(tag_name))
+                        await ctx.send(f'Tag "{tag_name}" not found')
 
     @tag.command(aliases=['remove'])
     async def delete(self, ctx, *, tag_name=''):
@@ -200,6 +218,7 @@ class TagsCog(commands.Cog):
         Usage example:
         $tag delete tagname
         """
+        guild_id = ctx.guild.id
         if tag_name == '':
             await ctx.send('Tag name required')
         else:
@@ -208,16 +227,18 @@ class TagsCog(commands.Cog):
                 tag_name = tag_name.strip('"')
             with closing(sqlite3.connect(self.bot.db_name)) as con:
                 with con:
-                    result = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=?', (tag_name,)).fetchone()
+                    result = con.execute('SELECT ROWID, user_id FROM Tags WHERE tag_name=? AND guild_id=?',
+                                         (tag_name, guild_id)).fetchone()
                     if result:
                         tag_id, owner_id = result[0], result[1]
                         if owner_id == ctx.author.id or await check_admin_rights(ctx):
-                            con.execute('DELETE FROM Tags WHERE ROWID=?;', (tag_id,))
-                            await ctx.send('Successfully deleted tag "{}"'.format(tag_name))
+                            con.execute('DELETE FROM Tags WHERE ROWID=?;',
+                                        (tag_id,))
+                            await ctx.send(f'Successfully deleted tag "{tag_name}"')
                         else:
-                            await ctx.send('You are not this tag\'s owner or admin, {}, stop ruckusing!'.format(ctx.author.name))
+                            await ctx.send(f'You are not this tag\'s owner or admin, {ctx.author.name}, stop ruckusing!')
                     else:
-                        await ctx.send('Tag "{}" not found'.format(tag_name))
+                        await ctx.send(f'Tag "{tag_name}" not found')
 
 
 def setup(bot):

@@ -45,6 +45,13 @@ def add_user_to_db_or_pass(con, username, user_id):
     con.execute('UPDATE OR IGNORE Users SET username=? WHERE user_id=?;', (username, user_id))
     con.execute('INSERT OR IGNORE INTO Users(username, user_id) VALUES(?, ?);', (username, user_id))
 
+def add_guild_to_db_or_pass(con, guild_id, prefix_list, locale='en'):
+    con.execute('INSERT OR IGNORE INTO Guilds(guild_id, prefix_list, locale) VALUES(?, ?, ?);',
+                (guild_id, prefix_list, locale))
+
+def delete_guild_from_db(con, guild_id):
+    con.execute('DELETE FROM Guilds WHERE guild_id=?;',
+                (guild_id,))
 
 def suggestion_exists_check(db_name, suggestion, suggestion_type, user_id=''):
     with closing(sqlite3.connect(db_name)) as con:
