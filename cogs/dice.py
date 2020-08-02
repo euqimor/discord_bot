@@ -19,6 +19,7 @@ TK_PAREN_LEFT = "PAREN_LEFT"
 TK_PAREN_RIGHT = "PAREN_RIGHT"
 TK_DICE = "DICE"
 
+
 # Rolls dice with a given number of sides and returns the sum
 def roll_dice(num_dice, num_sides):
     result = 0
@@ -26,17 +27,17 @@ def roll_dice(num_dice, num_sides):
         result += randint(1, num_sides)
     return result
 
+
 # The lexer will create tokens from substrings to feed to
 # the interpreter.
 class Token():
     def __init__(self, token_type, value):
         self.type = token_type
         self.value = value
+
     def __str__(self):
-        return "Token({token_type}, {value})".format(
-            token_type = self.type,
-            value = self.value
-        )
+        return f"Token({self.type}, {self.value})"
+
 
 class Lexer():
     def __init__(self, text):
@@ -103,7 +104,7 @@ class Lexer():
                 if token.type == TK_INT:
                     self.append_fancy_string(token.value)
                 elif token.type == TK_DICE:
-                    self.append_fancy_string("[{}]".format(token.value[2]))
+                    self.append_fancy_string(f"[{token.value[2]}]")
                 return token
             if self.current_character == "+":
                 self.append_fancy_string("+")
@@ -132,6 +133,7 @@ class Lexer():
             self.error()
         return Token(TK_EOF, None)
 
+
 # The interpreter relies on a lexer to convert a string into tokens, then evaluates 
 # those tokens to return a result. If the token list is ungrammatical, an exception will 
 # be thrown.
@@ -149,7 +151,7 @@ class Interpreter():
             #print(self.current_token)
             self.current_token = self.lexer.get_next_token()
         else:
-            print("ERROR: {}".format(self.current_token.type))
+            print(f"ERROR: {self.current_token.type}")
             self.error()
 
     def parse(self):
@@ -214,7 +216,7 @@ class DiceCog(commands.Cog):
         lexer = Lexer(roll_string)
         interpreter = Interpreter(lexer)
         result = interpreter.parse()
-        await context.send(":game_die: Rolling: {}\nResult: {}".format(lexer.fancy_string, result))
+        await context.send(f":game_die: Rolling: {lexer.fancy_string}\nResult: {result}")
 
     # This is just a test command to see if the cog is working.
     @commands.command()
@@ -234,9 +236,7 @@ class DiceCog(commands.Cog):
                 rolls.append(roll_dice(1, DICE_SIDES))
             rolls.remove(min(rolls))
             stat_rolls.append(sum(rolls))
-        await context.send(
-            ":game_die: Rolling stats!\nResult: {}, {}, {}, {}, {}, {}".format(*stat_rolls)
-        )
+        await context.send(f":game_die: Rolling stats!\nResult: {str(stat_rolls)[1:-1]}")
 
 
 def setup(bot):
