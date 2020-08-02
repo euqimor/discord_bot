@@ -58,10 +58,10 @@ def suggestion_exists_check(db_name, suggestion, suggestion_type, user_id=''):
         with con:
             if not user_id:
                 exists = con.execute('SELECT * FROM Suggestions \
-                                              WHERE suggestion LIKE ? AND suggestion_type=?;',
+                                      WHERE suggestion LIKE ? AND suggestion_type=?;',
                                      (suggestion, suggestion_type)).fetchall()
             else:
                 exists = con.execute('SELECT * FROM Suggestions \
-                                                                  WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
+                                      WHERE user_id=? AND suggestion LIKE ? AND suggestion_type=?;',
                                      (user_id, suggestion, suggestion_type)).fetchall()
     return bool(exists)

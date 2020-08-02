@@ -164,6 +164,13 @@ class OwnerCog(commands.Cog):
             await reaction_msg.delete()
             await ctx.message.delete()
 
+    @commands.command(hidden=True)
+    async def test(self, ctx):
+        num_emoji = {1:'1\u20e3', 2:'2\u20e3', 3:'3\u20e3', 4:'4\u20e3',
+                     5:'5\u20e3', 6:'6\u20e3', 7:'7\u20e3', 8:'8\u20e3', 9:'9\u20e3', 10:'\U0001f51f'}
+        message = await ctx.send(':one: afdasf\n\n:two: aggag\n\n:three: asfasfa\n\n:four: afasfa')
+        for key in num_emoji:
+            await message.add_reaction(num_emoji[key])
 
 def setup(bot):
     bot.add_cog(OwnerCog(bot))
