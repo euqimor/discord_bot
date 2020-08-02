@@ -115,7 +115,7 @@ class Lexer():
                 self.advance()
                 return Token(TK_MINUS, "-")
             if self.current_character == "*":
-                self.append_fancy_string("*")
+                self.append_fancy_string("\*")
                 self.advance()
                 return Token(TK_MULTIPLY, "*")
             if self.current_character == "/":
