@@ -11,7 +11,7 @@ class TagsCog(commands.Cog):
         self.bot = bot
 
     @commands.guild_only()
-    @commands.group(invoke_without_command=True, aliases=['tags'])
+    @commands.group(invoke_without_command=True, aliases=['tags', 'тэг', 'тег'])
     async def tag(self, ctx, *, tag_name=''):
         """
         Retrieves tag by name
@@ -54,7 +54,7 @@ class TagsCog(commands.Cog):
                     await ctx.send(f'Command or tag "{tag_name}" not found')
 
     @commands.guild_only()
-    @tag.command(aliases=['search', 'find'], name='list')
+    @tag.command(aliases=['search', 'find', 'поиск', 'найти'], name='list')
     async def _list(self, ctx, *, _filter=''):
         """
         Lists existing tags. By default shows only the tags of the user invoking the command.
@@ -99,7 +99,7 @@ class TagsCog(commands.Cog):
             await ctx.send('No tags found')
 
     @commands.guild_only()
-    @tag.command(aliases=['create'])
+    @tag.command(aliases=['create', 'добавить', 'создать'])
     async def add(self, ctx, tag_name, *, tag_content=''):
         """
         Add a tag
@@ -129,7 +129,7 @@ class TagsCog(commands.Cog):
                 await ctx.send(f'Failed to add tag "{tag_name}", name already exists')
 
     @commands.guild_only()
-    @tag.command()
+    @tag.command(aliases=['алиас', 'элиас'])
     async def alias(self, ctx, tag_name, *, tag_alias):
         """
         Add an alias for a tag, you don't need to be the tag's owner.
@@ -162,7 +162,7 @@ class TagsCog(commands.Cog):
                         await ctx.send(f"Failed to add alias \"{tag_alias}\", name already exists")
 
     @commands.guild_only()
-    @tag.command()
+    @tag.command(aliases=['дополнить'])
     async def append(self, ctx, tag_name, *, appended_content):
         """
         Append content to an existing tag. Available to tag owner or admin.
@@ -190,7 +190,7 @@ class TagsCog(commands.Cog):
                         await ctx.send(f'Tag "{tag_name}" not found')
 
     @commands.guild_only()
-    @tag.command()
+    @tag.command(aliases=['изменить', 'заменить'])
     async def edit(self, ctx, tag_name, *, new_content):
         """
         Fully replace the content of an existing tag. Available to tag owner or admin.
@@ -217,7 +217,7 @@ class TagsCog(commands.Cog):
                         await ctx.send(f'Tag "{tag_name}" not found')
 
     @commands.guild_only()
-    @tag.command(aliases=['remove'])
+    @tag.command(aliases=['remove', 'удалить'])
     async def delete(self, ctx, *, tag_name=''):
         """
         Delete a tag (admin or owner only)

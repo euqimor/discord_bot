@@ -76,7 +76,7 @@ class SillyCog(commands.Cog):
             pass
         await ctx.send(f'{line} {emoji}')
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, aliases=['кот', 'котик'])
     async def cat(self, ctx):
         """
         Cat.
@@ -99,7 +99,7 @@ class SillyCog(commands.Cog):
         # e.set_image(url=f"attachment://{filename}")
         await ctx.send(file=cat_file)
 
-    @cat.command()
+    @cat.command(aliases=['говорит'])
     async def says(self, ctx, *, phrase):
         async with aiohttp.ClientSession() as session:
             headers = {"x-api-key": self.bot.config["cat_token"], }
