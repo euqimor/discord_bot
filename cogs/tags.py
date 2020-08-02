@@ -10,6 +10,7 @@ class TagsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.guild_only()
     @commands.group(invoke_without_command=True, aliases=['tags'])
     async def tag(self, ctx, *, tag_name=''):
         """
@@ -52,6 +53,7 @@ class TagsCog(commands.Cog):
                 else:
                     await ctx.send(f'Command or tag "{tag_name}" not found')
 
+    @commands.guild_only()
     @tag.command(aliases=['search', 'find'], name='list')
     async def _list(self, ctx, *, _filter=''):
         """
@@ -96,6 +98,7 @@ class TagsCog(commands.Cog):
         else:
             await ctx.send('No tags found')
 
+    @commands.guild_only()
     @tag.command(aliases=['create'])
     async def add(self, ctx, tag_name, *, tag_content=''):
         """
@@ -125,6 +128,7 @@ class TagsCog(commands.Cog):
             except sqlite3.IntegrityError:
                 await ctx.send(f'Failed to add tag "{tag_name}", name already exists')
 
+    @commands.guild_only()
     @tag.command()
     async def alias(self, ctx, tag_name, *, tag_alias):
         """
@@ -157,6 +161,7 @@ class TagsCog(commands.Cog):
                     except sqlite3.IntegrityError:
                         await ctx.send(f"Failed to add alias \"{tag_alias}\", name already exists")
 
+    @commands.guild_only()
     @tag.command()
     async def append(self, ctx, tag_name, *, appended_content):
         """
@@ -184,6 +189,7 @@ class TagsCog(commands.Cog):
                     else:
                         await ctx.send(f'Tag "{tag_name}" not found')
 
+    @commands.guild_only()
     @tag.command()
     async def edit(self, ctx, tag_name, *, new_content):
         """
@@ -210,6 +216,7 @@ class TagsCog(commands.Cog):
                     else:
                         await ctx.send(f'Tag "{tag_name}" not found')
 
+    @commands.guild_only()
     @tag.command(aliases=['remove'])
     async def delete(self, ctx, *, tag_name=''):
         """
