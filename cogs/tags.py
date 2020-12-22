@@ -42,6 +42,14 @@ class TagsCog(commands.Cog):
                 tag_content = result[0]
                 await ctx.send(tag_content)
             else:
+                # fully ignore tag or command if it starts with a numeral
+                # this is to avoid spamming command errors when the server
+                # prefix is $ (or any currency symbol for that matter)
+                # for instance to ignore a message like `$800 GPU FTW!`
+                if tag_name[0].isnumeric():
+                    return
+
+                # if it wasn't the case, propose close matches or throw an error
                 with closing(sqlite3.connect(self.bot.db_name)) as con:
                     with con:
                         tags = [x[0] for x in con.execute('SELECT tag_name FROM Tags WHERE guild_id=?',
